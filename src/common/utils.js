@@ -1,4 +1,72 @@
 import Vue from 'vue'
+const inputype = ['button', 'checkbox', 'color', 'date',
+  'datetime', 'datetime-local', 'email', 'file', 'month',
+  'number', 'password', 'radio', 'reset', 'tel', 'text',
+  'time', 'week']
+
+function compress (object) {
+  for (const property in object) {
+    if (!hasProperty.call(object, property) || object[property] === undefined) {
+      delete object[property]
+    }
+  }
+  return object
+}
+
+/**
+ *
+ * @param {Object} object объект дескриптора, в котором мы ищем указанное
+ * ниже свойство propertyname
+ * @param {String} propertyname имя разыскиваемого в object свойства
+ * @param {Object} payload объект, от которого зависит результат вычисления свойства
+ * object[propertyname]
+ * @returns {any} undefined, если свойства propertyname в объекте object не содержится
+ * значение свойства object.propertyname (если это свойство) или результат выполнения функции
+ * object.propertyname(payload)
+ */
+function resolvePropertyValue (object, propertyname, payload) {
+  if (hasProperty.call(object, propertyname)) {
+    if (typeof object[propertyname] === 'function') return object[propertyname](payload)
+    return object[propertyname]
+  }
+  return undefined
+}
+
+function createInput (property, propertyholder, payload) {
+  if (hasProperty.call(property, 'input') && !inputype.includes(property.input)) {
+    console.warn(`[CDJS] Получено значение ${property.input}, ожидалось одно из ${inputype}`)
+  }
+  return compress({
+    type: (property.input || 'text'),
+    pattern: resolvePropertyValue(property, 'pattern', propertyholder),
+    name: property.datafield,
+    max: resolvePropertyValue(property, 'max', propertyholder),
+    min: resolvePropertyValue(property, 'min', propertyholder),
+    maxlength: resolvePropertyValue(property, 'maxlength', propertyholder),
+    minlength: resolvePropertyValue(property, 'minlength', propertyholder),
+    checked: resolvePropertyValue(property, 'checked', propertyholder),
+    placeholder: resolvePropertyValue(property, 'placeholder', propertyholder)
+  })
+}
+
+async function getOptions (select, propertyholder) {
+  setTimeout(() => { console.log('waiting...') }, 1000)
+  const optionpayload = resolvePropertyValue(select, 'params', propertyholder)
+  const result = await Vue.prototype.$http[select.method](select.url, optionpayload)
+  console.log(result)
+  return result
+}
+
+function createSelect (property, propertyholder, payload) {
+  if (property.select) {
+    return compress({
+      valuekey: property.valuekey,
+      labelkey: property.labelkey,
+      options: async () => await getOptions(property.select, propertyholder)
+    })
+  }
+  return undefined
+}
 
 const hasProperty = Object.prototype.hasOwnProperty
 
@@ -50,15 +118,15 @@ const flatterer = function (arr, accum) {
 
 const propertyconfig = function (property, propertyholder, payload = {}) {
   const ph = propertyholder
-  // const pl = payload;
   const p = property
-  return {
-    input: true,
+  return compress({
+    input: createInput(property, propertyholder, payload),
+    select: createSelect(property, propertyholder, payload),
     datafield: property.datafield,
     text: property.text,
-    readonly: ispropertyeditable(property, payload, propertyholder),
+    readonly: false,
     value: () => ph[p.datafield]
-  }
+  })
 }
 
 /**

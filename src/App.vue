@@ -20,6 +20,7 @@
         :total="metadata.totalCount"
         :page="metadata.currentOffset"
         :pageSize="payload.limit"></cd-grid>
+      <cd-form :descriptor="form" :payload="formpayload"></cd-form>
     </div>
   </div>
 </template>
@@ -29,6 +30,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import CDMenu from './components/cd-menu.vue'
 import CdGrid from './components/cd-grid.vue'
+import CDForm from './components/cd-form.vue'
 
 axios.defaults.baseURL = 'wft-geo-db.p.rapidapi.com'
 axios.defaults.headers.common['x-rapidapi-host'] = 'wft-geo-db.p.rapidapi.com'
@@ -40,13 +42,17 @@ export default {
   name: 'App',
   components: {
     'cd-menu': CDMenu,
-    'cd-grid': CdGrid
+    'cd-grid': CdGrid,
+    'cd-form': CDForm
   },
   data (app) {
     return {
       metadata: {
         currentOffset: 0,
         totalCount: 0
+      },
+      formpayload: {
+        namePrefix: ''
       },
       crud: {
         get: { url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities', method: 'get' }
@@ -91,6 +97,22 @@ export default {
         {
           datafield: 'longitude',
           text: 'Lon'
+        }
+      ],
+      form: [
+        {
+          select: {
+            valuekey: 'wikiDataId',
+            labelkey: 'name',
+            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+            method: 'get',
+            params: (payload) => ({
+              limit: 10,
+              namePrefix: payload.name
+            })
+          },
+          datafield: 'wikiDataId',
+          text: 'Country'
         }
       ],
       menu: [
