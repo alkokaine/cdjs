@@ -6,7 +6,7 @@
           :required="config.required">
           <option v-for="(option) in config.select.options()" :key="option[config.select.valuekey]"
             :disabled="config.select.isdisabled(option)" :label="option[config.select.labelkey]"
-            :value="option[config.select.valuekey]"/>
+            :value="option[config.select.valuekey]"></option>
         </select>
       </template>
       <template v-else-if="config.input">
@@ -32,9 +32,9 @@ export default {
       return this.config.value()
     }
   },
-  data () {
+  data (cell) {
     return {
-
+      options: cell.config.options ? cell.config.options() : null
     }
   }
 }

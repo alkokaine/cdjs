@@ -11,7 +11,7 @@
       </div>
     </cd-menu>
     <div class="content-wrapper" :class="{ 'is-collapsed': iscollapsed}">
-      <cd-grid :descriptor="descriptor"
+      <!-- <cd-grid :descriptor="descriptor"
         :crud="crud"
         keyfield="id"
         :payload="payload"
@@ -19,7 +19,7 @@
         :resolvedata="getcitydata"
         :total="metadata.totalCount"
         :page="metadata.currentOffset"
-        :pageSize="payload.limit"></cd-grid>
+        :pageSize="payload.limit"></cd-grid> -->
       <cd-form :descriptor="form" :payload="formpayload"></cd-form>
     </div>
   </div>
@@ -29,7 +29,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import CDMenu from './components/cd-menu.vue'
-import CdGrid from './components/cd-grid.vue'
+// import CdGrid from './components/cd-grid.vue'
 import CDForm from './components/cd-form.vue'
 
 axios.defaults.baseURL = 'wft-geo-db.p.rapidapi.com'
@@ -42,7 +42,7 @@ export default {
   name: 'App',
   components: {
     'cd-menu': CDMenu,
-    'cd-grid': CdGrid,
+    // 'cd-grid': CdGrid,
     'cd-form': CDForm
   },
   data (app) {
@@ -106,6 +106,7 @@ export default {
             labelkey: 'name',
             url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
             method: 'get',
+            resolveresult: (response) => (response.data.data),
             params: (payload) => ({
               limit: 10,
               namePrefix: payload.name

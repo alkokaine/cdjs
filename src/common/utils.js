@@ -50,11 +50,15 @@ function createInput (property, propertyholder, payload) {
 }
 
 async function getOptions (select, propertyholder) {
-  setTimeout(() => { console.log('waiting...') }, 1000)
-  const optionpayload = resolvePropertyValue(select, 'params', propertyholder)
-  const result = await Vue.prototype.$http[select.method](select.url, optionpayload)
-  console.log(result)
-  return result
+  setTimeout(async () => {
+    console.log('waiting...')
+    const optionpayload = resolvePropertyValue(select, 'params', propertyholder)
+    const result = await Vue.prototype.$http[select.method](select.url, optionpayload)
+    if (hasProperty.call(select, 'resolve') && typeof select.resolve === 'function') {
+      return select.resolve(result)
+    }
+    return result
+  }, 1000)
 }
 
 function createSelect (property, propertyholder, payload) {
