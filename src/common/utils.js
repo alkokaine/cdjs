@@ -65,16 +65,17 @@ function createInput (property, propertyholder, payload) {
 function createSelect (property, propertyholder, payload) {
   if (property) {
     return compress({
-      valuekey: property.valuekey,
-      labelkey: property.labelkey,
-      payload: () => property.params(propertyholder),
-      crud: {
+      valuekey: property.valuekey, // свойство ключа коллекции опций
+      labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
+      payload: () => property.params(propertyholder), // параметры получения данных
+      crud: { // объект, нужный для миксина коллекций
         get: {
-          url: property.url,
-          method: property.method
+          url: property.url, // урл получения данных
+          method: property.method // метод
         }
       },
-      resolveresult: property.resolveresult
+      resolveresult: property.resolveresult // функция, возвращающая итоговые данные
+      // для списка опций селекта
     })
   }
   return undefined
