@@ -10,7 +10,9 @@
                 :descriptor="property.descriptor">
                 <legend v-if="haslegend(property)">{{ property.text }}</legend>
             </cd-fieldset>
-            <cd-cell v-else :config="propertyconfig(property)" :showlabel="true"></cd-cell>
+            <cd-cell v-else :config="propertyconfig(property)">
+              <label class="cd-label" :for="property.datafield" slot="label">{{ property.text }}</label>
+            </cd-cell>
         </div>
     </fieldset>
 </template>
@@ -51,6 +53,13 @@ export default {
     }
     fieldset {
       border: solid 1px #444f5a;
-      margin: 5px;
+      margin-top: unset;
+    }
+    .cd-label {
+      font-weight: bold;
+    }
+    .cd-label::after {
+      content: ":";
+      margin-right: 5px;
     }
 </style>
