@@ -49,24 +49,32 @@ function createInput (property, propertyholder, payload) {
   })
 }
 
-async function getOptions (select, propertyholder) {
-  setTimeout(async () => {
-    console.log('waiting...')
-    const optionpayload = resolvePropertyValue(select, 'params', propertyholder)
-    const result = await Vue.prototype.$http[select.method](select.url, optionpayload)
-    if (hasProperty.call(select, 'resolve') && typeof select.resolve === 'function') {
-      return select.resolve(result)
-    }
-    return result
-  }, 1000)
-}
-
+/**
+ * функция, возвращающая настройки элемента
+ * формы select с опциями, которые достаются по url
+ * @param {*} property свойство, для которого мы получаем
+ * настройки для элемента формы
+ * @param {*} propertyholder объект, свойство property которого
+ * мы рассматриваем
+ * @param {*} payload какой-то объект, от которого может зависеть
+ * функциональность элемента формы select для рассматриваемого
+ * свойства property
+ * @returns объект, содержащий необходымые для рендеринга
+ * элемента формы select
+ */
 function createSelect (property, propertyholder, payload) {
-  if (property.select) {
+  if (property) {
     return compress({
       valuekey: property.valuekey,
       labelkey: property.labelkey,
-      options: async () => await getOptions(property.select, propertyholder)
+      payload: () => property.params(propertyholder),
+      crud: {
+        get: {
+          url: property.url,
+          method: property.method
+        }
+      },
+      resolveresult: property.resolveresult
     })
   }
   return undefined
@@ -125,7 +133,7 @@ const propertyconfig = function (property, propertyholder, payload = {}) {
   const p = property
   return compress({
     input: createInput(property, propertyholder, payload),
-    select: createSelect(property, propertyholder, payload),
+    select: createSelect(property.select, propertyholder, payload),
     datafield: property.datafield,
     text: property.text,
     readonly: false,
