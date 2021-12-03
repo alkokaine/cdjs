@@ -3,6 +3,9 @@
       <select>
         <option v-for="(option) in list" :key="option[keyfield]" :value="option[keyfield]" :label="option[labelkey]" :disabled="isdisabled(option)"/>
       </select>
+      <template v-if="error">
+        <span v-on:click="loaddata(payload)">{{ error }}</span>
+      </template>
   </div>
 </template>
 
