@@ -4,6 +4,13 @@ const inputype = ['button', 'checkbox', 'color', 'date',
   'number', 'password', 'radio', 'reset', 'tel', 'text',
   'time', 'week']
 
+/**
+ * функция, удаляющая все свойства объекта object,
+ * которые имеют значение undefined
+ * @param {Object} object объект, за чистоту которого
+ * мы здесь боремся
+ * @returns чистый объект
+ */
 function compress (object) {
   for (const property in object) {
     if (!hasProperty.call(object, property) || object[property] === undefined) {
@@ -20,19 +27,35 @@ function compress (object) {
  * @param {String} propertyname имя разыскиваемого в object свойства
  * @param {Object} payload объект, от которого зависит результат вычисления свойства
  * object[propertyname]
+ * @param {Object} another ещё один объект, от которого зависит результат вычисления свойства
+ * object[propertyname]
  * @returns {any} undefined, если свойства propertyname в объекте object не содержится
  * значение свойства object.propertyname (если это свойство) или результат выполнения функции
  * object.propertyname(payload)
  */
-function resolvePropertyValue (object, propertyname, payload) {
+function resolvePropertyValue (object, propertyname, payload, another = undefined) {
   if (hasProperty.call(object, propertyname)) {
-    if (typeof object[propertyname] === 'function') return object[propertyname](payload)
+    if (typeof object[propertyname] === 'function') return object[propertyname](payload, another)
     return object[propertyname]
   }
   return undefined
 }
-
+/**
+ * функция, возвращающая настройки поля <input>
+ * для свойства property с именем property.datafield
+ * объекта propertyholder,
+ * @param {Object} property дескриптор свойства property.datafield
+ * объекта propertyholder
+ * @param {Object} propertyholder объект, для свойства property.datafield
+ * мы получаем настройки элемента input
+ * @param {Object} payload какой-нибудь внешний объект, от которого может
+ * зависеть поведение элемента input
+ * @returns {Object} настройки элемента <input>
+ */
 function createInput (property, propertyholder, payload) {
+  // если дескриптор property содержит свойство input и его значение
+  // не содержится в массиве inputype
+  // предупредим в консоли
   if (hasProperty.call(property, 'input') && !inputype.includes(property.input)) {
     console.warn(`[CDJS] Получено значение ${property.input}, ожидалось одно из ${inputype}`)
   }
@@ -45,7 +68,8 @@ function createInput (property, propertyholder, payload) {
     maxlength: resolvePropertyValue(property, 'maxlength', propertyholder),
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
     checked: resolvePropertyValue(property, 'checked', propertyholder),
-    placeholder: resolvePropertyValue(property, 'placeholder', propertyholder)
+    placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
+    ondebounce: (...args) => { console.log(args) }
   })
 }
 
@@ -74,8 +98,9 @@ function createSelect (property, propertyholder, payload) {
           method: property.method // метод
         }
       },
-      resolveresult: property.resolveresult // функция, возвращающая итоговые данные
+      resolveresult: property.resolveresult, // функция, возвращающая итоговые данные
       // для списка опций селекта
+      isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', payload, option)
     })
   }
   return undefined
@@ -129,16 +154,49 @@ const flatterer = function (arr, accum) {
   }, accum)
 }
 
+function oninput (event, property, propertyholder) {
+  if (property.oninput) {
+    if (typeof property.oninput === 'function') {
+      property.oninput(event, propertyholder)
+    }
+  }
+}
+
+/**
+ * собственно ради чего всё задумывалось
+ * функция, возвращающая настройки клетки таблицы или поля на форме
+ * по объекту property (дескриптору свойства property.datafield
+ * объекта propertyholder)
+ * сюда бы хорошо передать компонент, который выполняет эту функцию,
+ * завести у него свойство типа хранилища и, при получении данных из API,
+ * иметь возможность запихнуть туда полученный датасет, таким образом мы сможем,
+ * гхм, регулировать посылаемые к API запросы, забирая из хранилища уже готовые
+ * данные
+ * впрочем, он может быть и в this
+ * @param {Object} property дескриптор свойства property.datafield
+ * объекта propertyholder
+ * @param {Object} propertyholder объект, свойство property.datafield
+ * которого мы хотим показать
+ * @param {Object} payload какой-нибудь внешний объект, от значений которого
+ * может зависеть настройки, возвращаемые этой фукнцией
+ * @returns {Object} настройки ячейки таблицы или поля на форме
+ */
 const propertyconfig = function (property, propertyholder, payload = {}) {
+  const whois = this
   const ph = propertyholder
   const p = property
+  console.log(whois)
   return compress({
     input: createInput(property, propertyholder, payload),
     select: createSelect(property.select, propertyholder, payload),
     datafield: property.datafield,
     text: property.text,
     readonly: false,
-    value: () => ph[p.datafield]
+    value: ph[p.datafield],
+    oninput: (event) => oninput(event, property, propertyholder),
+    propertychange: ({ newvalue, oldvalue }) => {
+      Vue.set(propertyholder, property.datafield, newvalue)
+    }
   })
 }
 
