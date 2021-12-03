@@ -16,8 +16,8 @@
       </template>
       <template v-else-if="config.input">
         <input v-model="value" v-debounce:1.5s.cancelonempty="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="config.readonly"
-          :value="value" :required="config.required" :pattern="config.input.pattern"
-          :class="{'is-readonly': config.readonly}" :placeholder="config.input.placeholder"
+          :required="config.required" :pattern="config.input.pattern"
+          :class="{'is-readonly': config.readonly, 'form-control form-control-sm': !config.readonly}" :placeholder="config.input.placeholder"
           :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
           :maxlength="config.input.maxlength"
           :checked="config.input.checked"
@@ -60,5 +60,8 @@ export default {
   input.is-readonly {
     border-style: none;
     cursor: default;
+  }
+  .form-control:focus{
+    box-shadow: 0 0 0 0.05rem rgb(13 110 253 / 25%)!important;
   }
 </style>

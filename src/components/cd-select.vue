@@ -1,10 +1,8 @@
 <template>
-  <div class="cd-select">
-      <select v-model="selectvalue" v-on:input="oninput">
-        <option v-if="error" :value="-1" :label="error"/>
-        <option v-for="(option) in list" :key="option[keyfield]" :value="option[keyfield]" :label="option[labelkey]" :disabled="isdisabled(option)"/>
-      </select>
-  </div>
+  <select v-model="selectvalue" class="cd-select form-control form-control-sm" v-on:input="oninput">
+    <option v-if="error" :value="-1" :label="error"/>
+    <option v-for="(option) in list" :key="option[keyfield]" :value="option[keyfield]" :label="option[labelkey]" :disabled="isdisabled(option)"/>
+  </select>
 </template>
 
 <script>
