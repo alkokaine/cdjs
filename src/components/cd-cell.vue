@@ -61,7 +61,4 @@ export default {
     border-style: none;
     cursor: default;
   }
-  .cd-cell>input {
-    vertical-align: middle;
-  }
 </style>
