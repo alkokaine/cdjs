@@ -181,7 +181,7 @@ function oninput (event, property, propertyholder) {
  * может зависеть настройки, возвращаемые этой фукнцией
  * @returns {Object} настройки ячейки таблицы или поля на форме
  */
-const propertyconfig = function (property, propertyholder, payload = {}) {
+const propertyconfig = function (property, propertyholder, isreadonly, payload = {}) {
   const ph = propertyholder
   const p = property
   return compress({
@@ -189,7 +189,7 @@ const propertyconfig = function (property, propertyholder, payload = {}) {
     select: createSelect(property.select, propertyholder, payload),
     datafield: property.datafield,
     text: property.text,
-    readonly: false,
+    readonly: !isreadonly,
     value: ph[p.datafield],
     oninput: (event) => oninput(event, property, propertyholder),
     propertychange: ({ newvalue, oldvalue }) => {
