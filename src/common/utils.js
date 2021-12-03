@@ -182,10 +182,8 @@ function oninput (event, property, propertyholder) {
  * @returns {Object} настройки ячейки таблицы или поля на форме
  */
 const propertyconfig = function (property, propertyholder, payload = {}) {
-  const whois = this
   const ph = propertyholder
   const p = property
-  console.log(whois)
   return compress({
     input: createInput(property, propertyholder, payload),
     select: createSelect(property.select, propertyholder, payload),
