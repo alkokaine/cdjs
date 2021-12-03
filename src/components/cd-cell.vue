@@ -2,48 +2,55 @@
   <div class="cd-cell">
       <slot name="label"></slot>
       <template v-if="config.select">
-        <cd-select :payload="config.select.payload()" :keyfield="config.select.valuekey" :labelkey="config.select.labelkey" :crud="config.select.crud" :resolvedata="config.select.resolveresult"></cd-select>
-        <!-- <select class="form-select form-select-sm" :multiple="config.select.multiple" :name="config.datafield"
-          :required="config.required">
-          <option v-for="(option) in config.select.options()" :key="option[config.select.valuekey]"
-            :disabled="config.select.isdisabled(option)" :label="option[config.select.labelkey]"
-            :value="option[config.select.valuekey]"></option>
-        </select>-->
+        <cd-select :payload="config.select.payload()"
+          :keyfield="config.select.valuekey"
+          :labelkey="config.select.labelkey"
+          :crud="config.select.crud"
+          :value="value"
+          :resolvedata="config.select.resolveresult"
+          :isdisabled="config.select.isdisabled">
+        </cd-select>
       </template>
       <template v-else-if="config.textarea">
         <textarea :id="config.datafield"/>
       </template>
       <template v-else-if="config.input">
-        <input :type="config.input.type" :name="config.datafield" :readonly="config.readonly"
+        <input v-model="value" v-debounce:1.5s.cancelonempty="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="config.readonly"
           :value="value" :required="config.required" :pattern="config.input.pattern"
           :class="{'is-readonly': config.readonly}" :placeholder="config.input.placeholder"
           :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
           :maxlength="config.input.maxlength"
-          :checked="config.input.checked"/>
+          :checked="config.input.checked"
+          v-on:input="config.oninput"/>
       </template>
   </div>
 </template>
 
 <script>
+import { getDirective } from 'vue-debounce'
 import CDSelect from './cd-select.vue'
 
 export default {
   name: 'cd-cell',
+  directives: {
+    debounce: getDirective()
+  },
   components: {
     'cd-select': CDSelect
   },
   props: {
-    config: { type: Object, required: true },
-    showlabel: { type: Boolean, default: false }
-  },
-  computed: {
-    value () {
-      return this.config.value()
-    }
+    config: { type: Object, required: true }
   },
   data (cell) {
     return {
-      options: cell.config.options ? cell.config.options() : null
+      value: cell.config.value
+    }
+  },
+  watch: {
+    value: {
+      handler (nvalue, ovalue) {
+        this.config.propertychange({ newvalue: nvalue, oldvalue: ovalue })
+      }
     }
   }
 }
