@@ -70,18 +70,7 @@ export default {
         const local = this
 
         if ((newvalue && typeof newvalue !== 'function') && (local.$http)) {
-          const localcrud = local.urls
-          if (localcrud && localcrud.get) {
-            const request = Object.prototype.hasOwnProperty.call(localcrud.get, 'method')
-              ? { url: localcrud.get.url, exec: local.$http[localcrud.get.method] }
-              : { url: localcrud.get, exec: local.$http.post }
-            request.exec(request.url, { params: newvalue })
-              .then((response) => {
-                local.list = local.resolvedata(response)
-              }).catch((reason) => {
-                console.error(reason)
-              })
-          }
+          local.loaddata(newvalue)
         }
       }
     }
@@ -101,10 +90,27 @@ export default {
   },
   data (col) {
     return {
-      list: col.collection
+      list: col.collection,
+      error: Object
     }
   },
   methods: {
+    loaddata (payload) {
+      const local = this
+      const localcrud = local.urls
+      if (localcrud && localcrud.get) {
+        const request = Object.prototype.hasOwnProperty.call(localcrud.get, 'method')
+          ? { url: localcrud.get.url, exec: local.$http[localcrud.get.method] }
+          : { url: localcrud.get, exec: local.$http.post }
+        request.exec(request.url, { params: payload })
+          .then((response) => {
+            local.list = local.resolvedata(response)
+            local.error = false
+          }).catch((reason) => {
+            local.error = reason
+          })
+      }
+    },
     delete (row) {
       console.log('Deleting ', this.urls.remove, row)
     },
