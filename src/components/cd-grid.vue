@@ -46,8 +46,8 @@
             <th v-if="showmethods && index === 0" :rowspan="header.length"></th>
           </tr>
         </thead>
-        <template v-if="hasdata">
-          <tbody class="cd-grid--table-content">
+        <tbody class="cd-grid--table-content">
+          <template v-if="hasdata">
             <!-- проходим в цикле по list -->
             <tr class="cd-grid--row" v-for="(row, rindex) in list" :key="rowkey(row)">
               <!-- можно выбирать строки? -->
@@ -72,15 +72,18 @@
                       :payload="row"/>
               </td>
             </tr>
-          </tbody>
+          </template>
+          <template v-else>
+            <tr class="cd-grid--no-data">
+              <td class="cd-grid--no-data" :colspan="columns.length">
+                <slot name="no-data">
+                  <div>Нет данных</div>
+                  <div class="no-data--reload" v-if="error" v-on:click="loaddata(payload)">{{ error }}</div>
+                </slot>
+              </td>
+            </tr>
         </template>
-        <template v-else>
-          <div class="cd-grid--no-data">
-            <slot name="no-data">
-              <span>Нет данных</span>
-            </slot>
-          </div>
-        </template>
+        </tbody>
       </table>
     </div>
     <div class="cd-grid--footer">
@@ -120,7 +123,8 @@ export default {
   },
   data (grid) {
     return {
-      header: utils.headerrows(grid.descriptor, grid.payload)
+      header: utils.headerrows(grid.descriptor, grid.payload),
+      currentrow: {}
     }
   },
   computed: {
@@ -128,13 +132,16 @@ export default {
       return utils.flatterer(this.descriptor, []).filter((p) => utils.ispropertyvisible(p, this.payload, {}))
     },
     propertyconfig: function () {
-      return (property, row) => utils.propertyconfig.call(this, property, row, this.payload)
+      return (property, row) => utils.propertyconfig.call(this, property, row, this.iscurrentrow(row), this.payload)
     }
   },
   name: 'cd-grid',
   methods: {
     onpagechange (event, scope) {
       Vue.set(this.payload, 'offset', scope.row.offset)
+    },
+    iscurrentrow (row) {
+      return row[this.keyfield] === this.currentrow[this.keyfield] && this.currentrow[this.keyfield] !== undefined
     }
   }
 }
@@ -146,13 +153,23 @@ export default {
     display: table-cell;
     padding: 5px;
   }
+  .no-data--reload {
+    cursor: pointer;
+    width: 300px;
+  }
   .cd-grid {
     margin: auto;
   }
   .cd-grid--table {
     margin: auto;
   }
+  td.cd-grid--no-data {
+    text-align: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
   /* table {
     width: unset!important;
   } */
+
 </style>
