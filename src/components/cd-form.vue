@@ -41,7 +41,7 @@ export default {
       return (property) => utils.ispropertyeditable(property, null, this.formpayload)
     },
     propertyconfig () {
-      return (property) => utils.propertyconfig(property, this.formpayload, undefined)
+      return (property) => utils.propertyconfig.call(this, property, this.formpayload, undefined)
     }
   },
   data: function (form) {

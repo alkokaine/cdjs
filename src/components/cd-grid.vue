@@ -128,7 +128,7 @@ export default {
       return utils.flatterer(this.descriptor, []).filter((p) => utils.ispropertyvisible(p, this.payload, {}))
     },
     propertyconfig: function () {
-      return (property, row) => utils.propertyconfig(property, row, this.payload)
+      return (property, row) => utils.propertyconfig.call(this, property, row, this.payload)
     }
   },
   name: 'cd-grid',
