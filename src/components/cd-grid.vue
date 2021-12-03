@@ -14,39 +14,39 @@
       <slot name="cd-grid-buttons"></slot>
     </div>
     <div class="cd-grid--content">
-      <template v-if="hasdata">
-        <table class="table cd-grid--table">
-          <caption>
-            <slot name="table-caption"></slot>
-          </caption>
-          <thead v-if="!hideheader" class="cd-grid--header">
-            <tr v-for="(row, index) in header" :key="index" class="cd-grid--header-row">
-              <!-- если можно выбирать строки нарисуем колонку с чекбоксом -->
-              <!-- который показывается если index === 0, а rowspan берётся как кол-во строк в header -->
-              <th v-if="selectrows && index === 0"
-                class="cd-grid--header-cell cd-checkbox--cell"
-                :rowspan="header.length">
-                <!-- checked когда всё выбрано, по change выполняем onselectchange -->
-                <input class="cd-checkbox"
-                  type="checkbox"
-                  @change="onrowselect($event)"
-                  :checked="allselected"
-                />
-              </th>
-              <!-- теперь заголовки столбцов -->
-              <!-- проходим в цикле по cols -->
-              <!-- ставим colspan и rowspan из свойств col -->
-              <th class="cd-grid--header-cell"
-                v-for="(col, jindex) in row.cols"
-                :key="jindex" :colspan="col.span" :rowspan="col.rowspan" :class="col.headerclass">
-                  <div class="cd-grid--header-cell_content">
-                    <span>{{ col.text }}</span>
-                  </div>
-              </th>
-              <!-- показывать методы? index === 0? рисуем клетку с rowspan -->
-              <th v-if="showmethods && index === 0" :rowspan="header.length"></th>
-            </tr>
-          </thead>
+      <table class="table cd-grid--table">
+        <caption>
+          <slot name="table-caption"></slot>
+        </caption>
+        <thead v-if="!hideheader" class="cd-grid--header">
+          <tr v-for="(row, index) in header" :key="index" class="cd-grid--header-row">
+            <!-- если можно выбирать строки нарисуем колонку с чекбоксом -->
+            <!-- который показывается если index === 0, а rowspan берётся как кол-во строк в header -->
+            <th v-if="selectrows && index === 0"
+              class="cd-grid--header-cell cd-checkbox--cell"
+              :rowspan="header.length">
+              <!-- checked когда всё выбрано, по change выполняем onselectchange -->
+              <input class="cd-checkbox"
+                type="checkbox"
+                @change="onrowselect($event)"
+                :checked="allselected"
+              />
+            </th>
+            <!-- теперь заголовки столбцов -->
+            <!-- проходим в цикле по cols -->
+            <!-- ставим colspan и rowspan из свойств col -->
+            <th class="cd-grid--header-cell"
+              v-for="(col, jindex) in row.cols"
+              :key="jindex" :colspan="col.span" :rowspan="col.rowspan" :class="col.headerclass">
+                <div class="cd-grid--header-cell_content">
+                  <span>{{ col.text }}</span>
+                </div>
+            </th>
+            <!-- показывать методы? index === 0? рисуем клетку с rowspan -->
+            <th v-if="showmethods && index === 0" :rowspan="header.length"></th>
+          </tr>
+        </thead>
+        <template v-if="hasdata">
           <tbody class="cd-grid--table-content">
             <!-- проходим в цикле по list -->
             <tr class="cd-grid--row" v-for="(row, rindex) in list" :key="rowkey(row)">
@@ -73,15 +73,15 @@
               </td>
             </tr>
           </tbody>
-        </table>
-      </template>
-      <template v-else>
-        <div class="cd-grid--no-data">
-          <slot name="no-data">
-            Нет данных
-          </slot>
-        </div>
-      </template>
+        </template>
+        <template v-else>
+          <div class="cd-grid--no-data">
+            <slot name="no-data">
+              <span>Нет данных</span>
+            </slot>
+          </div>
+        </template>
+      </table>
     </div>
     <div class="cd-grid--footer">
       <template v-if="paging && total">
@@ -152,7 +152,7 @@ export default {
   .cd-grid--table {
     margin: auto;
   }
-  table {
+  /* table {
     width: unset!important;
-  }
+  } */
 </style>
