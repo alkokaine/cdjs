@@ -11,16 +11,7 @@
       </div>
     </cd-menu>
     <div class="content-wrapper" :class="{ 'is-collapsed': iscollapsed}">
-      <cd-grid :descriptor="descriptor"
-        :crud="crud"
-        keyfield="id"
-        :payload="payload"
-        :paging="true"
-        :resolvedata="getcitydata"
-        :total="metadata.totalCount"
-        :page="metadata.currentOffset"
-        :pageSize="payload.limit"></cd-grid>
-      <cd-form :descriptor="form" :payload="formpayload"></cd-form>
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -29,8 +20,6 @@
 import Vue from 'vue'
 import axios from 'axios'
 import CDMenu from './components/cd-menu.vue'
-import CDGrid from './components/cd-grid.vue'
-import CDForm from './components/cd-form.vue'
 
 axios.defaults.baseURL = 'wft-geo-db.p.rapidapi.com'
 axios.defaults.headers.common['x-rapidapi-host'] = 'wft-geo-db.p.rapidapi.com'
@@ -41,9 +30,7 @@ Vue.prototype.$http = axios
 export default {
   name: 'App',
   components: {
-    'cd-menu': CDMenu,
-    'cd-grid': CDGrid,
-    'cd-form': CDForm
+    'cd-menu': CDMenu
   },
   data (app) {
     return {
@@ -128,35 +115,7 @@ export default {
           id: 3,
           icon: 'bi bi-table',
           text: 'Таблица',
-          menu: [
-            {
-              id: 5,
-              text: 'Table1',
-              menu: [
-                { id: 8, text: 'Table1-Point1' },
-                { id: 9, text: 'Table1-Point2' },
-                { id: 10, text: 'Table1-Point3' }
-              ]
-            },
-            { id: 6, text: 'Table2' },
-            {
-              id: 7,
-              text: 'Table3',
-              menu: [
-                { id: 11, text: 'Table3-Point1' },
-                {
-                  id: 12,
-                  text: 'Table3-Point2',
-                  menu: [
-                    { id: 14, text: 'Table3-Point2-Point1' },
-                    { id: 15, text: 'Table3-Point2-Point2' },
-                    { id: 16, text: 'Table3-Point2-Point3' }
-                  ]
-                },
-                { id: 13, text: 'Table2-Point3' }
-              ]
-            }
-          ]
+          url: '/Grid'
         },
         { id: 4, icon: 'bi bi-input-cursor-text', text: 'Форма' }
       ],
@@ -174,7 +133,7 @@ export default {
       return data.data
     },
     menuitemclick (event, scope) {
-      if (scope.row.url) console.log(scope)
+      if (scope.row.url) this.$router.push(scope.row.url)
     }
   }
 }
