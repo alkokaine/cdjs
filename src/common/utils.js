@@ -87,20 +87,23 @@ function createInput (property, propertyholder, payload) {
  * элемента формы select
  */
 function createSelect (property, propertyholder, payload) {
-  if (property) {
+  const select = property.select
+  if (select) {
     return compress({
-      valuekey: property.valuekey, // свойство ключа коллекции опций
-      labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
-      payload: () => property.params(propertyholder), // параметры получения данных
+      valuekey: select.valuekey, // свойство ключа коллекции опций
+      labelkey: select.labelkey, // свойство опции, которое мы видим в дропдауне
+      payload: () => select.params(propertyholder), // параметры получения данных
       crud: { // объект, нужный для миксина коллекций
         get: {
-          url: property.url, // урл получения данных
-          method: property.method // метод
+          url: select.url, // урл получения данных
+          method: select.method // метод
         }
       },
-      resolveresult: property.resolveresult, // функция, возвращающая итоговые данные
+      resolveresult: select.resolveresult, // функция, возвращающая итоговые данные
       // для списка опций селекта
+      // определяем, задизаблена ли опция
       isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', payload, option)
+      // выполняем onselect
     })
   }
   return undefined
@@ -186,7 +189,7 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
   const p = property
   return compress({
     input: createInput(property, propertyholder, payload),
-    select: createSelect(property.select, propertyholder, payload),
+    select: createSelect(property, propertyholder, payload),
     datafield: property.datafield,
     text: property.text,
     readonly: !isreadonly,

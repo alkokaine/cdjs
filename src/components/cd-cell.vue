@@ -8,7 +8,8 @@
           :crud="config.select.crud"
           :value="value"
           :resolvedata="config.select.resolveresult"
-          :isdisabled="config.select.isdisabled">
+          :isdisabled="config.select.isdisabled"
+          :onselect="config.select.onselect">
         </cd-select>
       </template>
       <template v-else-if="config.textarea">
@@ -52,6 +53,8 @@ export default {
         this.config.propertychange({ newvalue: nvalue, oldvalue: ovalue })
       }
     }
+  },
+  methods: {
   }
 }
 </script>
