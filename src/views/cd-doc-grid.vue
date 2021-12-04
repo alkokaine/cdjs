@@ -1,31 +1,46 @@
 <template>
-  <cd-list :collection="doc" keyfield="id">
-    <div class="cd-grid--main" slot="header">
-      <span class="h3">cd-grid</span>
-    </div>
-    <div class="cd-grid--part" slot-scope="info">
-      {{ info }}
-    </div>
-  </cd-list>
+  <cd-doc :content="doc"></cd-doc>
 </template>
 
 <script>
-import CDList from '../components/cd-list.vue'
+import CDDocGeneric from '../generic/cd-doc-generic.vue'
+
 export default {
   name: 'cd-doc-grid',
   components: {
-    'cd-list': CDList
+    'cd-doc': CDDocGeneric
   },
   data (view) {
     return {
       doc: [
         {
           id: 'grid-a',
-          header: 'AA'
+          header: 'CD-GRID',
+          description: ['aaa']
         },
         {
           id: 'grid-b',
-          header: 'BB'
+          header: 'BB',
+          subs: [
+            {
+              id: 'grid-b-1',
+              header: 'BB-1',
+              info: [
+                {
+                  description: 'BB is BB and this is law',
+                  code: 'here will be code (soon)'
+                }
+              ]
+            },
+            {
+              id: 'grid-b-2',
+              header: 'BB-2'
+            },
+            {
+              id: 'grid-b-3',
+              header: 'BB-3'
+            }
+          ]
         },
         {
           id: 'grid-c',
