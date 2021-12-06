@@ -1,8 +1,5 @@
 import Vue from 'vue'
-const inputype = ['button', 'checkbox', 'color', 'date',
-  'datetime', 'datetime-local', 'email', 'file', 'month',
-  'number', 'password', 'radio', 'reset', 'tel', 'text',
-  'time', 'week']
+import { inputtype } from inputtype // а здесь его будем использовать
 
 /**
  * функция, удаляющая все свойства объекта object,
@@ -54,10 +51,10 @@ function resolvePropertyValue (object, propertyname, payload, another = undefine
  */
 function createInput (property, propertyholder, payload) {
   // если дескриптор property содержит свойство input и его значение
-  // не содержится в массиве inputype
+  // не содержится в массиве inputtype
   // предупредим в консоли
-  if (hasProperty.call(property, 'input') && !inputype.includes(property.input)) {
-    console.warn(`[CDJS] Получено значение ${property.input}, ожидалось одно из ${inputype}`)
+  if (hasProperty.call(property, 'input') && !inputtype.includes(property.input)) {
+    console.warn(`[CDJS] Получено значение ${property.input}, ожидалось одно из ${inputtype}`)
   }
   return compress({
     type: (property.input || 'text'),
