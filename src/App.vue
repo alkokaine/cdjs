@@ -3,7 +3,7 @@
     <cd-menu class="doc-menu" :iscollapsed="iscollapsed" :menu="menu" :menuitemclicked="menuitemclick">
       <div slot="menu-header" class="cdjs-container" :class="{ 'is-collapsed': iscollapsed }">
         <div v-if="!iscollapsed" class="cdjs-name--block">
-          <span>[{ CDJS }]</span>
+          <router-link to="/">CDJS</router-link>
         </div>
         <div class="cdjs-name--collapse">
           <i class='collapse-menu' :class="[iscollapsed ? 'bi bi-list' : 'bi bi-x']" v-on:click="collapse"></i>
