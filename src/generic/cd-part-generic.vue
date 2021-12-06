@@ -1,6 +1,6 @@
 <template>
   <div class="cd-doc-part">
-    <h3>{{ part.header }}</h3>
+    <h3 v-html="part.header"></h3>
     <span v-for="(description, index) in part.description" :key="index" v-html="description"></span>
     <span>{{ part.code }}</span><br/>
     <cd-list :collection="part.info" keyfield="id">
@@ -24,5 +24,7 @@ export default {
 </script>
 
 <style>
-
+  .cd-doc-part {
+    padding-top: 1em;
+  }
 </style>
