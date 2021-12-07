@@ -1,16 +1,21 @@
 <template>
-  <cd-doc :content="content"></cd-doc>
+  <div>
+    <cd-doc :content="content"></cd-doc>
+    <cd-info v-for="(info, index) in select" :key="index" :component="info" property="props"></cd-info>
+  </div>
 </template>
 
 <script>
+import CDInfo from '../generic/cd-doc-component-info.vue'
 import CdDocGeneric from '../generic/cd-doc-generic.vue'
 import inputype from '../common/inputtype'
-
+import CDSelect from '../components/cd-select.vue'
 export default {
-  components: { 'cd-doc': CdDocGeneric },
+  components: { 'cd-doc': CdDocGeneric, 'cd-info': CDInfo },
   name: 'cd-doc-home',
   data (home) {
     return {
+      select: CDSelect.mixins.concat(CDSelect),
       content: [
         {
           id: 'home-1',
@@ -85,8 +90,7 @@ select: {
   params: Function // функция, которая возвращает параметры запроса к url для получения списка опций
 }
 </code>
-</pre>`,
-                    'Подробнее об этом можно будет прочесть в разделе про список (но позже)'
+</pre>`
                   ]
                 }
               ]
