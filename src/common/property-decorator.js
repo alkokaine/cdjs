@@ -1,4 +1,5 @@
 export default {
+  name: 'property-descriptor',
   props: {
     descriptor: {
       type: Array,
