@@ -67,6 +67,28 @@ export default {
                     'Если в дескрипторе свойство <code><b>type</b></code> не определено, по умолчанию отрисуется обычный текстовый <code><b>input</b></code><br/>',
                     '...тут будет что-то ещё....'
                   ]
+                },
+                {
+                  header: 'Свойство <code><b>select</b></code> объекта-дескриптора',
+                  description: [
+                    'Для рендеринга элемента <code><b>select</b></code> будем использовать свойство объекта-дескриптора <b>select</b>.</br>',
+                    `<pre>
+<code>
+datafield: String,
+text: String,
+select: {
+  valuekey: String, // имя свойства, содержащее ключевое значение опций selecta
+  labelkey: String, // имя свойства, содержащее значение для заголовка опции
+  url: String, // урл, по которому получим опции
+  method: String, // метод
+  resolveresult: Function, // функция (response) => Array, которая возвращает список опций из ответа axios 
+  isdisabled: Function, // функция (payload, option) => Boolean, которая дисаблит option для свойства datafield объекта payload
+  params: Function // функция, которая возвращает параметры запроса к url для получения списка опций
+}
+</code>
+</pre>`,
+                    'Подробнее об этом можно будет прочесть в разделе про список (но позже)'
+                  ]
                 }
               ]
             }
