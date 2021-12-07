@@ -110,14 +110,14 @@ export default {
       ],
       menu: [
         { id: 1, icon: 'bi bi-list-ul', text: 'Список', url: '/Collection' },
-        { id: 2, icon: 'bi bi-menu-button-wide', text: 'Меню' },
+        { id: 2, icon: 'bi bi-menu-button-wide', text: 'Меню', url: '/Menu' },
         {
           id: 3,
           icon: 'bi bi-table',
           text: 'Таблица',
           url: '/Grid'
         },
-        { id: 4, icon: 'bi bi-input-cursor-text', text: 'Форма' }
+        { id: 4, icon: 'bi bi-input-cursor-text', text: 'Форма', url: '/Form' }
       ],
       iscollapsed: window.innerWidth <= 1024,
       totalrows: 0
