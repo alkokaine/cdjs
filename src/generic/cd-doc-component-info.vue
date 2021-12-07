@@ -18,7 +18,8 @@ export default {
   },
   data (info) {
     return {
-      data: Array.from(Object.keys(info.component[info.property])).map(pname => info.mapcomponentproperty(pname, info.component)),
+      data: Array.from(Object.keys(info.component[info.property]))
+        .map(pname => info.mapcomponentproperty(pname, info.component[info.property])),
       descriptor: [
         {
           datafield: 'propertyname',
@@ -36,14 +37,6 @@ export default {
         {
           datafield: 'description',
           text: 'Описание'
-        },
-        {
-          datafield: 'default',
-          text: 'Значение по умолчанию'
-        },
-        {
-          datafield: 'returns',
-          text: 'Возвращаемое значение'
         }
       ]
     }
@@ -51,28 +44,26 @@ export default {
   methods: {
     mapcomponentproperty (propertyname, holder) {
       const info = this
-      const value = holder[info.property][propertyname]
+      const value = holder[propertyname]
       return {
         propertyname: propertyname,
-        type: info.resolvetype(value.type),
+        type: info.resolvetype(value, 'type'),
         description: value.description,
-        required: value.required,
-        default: info.resolvedefault(value.default),
-        returns: info.resolvetype(value.returns)
+        required: value.required
       }
     },
-    resolvetype (propertyvalue) {
+    resolvetype (value, property) {
       const info = this
-
+      const propertyvalue = (value[property] || value)
       if (Array.isArray(propertyvalue)) {
-        return propertyvalue.map(m => info.resolvetype(m))
-      } else if (typeof propertyvalue === 'function') {
-        return propertyvalue.name
+        return propertyvalue.map(variant => variant.name)
+      } else if (propertyvalue !== undefined) {
+        if (typeof propertyvalue === 'function' && propertyvalue.name === 'Function' && property !== 'returns') {
+          return `${propertyvalue.name}: ${utils.extractarguments(value.default)} => ${info.resolvetype(value, 'returns')}`
+        } else {
+          return `${propertyvalue.name}:`
+        }
       }
-    },
-    resolvedefault (check) {
-      if (typeof check === 'function') return `(${utils.extractarguments(check)}) => {}`
-      return check
     }
   }
 }
