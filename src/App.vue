@@ -133,7 +133,7 @@ export default {
       return data.data
     },
     menuitemclick (event, scope) {
-      if (scope.row.url) this.$router.push(scope.row.url)
+      if (scope.row.url && this.$route.path !== scope.row.url) this.$router.push(scope.row.url)
     }
   }
 }
