@@ -4,7 +4,6 @@
 
 <script>
 import CdDocGeneric from '../generic/cd-doc-generic.vue'
-// import cities from '../examples/simple-grid'
 import inputype from '../common/inputtype'
 
 export default {
