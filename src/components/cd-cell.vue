@@ -1,7 +1,10 @@
 <template>
   <div class="cd-cell">
       <slot name="label"></slot>
-      <template v-if="config.select">
+      <template v-if="config.readonly">
+        <span>{{ config.value }}</span>
+      </template>
+      <template v-else-if="config.select">
         <cd-select :payload="config.select.payload()"
           :keyfield="config.select.valuekey"
           :labelkey="config.select.labelkey"

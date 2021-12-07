@@ -8,7 +8,8 @@ export default {
         if (selection.selectedrows.length === 0) return false
         return selection.selectedrowindex(row) >= 0
       },
-      returns: Boolean
+      returns: Boolean,
+      description: 'Вычисляет, выбран указанный row, или нет'
     },
     cbkey: {
       type: Function,
@@ -16,7 +17,8 @@ export default {
         const selection = this
         return `cb_${row[selection.keyfield]}_${index}`
       },
-      returns: String
+      returns: String,
+      description: 'Возвращает вычисленный id для элемента выбора объекта коллекции'
     },
     onrowselect: {
       type: Function,
@@ -34,17 +36,19 @@ export default {
             unselected.forEach(u => selection.selectedrows.push(u[selection.keyfield]))
           }
         }
-      }
+      },
+      description: 'Функция будет выполняться при выборе строки'
     },
     selectedrowindex: {
       type: Function,
       default: function (row) {
         const selection = this
         return (selection.selectedrows.findIndex((r) => r === row[selection.keyfield]))
-      }
+      },
+      description: '(тут была какая-то идея)'
     },
-    keyfield: { type: String, required: true },
-    selectrows: { type: Boolean, default: false }
+    keyfield: { type: String, required: true, description: 'Свойство-идентификатор объекта коллекции' },
+    selectrows: { type: Boolean, default: false, description: 'кандидат на удаление, или лучше перенести в грид или лист' }
   },
   data () {
     return {

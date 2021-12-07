@@ -21,21 +21,20 @@ export default {
   name: 'cd-list',
   mixins: [collection, selection],
   props: {
-    showitems: { type: Boolean, default: true },
-    onrowhover: { type: Function, default: function (event, row) {} },
+    showitems: { type: Boolean, default: true, description: 'Прячем или нет элементы списка' },
     /**
      * строка или функция, возвращающая css-класс для для
      */
-    listclass: { type: String },
+    listclass: { type: String, description: 'Строка, содержащая название класса для элемента ul внутри cd-list' },
     /**
      * строка или функция, возвращающая css-класс для строки коллекции
      */
-    rowclass: { type: [String, Function], default: '' },
-    listitemclicked: { type: Function, default: function (event, scope) {} },
-    listitementered: { type: Function, default: function (event, scope) {} },
-    listitemleaved: { type: Function, default: function (event, scope) {} },
-    listleave: { type: Function, default: function (event) {} },
-    listenter: { type: Function, default: function (event) {} }
+    rowclass: { type: [String, Function], default: '', description: 'Строка или функция, возвращающая строку с классом для элемента списка, ' },
+    listitemclicked: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится по клику на элементе списка' },
+    listitementered: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при входе мыши на элемент списка' },
+    listitemleaved: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при выходе из элемента списка' },
+    listleave: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при выходе мыши из списка' },
+    listenter: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при входе мыши в список' }
   },
   computed: {
     rowclassResolved () {
