@@ -18,16 +18,38 @@ export default {
   },
   data (info) {
     return {
-      data: Array.from(Object.keys(info.component[info.property])).map(pname => ({
-        propertyname: pname,
-        value: info.component[pname]
-      })),
+      data: Array.from(Object.keys(info.component[info.property])).map(pname => info.mapcomponentproperty(pname, info.component)),
       descriptor: [
         {
           datafield: 'propertyname',
           text: 'PropertyName'
+        },
+        {
+          datafield: 'type',
+          text: 'Type'
         }
       ]
+    }
+  },
+  methods: {
+    mapcomponentproperty (propertyname, holder) {
+      const info = this
+      const value = holder[info.property][propertyname]
+      console.log(value.type)
+      return {
+        propertyname: propertyname,
+        type: info.resolvetype(holder[info.property][propertyname].type)
+      }
+    },
+    resolvetype (propertyvalue) {
+      const info = this
+
+      if (Array.isArray(propertyvalue)) {
+        const map = propertyvalue.map(m => info.resolvetype(m))
+        return map
+      } else if (typeof propertyvalue === 'function') {
+        return propertyvalue.name
+      }
     }
   }
 }
