@@ -39,11 +39,10 @@ export default {
     mapcomponentproperty (propertyname, holder) {
       const info = this
       const value = holder[info.property][propertyname]
-      console.log(value.type)
       return {
         propertyname: propertyname,
-        type: info.resolvetype(holder[info.property][propertyname].type),
-        description: holder[info.property][propertyname].description
+        type: info.resolvetype(value.type),
+        description: value.description
       }
     },
     resolvetype (propertyvalue) {
