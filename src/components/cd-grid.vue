@@ -113,14 +113,14 @@ export default {
     'cd-paging': paging
   },
   props: {
-    allownew: { type: Boolean },
-    hideheader: { type: Boolean, default: false },
-    filter: { type: Array, default: () => ([]) },
-    usefilter: { type: Boolean, default: false },
-    paging: { type: Boolean, default: false },
-    total: { type: Number },
-    page: { type: Number },
-    pageSize: { type: Number }
+    allownew: { type: Boolean, description: 'Можно ли добавлять новые строки в грид' },
+    hideheader: { type: Boolean, default: false, description: 'Скрывать ли header грида' },
+    filter: { type: Array, default: () => ([]), description: 'Коллекция объектов-дескрипторов свойств объекта payload (о нём было выше)' },
+    usefilter: { type: Boolean, default: false, description: 'Использовать ли фильтр (показывать ли форму-редактор аргументов запроса получения данных)' },
+    paging: { type: Boolean, default: false, description: 'Использовать ли постраничную загрузку' },
+    total: { type: Number, description: 'При постраничной загрузке данных, эта штука возвращается контроллером вместе с коллекцией, означает сколько-всего-элементов-в-коллекции' },
+    page: { type: Number, description: 'При постраничной загрузке данных, номер текущей страницы' },
+    pageSize: { type: Number, description: 'При постраничной загрузке данных, размер страницы в элементах' }
   },
   data (grid) {
     return {

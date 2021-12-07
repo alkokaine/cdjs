@@ -6,7 +6,8 @@ export default {
       default (payload) {
         console.log(payload)
         return []
-      }
+      },
+      description: 'Массив объектов-дескрипторов свойств, с которыми будет иметь дело декоратору'
     },
     isvisible: {
       type: Function,
@@ -14,7 +15,8 @@ export default {
         console.log(Object.prototype.hasOwnProperty.call(property, 'hidden'))
         return true
       },
-      returns: Boolean
+      returns: Boolean,
+      description: 'Функция, которая определяет, видим ли мы колонку в таблице или поле на форме'
     },
     iseditable: {
       type: Function,
@@ -22,7 +24,8 @@ export default {
         console.log(Object.prototype.hasOwnProperty.call(property, 'canedit'))
         return true
       },
-      returns: Boolean
+      returns: Boolean,
+      description: 'Функция, которая определяет, можем ли мы редактировать значение в колонке или в элементе форму'
     }
   },
   data () {

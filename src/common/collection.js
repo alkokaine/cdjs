@@ -9,7 +9,8 @@ export default {
       default: function (response) {
         return response.data
       },
-      returns: Array
+      returns: Array,
+      description: 'возвращает ту часть ответа сервера, которую мы собирались поместить в коллекцию'
     },
     /**
      * функция, которая преобразует объект параметров запроса,
@@ -20,33 +21,41 @@ export default {
       default: function (payload) {
         return payload
       },
-      returns: Object
+      returns: Object,
+      description: 'изменяет payload так, чтобы его структура пролезала в метод контроллера и возвращает его'
     },
     /**
      * собственно, коллекция
      */
-    collection: { type: Array, default: () => ([]) },
+    collection: {
+      type: Array,
+      default: () => ([]),
+      description: 'непосредственно коллекция, массив объектов'
+    },
     /**
     * payload: объект, по которому клиенту возвращается набор записей
     */
-    payload: { type: Object },
+    payload: {
+      type: Object,
+      description: 'Прежде чем читать дальше, нужно смириться с тем, что почти всегда сервер от нас что-то ожидает, и это что-то должно передаваться в это свойство'
+    },
     /**
       * keyfield: имя свойства с ключевым значением
       *
       */
-    keyfield: { type: String, required: true },
+    keyfield: { type: String, required: true, description: 'Прежде чем читать дальше, нужно смириться с тем, что у элементов в коллекции есть неповторяющееся свойство, его идентификатор, он передаётся сюда' },
     /**
      * объект или функция, возвращающая объект, содержащий
      * свойства строковые get, remove, add, update
      * как правило, ссылки получались постоянные, но чем чёрт не шутит,
      * пусть это будет функцией от параметров загрузки данных, см. watch.payload
      */
-    crud: { type: [Object, Function] },
+    crud: { type: [Object, Function], description: 'Пусть это будет объект с четырьма свойствами: get, update, delete, add { method: String, url: String }, для получения коллекции, добавления, удаления и редактирования объектов коллекци' },
     /**
      * функция, возвращающая новый объект коллекции
      * параметрами её будут payload и resolve
      */
-    createnew: { type: Function },
+    createnew: { type: Function, returns: Object, description: 'Функция, возвращающая объект, который будет добавлен в коллекцию' },
     /**
      * функция, выполняющаяся при редактировании элемента коллекции,
      * в том числе нового
@@ -56,15 +65,15 @@ export default {
     /**
      * строчка, которая будет написана на кнопке добавления новой строки
      */
-    addnewheader: { type: String, default: 'Добавить новую строку' },
+    addnewheader: { type: String, default: 'Добавить новую строку', description: 'Строчка, что будет на кнопке добавления строки' },
     /**
      * нужна ли постраничная загрузка
      */
-    paging: { type: Boolean, default: false },
+    paging: { type: Boolean, default: false, description: 'Нужна ли постраничная загрузка' },
     /**
      * свойство-признак того, что эта коллекция вложена в другую
      */
-    inner: { type: Boolean, default: false }
+    inner: { type: Boolean, default: false, description: 'Признак того, что коллекция вложенная' }
   },
   watch: {
     /**

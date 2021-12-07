@@ -12,11 +12,17 @@ export default {
   mixins: [collection],
   props: {
     selected: { type: [Number, Array] },
-    isdisabled: { type: Function },
-    keyfield: { type: String, required: true },
-    labelkey: { type: String, required: true },
-    value: { type: [Number, String] },
-    onselect: { type: Function, required: true }
+    isdisabled: {
+      type: Function,
+      default: function (option, paylad) {
+        return false
+      },
+      description: 'Функция, которая вычисляет disabled для option и payload'
+    },
+    keyfield: { type: String, required: true, description: 'Свойство-идентификатор объектов в опциях select' },
+    labelkey: { type: String, required: true, description: 'Свойство-заголовок объектов в опциях select' },
+    value: { type: [Number, String], description: 'Текущее значение select' },
+    onselect: { type: Function, required: true, description: 'Что произойдёт по выбору опции' }
   },
   data (select) {
     return {
