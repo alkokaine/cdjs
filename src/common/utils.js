@@ -280,7 +280,7 @@ const extractarguments = function getArgs (func) {
          string.match(/^\s*\(([^)]*)\)\s*=>/)?.[1] ||
     // arrow functions with single argument without parens like `arg => {}`
          string.match(/^\s*([^=]*)=>/)?.[1]
-
+  if (args === undefined) return ''
   // Split the arguments string into an array comma delimited.
   return args.split(',').map(function (arg) {
     // Ensure no inline comments are parsed and trim the whitespace.
