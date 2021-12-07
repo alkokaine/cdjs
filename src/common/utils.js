@@ -266,11 +266,36 @@ const headerrows = function (descriptor, payload, accum = []) {
   }))
   return accum
 }
+
+const extractarguments = function getArgs (func) {
+  if (func.length === 0) {
+    return []
+  }
+
+  const string = func.toString()
+  // First match everything inside the function argument parens. like `function (arg1,arg2) {}` or `async function(arg1,arg2) {}
+
+  const args = string.match(/(?:async|function)\s*.*?\(([^)]*)\)/)?.[1] ||
+    // arrow functions with multiple arguments  like `(arg1,arg2) => {}`
+         string.match(/^\s*\(([^)]*)\)\s*=>/)?.[1] ||
+    // arrow functions with single argument without parens like `arg => {}`
+         string.match(/^\s*([^=]*)=>/)?.[1]
+
+  // Split the arguments string into an array comma delimited.
+  return args.split(',').map(function (arg) {
+    // Ensure no inline comments are parsed and trim the whitespace.
+    return arg.replace(/\/\*.*\*\//, '').trim()
+  }).filter(function (arg) {
+    // Ensure no undefined values are added.
+    return arg
+  })
+}
 export default {
   ispropertyeditable,
   ispropertyvisible,
   flatterer,
   propertyconfig,
   countchildren,
-  headerrows
+  headerrows,
+  extractarguments
 }
