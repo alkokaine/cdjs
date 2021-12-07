@@ -210,4 +210,7 @@ export default {
   .cd-menu-item--block.is-collapsed.is-active {
     display: flex;
   }
+  .cd-menu-item--header {
+    cursor: pointer;
+  }
 </style>
