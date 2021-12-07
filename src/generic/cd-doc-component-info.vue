@@ -27,6 +27,10 @@ export default {
         {
           datafield: 'type',
           text: 'Type'
+        },
+        {
+          datafield: 'description',
+          text: 'Описание'
         }
       ]
     }
@@ -38,15 +42,15 @@ export default {
       console.log(value.type)
       return {
         propertyname: propertyname,
-        type: info.resolvetype(holder[info.property][propertyname].type)
+        type: info.resolvetype(holder[info.property][propertyname].type),
+        description: holder[info.property][propertyname].description
       }
     },
     resolvetype (propertyvalue) {
       const info = this
 
       if (Array.isArray(propertyvalue)) {
-        const map = propertyvalue.map(m => info.resolvetype(m))
-        return map
+        return propertyvalue.map(m => info.resolvetype(m))
       } else if (typeof propertyvalue === 'function') {
         return propertyvalue.name
       }
