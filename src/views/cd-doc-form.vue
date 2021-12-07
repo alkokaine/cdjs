@@ -18,7 +18,7 @@ export default {
       form: CDForm,
       content: [
         {
-          id: 'menu-1',
+          id: 'form-1',
           header: 'CD-FORM'
         }
       ]
