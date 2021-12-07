@@ -6,7 +6,7 @@
       </slot>
     </div>
     <div class="cd-grid-buttons--row">
-      <button class="cd-grid--createnew" v-on:click="callcreate">
+      <button v-if="allownew" class="cd-grid--createnew" v-on:click="callcreate">
         <span>
           {{ addnewheader }}
         </span>
@@ -113,6 +113,7 @@ export default {
     'cd-paging': paging
   },
   props: {
+    allownew: { type: Boolean },
     hideheader: { type: Boolean, default: false },
     filter: { type: Array, default: () => ([]) },
     usefilter: { type: Boolean, default: false },
