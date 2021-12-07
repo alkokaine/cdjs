@@ -10,6 +10,12 @@ export default {
         return response.data
       }
     },
+    resolvepayload: {
+      type: Function,
+      default: function (payload) {
+        return payload
+      }
+    },
     /**
      * собственно, коллекция
      */
@@ -103,7 +109,7 @@ export default {
         const request = Object.prototype.hasOwnProperty.call(localcrud.get, 'method')
           ? { url: localcrud.get.url, exec: local.$http[localcrud.get.method] }
           : { url: localcrud.get, exec: local.$http.post }
-        request.exec(request.url, { params: payload })
+        request.exec(request.url, local.resolvepayload(payload))
           .then((response) => {
             local.list = local.resolvedata(response)
             local.error = false
