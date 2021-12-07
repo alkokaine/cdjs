@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { inputtype } from inputtype // а здесь его будем использовать
+import { inputtype } from './inputtype' // а здесь его будем использовать
 
 /**
  * функция, удаляющая все свойства объекта object,
