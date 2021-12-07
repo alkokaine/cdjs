@@ -7,14 +7,16 @@ export default {
         const selection = this
         if (selection.selectedrows.length === 0) return false
         return selection.selectedrowindex(row) >= 0
-      }
+      },
+      returns: Boolean
     },
     cbkey: {
       type: Function,
       default: function (row, index) {
         const selection = this
         return `cb_${row[selection.keyfield]}_${index}`
-      }
+      },
+      returns: String
     },
     onrowselect: {
       type: Function,

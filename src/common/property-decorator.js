@@ -13,14 +13,16 @@ export default {
       default (property) {
         console.log(Object.prototype.hasOwnProperty.call(property, 'hidden'))
         return true
-      }
+      },
+      returns: Boolean
     },
     iseditable: {
       type: Function,
       default (property) {
         console.log(Object.prototype.hasOwnProperty.call(property, 'canedit'))
         return true
-      }
+      },
+      returns: Boolean
     }
   },
   data () {

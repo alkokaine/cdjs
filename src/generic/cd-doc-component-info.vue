@@ -40,6 +40,10 @@ export default {
         {
           datafield: 'default',
           text: 'Значение по умолчанию'
+        },
+        {
+          datafield: 'returns',
+          text: 'Возвращаемое значение'
         }
       ]
     }
@@ -53,7 +57,8 @@ export default {
         type: info.resolvetype(value.type),
         description: value.description,
         required: value.required,
-        default: info.resolvedefault(value.default)
+        default: info.resolvedefault(value.default),
+        returns: info.resolvetype(value.returns)
       }
     },
     resolvetype (propertyvalue) {
@@ -66,7 +71,7 @@ export default {
       }
     },
     resolvedefault (check) {
-      if (typeof check === 'function') return utils.extractarguments(check)
+      if (typeof check === 'function') return `(${utils.extractarguments(check)}) => {}`
       return check
     }
   }

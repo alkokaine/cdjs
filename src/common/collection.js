@@ -8,13 +8,19 @@ export default {
       type: Function,
       default: function (response) {
         return response.data
-      }
+      },
+      returns: Array
     },
+    /**
+     * функция, которая преобразует объект параметров запроса,
+     * по умолчанию возвращает его нетронутым
+     */
     resolvepayload: {
       type: Function,
       default: function (payload) {
         return payload
-      }
+      },
+      returns: Object
     },
     /**
      * собственно, коллекция
