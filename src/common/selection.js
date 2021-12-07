@@ -1,4 +1,5 @@
 export default {
+  name: 'selection',
   props: {
     isrowselected: {
       type: Function,
