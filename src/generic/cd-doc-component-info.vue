@@ -22,15 +22,16 @@ export default {
       descriptor: [
         {
           datafield: 'propertyname',
-          text: 'PropertyName'
+          text: 'Свойство'
         },
         {
           datafield: 'type',
-          text: 'Type'
+          text: 'Принимаемое значение'
         },
         {
           datafield: 'required',
-          text: 'Обязательное'
+          text: 'Обязательное',
+          input: 'checkbox'
         },
         {
           datafield: 'description',
@@ -38,7 +39,7 @@ export default {
         },
         {
           datafield: 'default',
-          text: 'default'
+          text: 'Значение по умолчанию'
         }
       ]
     }
