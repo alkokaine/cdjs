@@ -109,7 +109,7 @@ export default {
         }
       ],
       menu: [
-        { id: 1, icon: 'bi bi-list-ul', text: 'Список' },
+        { id: 1, icon: 'bi bi-list-ul', text: 'Список', url: '/Collection' },
         { id: 2, icon: 'bi bi-menu-button-wide', text: 'Меню' },
         {
           id: 3,
