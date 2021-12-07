@@ -1,7 +1,7 @@
 <template>
   <div>
     <cd-doc :content="content"></cd-doc>
-    <cd-info property="props" :component="menu" :key="index"></cd-info>
+    <cd-info property="props" :component="menu"></cd-info>
   </div>
 </template>
 
