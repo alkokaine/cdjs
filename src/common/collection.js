@@ -124,13 +124,17 @@ export default {
         const request = Object.prototype.hasOwnProperty.call(localcrud.get, 'method')
           ? { url: localcrud.get.url, exec: local.$http[localcrud.get.method] }
           : { url: localcrud.get, exec: local.$http.post }
-        request.exec(request.url, local.resolvepayload(payload))
-          .then((response) => {
-            local.list = local.resolvedata(response)
-            local.error = false
-          }).catch((reason) => {
-            local.error = reason
-          })
+        try {
+          request.exec(request.url, local.resolvepayload(payload))
+            .then((response) => {
+              local.list = local.resolvedata(response)
+              local.error = false
+            }).catch((reason) => {
+              local.error = reason
+            })
+        } catch (error) {
+          local.list = local.collection
+        }
       }
     },
     delete (row) {
