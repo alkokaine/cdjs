@@ -113,7 +113,7 @@ export default {
   data (col) {
     return {
       list: col.collection,
-      error: Object
+      error: false
     }
   },
   methods: {
