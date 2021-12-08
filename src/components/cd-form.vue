@@ -1,6 +1,8 @@
 <template>
   <div class="cd-form">
-      <slot name="header"></slot>
+      <slot name="header">
+        {{ formpayload }}
+      </slot>
       <form class="cd-form--content">
           <slot>
               <template v-if="descriptor.length">
@@ -24,7 +26,7 @@ export default {
     'cd-fieldset': fieldset
   },
   props: {
-    payload: { type: [Object, Function] },
+    payload: { type: Object, required: true, description: 'Объект, который изначально размещается на форме' },
     descriptor: {
       type: Array,
       default: function () {
@@ -46,17 +48,17 @@ export default {
   },
   data: function (form) {
     return {
-      formpayload: Object
+      formpayload: form.payload
     }
-  },
-  watch: {
-    payload: {
-      immediate: true,
-      handler (newvalue) {
-        this.formpayload = newvalue
-      }
-    }
-  }
+  }//,
+  // watch: {
+  //   payload: {
+  //     immediate: true,
+  //     handler (newvalue) {
+  //       this.formpayload = newvalue
+  //     }
+  //   }
+  // }
 }
 </script>
 
