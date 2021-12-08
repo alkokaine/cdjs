@@ -1,18 +1,18 @@
 <template>
   <div class="cd-form">
-      <slot name="header">
-        {{ formpayload }}
+    <slot name="header">
+      {{ formpayload }}
+    </slot>
+    <form class="cd-form--content">
+      <slot>
+        <template v-if="descriptor.length">
+            <cd-fieldset :descriptor="descriptor" :isvisible="isvisible" :iseditable="iseditable" :propertyconfig="propertyconfig"></cd-fieldset>
+        </template>
+        <template v-else>
+            <span>Напишите в внутри тэга cd-form содержимое формы, или используйте свойство descriptor для встроенного рендеринга</span>
+        </template>
       </slot>
-      <form class="cd-form--content">
-          <slot>
-              <template v-if="descriptor.length">
-                  <cd-fieldset :descriptor="descriptor" :isvisible="isvisible" :iseditable="iseditable" :propertyconfig="propertyconfig"></cd-fieldset>
-              </template>
-              <template v-else>
-                  <span>Напишите в внутри тэга cd-form содержимое формы, или используйте свойство descriptor для встроенного рендеринга</span>
-              </template>
-          </slot>
-      </form>
+    </form>
   </div>
 </template>
 
