@@ -101,7 +101,7 @@ select: {
         }
       ],
       selectexample: {
-        datafield: 'OptionID',
+        datafield: 'property1',
         text: 'Выберите что-то',
         labelkey: 'labelkey',
         valuekey: 'valuekey',
@@ -167,19 +167,24 @@ select: {
   },
   methods: {
     convertproperty (property) {
+      const p = property
       return {
-        datafield: property.datafield,
-        text: property.text,
+        datafield: p.datafield,
+        text: p.text,
         select: {
-          labelkey: property.labelkey,
-          valuekey: property.valuekey,
-          url: property.url,
-          method: property.method,
-          values: property.values,
-          resolveresult: property.resolveresult,
-          isdisabled: property.isdisabled,
-          params: property.params,
-          onselect: property.onselect
+          labelkey: p.labelkey,
+          valuekey: p.valuekey,
+          crud: {
+            get: {
+              url: p.url,
+              method: p.method
+            }
+          },
+          values: p.values,
+          resolveresult: p.resolveresult,
+          isdisabled: p.isdisabled,
+          params: p.params,
+          onselect: p.onselect
         }
       }
     }
