@@ -1,6 +1,6 @@
 <template>
-  <select :value="selected" class="cd-select form-control form-control-sm" v-on:input="oninput">
-    <option v-if="error" :value="-1" :label="error"/>
+  <select v-model="current" class="cd-select form-control form-control-sm" v-on:input="oninput">
+    <option v-if="error" value="reload" :label="error"/>
     <option v-for="(option) in list" :key="option[keyfield]" :value="option[keyfield]" :label="option[labelkey]" :disabled="isdisabled(option)"/>
   </select>
 </template>
@@ -11,7 +11,6 @@ export default {
   name: 'cd-select',
   mixins: [collection],
   props: {
-    selected: { type: [Number, Array] },
     isdisabled: {
       type: Function,
       default: function (option, paylad) {
@@ -26,13 +25,17 @@ export default {
   },
   data (select) {
     return {
+      current: select.value
     }
   },
   methods: {
     oninput (event) {
-      if (event.target.value === '-1') this.loaddata(this.payload)
+      if (event.target.value === 'reload') this.loaddata(this.payload)
       const selected = this.list.find(option => String(option[this.keyfield]) === event.target.value)
-      this.onselect(selected)
+      if (selected !== null && selected !== undefined) {
+        this.current = selected[this.keyfield]
+        this.onselect(selected)
+      }
     }
   }
 }
