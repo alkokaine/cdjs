@@ -2,6 +2,7 @@
   <div>
     <cd-doc :content="content"></cd-doc>
     <cd-info v-for="(info, index) in select" :key="index" :component="info" property="props"></cd-info>
+    <cd-prop-example :property="selectexample" :options="options" :convertproperty="convertproperty" :payload="selectform"></cd-prop-example>
   </div>
 </template>
 
@@ -10,8 +11,9 @@ import CDInfo from '../generic/cd-doc-component-info.vue'
 import CdDocGeneric from '../generic/cd-doc-generic.vue'
 import inputype from '../common/inputtype'
 import CDSelect from '../components/cd-select.vue'
+import CDPropExample from '../generic/cd-prop-example.vue'
 export default {
-  components: { 'cd-doc': CdDocGeneric, 'cd-info': CDInfo },
+  components: { 'cd-doc': CdDocGeneric, 'cd-info': CDInfo, 'cd-prop-example': CDPropExample },
   name: 'cd-doc-home',
   data (home) {
     return {
@@ -97,7 +99,89 @@ select: {
             }
           ]
         }
-      ]
+      ],
+      selectexample: {
+        datafield: 'OptionID',
+        text: 'Выберите что-то',
+        labelkey: 'labelkey',
+        valuekey: 'valuekey',
+        url: 'url',
+        values: [{ labelkey: 'label key 1', valuekey: 1 }, { labelkey: 'label key 2', valuekey: 2 }, { labelkey: 'label key 3', valuekey: 3 }],
+        method: 'method',
+        resolveresult: (response) => response.data,
+        isdisabled: 'isdisabled',
+        params (payload) {
+          return payload
+        },
+        onselect (...args) {
+          console.log(args)
+        }
+      },
+      options: [
+        {
+          datafield: 'datafield',
+          text: 'Имя свойства объекта'
+        },
+        {
+          datafield: 'text',
+          text: 'Человеческое имя свойства'
+        },
+        {
+          text: 'select',
+          descriptor: [
+            {
+              datafield: 'labelkey',
+              text: 'labelkey'
+            },
+            {
+              datafield: 'valuekey',
+              text: 'valuekey'
+            },
+            {
+              datafield: 'url',
+              text: 'url'
+            },
+            {
+              datafield: 'method',
+              text: 'method'
+            },
+            {
+              datafield: 'resolveresult',
+              text: 'resolveresult'
+            },
+            {
+              datafield: 'isdisabled',
+              text: 'isdisabled'
+            },
+            {
+              datafield: 'params',
+              text: 'params'
+            }
+          ]
+        }
+      ],
+      selectform: {
+        property1: 1
+      }
+    }
+  },
+  methods: {
+    convertproperty (property) {
+      return {
+        datafield: property.datafield,
+        text: property.text,
+        select: {
+          labelkey: property.labelkey,
+          valuekey: property.valuekey,
+          url: property.url,
+          method: property.method,
+          values: property.values,
+          resolveresult: property.resolveresult,
+          isdisabled: property.isdisabled,
+          params: property.params,
+          onselect: property.onselect
+        }
+      }
     }
   }
 }
