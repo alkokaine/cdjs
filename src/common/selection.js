@@ -47,8 +47,7 @@ export default {
       },
       description: '(тут была какая-то идея)'
     },
-    keyfield: { type: String, required: true, description: 'Свойство-идентификатор объекта коллекции' },
-    selectrows: { type: Boolean, default: false, description: 'кандидат на удаление, или лучше перенести в грид или лист' }
+    keyfield: { type: String, required: true, description: 'Свойство-идентификатор объекта коллекции' }
   },
   data () {
     return {

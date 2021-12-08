@@ -120,7 +120,8 @@ export default {
     paging: { type: Boolean, default: false, description: 'Использовать ли постраничную загрузку' },
     total: { type: Number, description: 'При постраничной загрузке данных, эта штука возвращается контроллером вместе с коллекцией, означает сколько-всего-элементов-в-коллекции' },
     page: { type: Number, description: 'При постраничной загрузке данных, номер текущей страницы' },
-    pageSize: { type: Number, description: 'При постраничной загрузке данных, размер страницы в элементах' }
+    pageSize: { type: Number, description: 'При постраничной загрузке данных, размер страницы в элементах' },
+    selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' }
   },
   data (grid) {
     return {
