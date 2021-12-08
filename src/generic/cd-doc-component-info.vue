@@ -62,7 +62,7 @@ export default {
         if (typeof propertyvalue === 'function' && propertyvalue.name === 'Function' && property !== 'returns') {
           return `${propertyvalue.name}: ${utils.extractarguments(value.default)} => ${info.resolvetype(value, 'returns')}`
         } else {
-          if (resolveddefault) return `${propertyvalue.name}, default: ${resolveddefault}`
+          if ((resolveddefault || typeof resolveddefault === 'boolean') && typeof resolveddefault !== 'function') return `${propertyvalue.name}, default: ${resolveddefault}`
           return `${propertyvalue.name}`
         }
       }
