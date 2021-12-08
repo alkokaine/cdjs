@@ -90,6 +90,7 @@ function createSelect (property, propertyholder, payload) {
       valuekey: select.valuekey, // свойство ключа коллекции опций
       labelkey: select.labelkey, // свойство опции, которое мы видим в дропдауне
       payload: () => select.params(propertyholder), // параметры получения данных
+      values: select.values,
       crud: { // объект, нужный для миксина коллекций
         get: {
           url: select.url, // урл получения данных
@@ -99,8 +100,9 @@ function createSelect (property, propertyholder, payload) {
       resolveresult: select.resolveresult, // функция, возвращающая итоговые данные
       // для списка опций селекта
       // определяем, задизаблена ли опция
-      isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', payload, option)
+      isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', payload, option),
       // выполняем onselect
+      onselect: (option) => select.onselect(option, propertyholder)
     })
   }
   return undefined
