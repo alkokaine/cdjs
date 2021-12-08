@@ -8,6 +8,7 @@
         <cd-select :payload="config.select.payload()"
           :keyfield="config.select.valuekey"
           :labelkey="config.select.labelkey"
+          :collection="config.select.values"
           :crud="config.select.crud"
           :value="value"
           :resolvedata="config.select.resolveresult"
