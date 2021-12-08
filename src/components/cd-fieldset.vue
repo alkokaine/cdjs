@@ -42,18 +42,19 @@ export default {
 </script>
 
 <style>
-    legend {
-      background-color: #444f5a;
-      width: auto;
-      margin-left: 10px;
-      color: white;
-      font-size: 18px;
-      font-weight: 600;
-      float: none;
-    }
+  @import '~bootstrap/dist/css/bootstrap.css';
+  legend {
+    background-color: lightgray;
+    width: unset!important;
+    margin-left: 10px;
+    padding-left: 10px!important;
+    padding-right: 10px!important;
+  }
     fieldset {
-      border: solid 1px #444f5a;
       margin-top: unset;
+    }
+    fieldset.inner {
+      border: solid 1px #444f5a;
     }
     .cd-label {
       font-weight: bold;
