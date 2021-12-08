@@ -66,7 +66,7 @@ function createInput (property, propertyholder, payload) {
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
     checked: resolvePropertyValue(property, 'checked', propertyholder),
     placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
-    ondebounce: (...args) => { console.log(args) }
+    ondebounce: (value, event) => { Vue.set(propertyholder, property.datafield, value) }
   })
 }
 
