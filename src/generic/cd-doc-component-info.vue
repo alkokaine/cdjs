@@ -55,13 +55,15 @@ export default {
     resolvetype (value, property) {
       const info = this
       const propertyvalue = (value[property] || value)
+      const resolveddefault = value.default
       if (Array.isArray(propertyvalue)) {
         return propertyvalue.map(variant => variant.name)
       } else if (propertyvalue !== undefined) {
         if (typeof propertyvalue === 'function' && propertyvalue.name === 'Function' && property !== 'returns') {
           return `${propertyvalue.name}: ${utils.extractarguments(value.default)} => ${info.resolvetype(value, 'returns')}`
         } else {
-          return `${propertyvalue.name}:`
+          if ((resolveddefault || typeof resolveddefault === 'boolean') && typeof resolveddefault !== 'function') return `${propertyvalue.name}, default: ${resolveddefault}`
+          return `${propertyvalue.name}`
         }
       }
     }
