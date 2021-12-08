@@ -134,6 +134,9 @@ export default {
             })
         } catch (error) {
           local.list = local.collection
+          // по-хорошему, такой ситуации быть не может
+          // либо к нам приходит коллекция, либо мы получаем её
+          local.error = false
         }
       }
     },
