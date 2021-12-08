@@ -1,7 +1,15 @@
 <template>
   <div class="cd-prop-example">
-      <cd-form class="cd-descriptor--editor" :payload="property" :descriptor="options"></cd-form>
-      <div class="cd-descriptor--view"><code>{{ property }}</code></div>
+      <cd-form class="cd-descriptor--editor" :payload="property" :descriptor="options">
+        <div slot="header">
+          <span>Редактор свойств select</span>
+        </div>
+      </cd-form>
+      <div class="cd-descriptor--view">
+        <code>
+          <div>{{ property }}</div>
+        </code>
+      </div>
       <cd-form class="cd-example--form" :payload="payload" :descriptor="descriptor"></cd-form>
   </div>
 </template>
@@ -22,9 +30,11 @@ export default {
   },
   data (example) {
     return {
-      descriptor: [
-        example.convertproperty(example.property)
-      ]
+    }
+  },
+  computed: {
+    descriptor () {
+      return [this.convertproperty(this.property)]
     }
   }
 }
