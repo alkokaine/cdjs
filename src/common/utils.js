@@ -89,7 +89,7 @@ function createSelect (property, propertyholder, payload) {
     return compress({
       valuekey: select.valuekey, // свойство ключа коллекции опций
       labelkey: select.labelkey, // свойство опции, которое мы видим в дропдауне
-      payload: () => select.params(propertyholder), // параметры получения данных
+      payload: select.params(propertyholder), // параметры получения данных,
       values: select.values,
       crud: { // объект, нужный для миксина коллекций
         get: {
@@ -102,7 +102,10 @@ function createSelect (property, propertyholder, payload) {
       // определяем, задизаблена ли опция
       isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', payload, option),
       // выполняем onselect
-      onselect: (option) => select.onselect(option, propertyholder)
+      onselect: (option) => {
+        Vue.set(propertyholder, property.datafield, option[select.valuekey])
+        select.onselect(option, propertyholder)
+      }
     })
   }
   return undefined
