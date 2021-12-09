@@ -48,7 +48,14 @@ export default {
   },
   data (cell) {
     return {
-      value: cell.config.value
+      value: ''
+    }
+  },
+  watch: {
+    'config.value': {
+      handler (newvalue, oldvalue) {
+        this.value = newvalue
+      }
     }
   },
   methods: {
