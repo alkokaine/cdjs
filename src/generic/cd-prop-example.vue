@@ -50,6 +50,7 @@ export default {
   }
   .cd-descriptor--view {
     width: 30%;
+    white-space: pre-wrap;
   }
   .cd-example--form {
     width: 30%;
