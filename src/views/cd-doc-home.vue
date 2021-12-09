@@ -220,7 +220,6 @@ select: {
       this.property = this.examples[Number(event.target.value) - 1].payload
     },
     convertproperty (p) {
-      console.log(p)
       return [{
         datafield: p.datafield,
         text: p.text,
