@@ -2,7 +2,9 @@
   <div>
     <cd-doc :content="content"></cd-doc>
     <cd-info v-for="(info, index) in select" :key="index" :component="info" property="props"></cd-info>
-    <cd-prop-example :property="selectexample" :options="options" :convertproperty="convertproperty" :payload="selectform"></cd-prop-example>
+    <cd-prop-example :property="selectexample" :options="options" :convertproperty="convertproperty" :payload="selectform">
+      <template slot="header"><code>select</code></template>
+    </cd-prop-example>
   </div>
 </template>
 

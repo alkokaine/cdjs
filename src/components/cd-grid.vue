@@ -150,7 +150,6 @@ export default {
 </script>
 
 <style>
-  @import '~bootstrap/dist/css/bootstrap.min.css';
   .cd-grid--cell {
     display: table-cell;
     padding: 5px;

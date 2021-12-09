@@ -1,8 +1,6 @@
 <template>
   <div class="cd-form">
-    <slot name="header">
-      {{ formpayload }}
-    </slot>
+    <slot name="header"></slot>
     <form class="cd-form--content">
       <slot>
         <template v-if="descriptor.length">

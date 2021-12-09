@@ -140,8 +140,7 @@ export default {
 </script>
 
 <style>
-  /* @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&family=Raleway:wght@300;400&display=swap');*/
-  @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
+  @import '~bootstrap/dist/css/bootstrap.css';
   :root {
     --icon-width: 40px;
     --icon-height: 40px;

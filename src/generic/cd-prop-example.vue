@@ -1,16 +1,17 @@
 <template>
   <div class="cd-prop-example">
-      <cd-form class="cd-descriptor--editor" :payload="property" :descriptor="options">
-        <div slot="header">
-          <span>Редактор свойств select</span>
-        </div>
-      </cd-form>
+    <div class="prop-example--header">
+      <slot name="header"></slot>
+    </div>
+    <div class="cd-prop-example--content">
+      <cd-form class="cd-descriptor--editor" :payload="property" :descriptor="options"></cd-form>
       <div class="cd-descriptor--view">
         <code>
           <div>{{ property }}</div>
         </code>
       </div>
       <cd-form class="cd-example--form" :payload="payload" :descriptor="descriptor"></cd-form>
+    </div>
   </div>
 </template>
 
@@ -41,7 +42,7 @@ export default {
 </script>
 
 <style>
-  .cd-prop-example {
+  .cd-prop-example--content {
     display: flex;
   }
   .cd-descriptor--editor {
@@ -53,4 +54,8 @@ export default {
   .cd-example--form {
     width: 30%;
   }
+  .prop-example--header {
+    font-size: 3em;
+    text-align: center;
+}
 </style>

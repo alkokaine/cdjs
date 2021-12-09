@@ -1,5 +1,5 @@
 <template>
-  <fieldset class="cd-fieldset">
+  <fieldset class="cd-fieldset border p-2">
         <slot></slot>
         <div class="cd-field" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
             <cd-fieldset v-if="hasdescriptor(property)"
@@ -8,7 +8,7 @@
                 :iseditable="iseditable"
                 :propertyconfig="propertyconfig"
                 :descriptor="property.descriptor">
-                <legend v-if="haslegend(property)">{{ property.text }}</legend>
+                <legend v-if="haslegend(property)" class="cd-legend w-auto">{{ property.text }}</legend>
             </cd-fieldset>
             <cd-cell v-else :config="propertyconfig(property)">
               <label class="cd-label" :for="property.datafield" slot="label">{{ property.text }}</label>
@@ -42,25 +42,22 @@ export default {
 </script>
 
 <style>
-  @import '~bootstrap/dist/css/bootstrap.css';
-  legend {
+  .cd-legend {
     background-color: lightgray;
-    width: unset!important;
+    display: block;
+    padding-left: 10px;
+    padding-right: 10px;
     margin-left: 10px;
-    padding-left: 10px!important;
-    padding-right: 10px!important;
+    float: none;
   }
-    fieldset {
-      margin-top: unset;
-    }
-    fieldset.inner {
-      border: solid 1px #444f5a;
-    }
-    .cd-label {
-      font-weight: bold;
-    }
-    .cd-label::after {
-      content: ":";
-      margin-right: 5px;
-    }
+  .cd-field>fieldset.cd-fieldset {
+    margin-top: 10px;
+  }
+  .cd-label {
+    font-weight: bold;
+  }
+  .cd-label::after {
+    content: ":";
+    margin-right: 5px;
+  }
 </style>
