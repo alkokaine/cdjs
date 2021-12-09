@@ -2,9 +2,10 @@
   <div>
     <cd-doc :content="content"></cd-doc>
     <cd-info v-for="(info, index) in select" :key="index" :component="info" property="props"></cd-info>
-    <cd-prop-example :property="selectexample" :options="options" :convertproperty="convertproperty" :payload="selectform">
-      <template slot="header"><code>select</code></template>
-    </cd-prop-example>
+    <select v-model="selected" v-on:change="onselect">
+      <option v-for="(option) in examples" :key="option.id" :value="option.id" :label="option.name">{{ option.name }}</option>
+    </select>
+    <cd-prop-example v-if="selected" :property="property" :options="options" :payload="selectform" :convertproperty="convertproperty"></cd-prop-example>
   </div>
 </template>
 
@@ -14,6 +15,97 @@ import CdDocGeneric from '../generic/cd-doc-generic.vue'
 import inputype from '../common/inputtype'
 import CDSelect from '../components/cd-select.vue'
 import CDPropExample from '../generic/cd-prop-example.vue'
+
+const readyvaluesoptions = [
+  {
+    datafield: 'datafield',
+    text: 'Имя свойства объекта'
+  },
+  {
+    datafield: 'text',
+    text: 'Человеческое имя свойства'
+  },
+  {
+    text: 'select',
+    descriptor: [
+      {
+        datafield: 'labelkey',
+        text: 'labelkey'
+      },
+      {
+        datafield: 'valuekey',
+        text: 'valuekey'
+      },
+      {
+        datafield: 'url',
+        text: 'url'
+      },
+      {
+        datafield: 'method',
+        text: 'method'
+      },
+      {
+        datafield: 'resolveresult',
+        text: 'resolveresult'
+      },
+      {
+        datafield: 'isdisabled',
+        text: 'isdisabled'
+      },
+      {
+        datafield: 'params',
+        text: 'params'
+      }
+    ]
+  }
+]
+
+const selectexample = {
+  datafield: 'property1',
+  text: 'Выберите что-то',
+  labelkey: 'labelkey',
+  valuekey: 'valuekey',
+  values: [{ labelkey: 'label key 1', valuekey: 1 }, { labelkey: 'label key 2', valuekey: 2 }, { labelkey: 'label key 3', valuekey: 3 }],
+  isdisabled: 'isdisabled',
+  params (payload) {
+    return payload
+  },
+  onselect (...args) {
+    console.log(args)
+  }
+}
+const rapidapiCountry = {
+  datafield: 'wikiDataId',
+  text: 'Страна',
+  valuekey: 'wikiDataId',
+  labelkey: 'name',
+  url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+  method: 'get',
+  resolveresult: (response) => (response.data.data),
+  isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
+  params: (payload) => ({
+    limit: 10,
+    namePrefix: payload.namePrefix
+  })
+}
+const rapidapiCity = {
+  datafield: 'id',
+  text: 'Город',
+  url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
+  method: 'get',
+  labelkey: 'city',
+  valuekey: 'id',
+  resolveresult: (response) => (response.data.data),
+  params: (payload) => ({
+    limit: 10,
+    minPopulation: null,
+    namePrefix: null,
+    distanceUnit: null,
+    offset: 0,
+    excludedCountryIds: null
+  })
+}
+
 export default {
   components: { 'cd-doc': CdDocGeneric, 'cd-info': CDInfo, 'cd-prop-example': CDPropExample },
   name: 'cd-doc-home',
@@ -102,75 +194,34 @@ select: {
           ]
         }
       ],
-      selectexample: {
-        datafield: 'property1',
-        text: 'Выберите что-то',
-        labelkey: 'labelkey',
-        valuekey: 'valuekey',
-        url: 'url',
-        values: [{ labelkey: 'label key 1', valuekey: 1 }, { labelkey: 'label key 2', valuekey: 2 }, { labelkey: 'label key 3', valuekey: 3 }],
-        method: 'method',
-        resolveresult: (response) => response.data,
-        isdisabled: 'isdisabled',
-        params (payload) {
-          return payload
-        },
-        onselect (...args) {
-          console.log(args)
-        }
-      },
-      options: [
-        {
-          datafield: 'datafield',
-          text: 'Имя свойства объекта'
-        },
-        {
-          datafield: 'text',
-          text: 'Человеческое имя свойства'
-        },
-        {
-          text: 'select',
-          descriptor: [
-            {
-              datafield: 'labelkey',
-              text: 'labelkey'
-            },
-            {
-              datafield: 'valuekey',
-              text: 'valuekey'
-            },
-            {
-              datafield: 'url',
-              text: 'url'
-            },
-            {
-              datafield: 'method',
-              text: 'method'
-            },
-            {
-              datafield: 'resolveresult',
-              text: 'resolveresult'
-            },
-            {
-              datafield: 'isdisabled',
-              text: 'isdisabled'
-            },
-            {
-              datafield: 'params',
-              text: 'params'
-            }
-          ]
-        }
-      ],
+      examples: [{
+        id: 1,
+        name: 'Простой селект с синхронными данными',
+        payload: selectexample
+      }, {
+        id: 2,
+        name: 'Асинхронный селект, получающий данные по url',
+        payload: rapidapiCountry
+      }, {
+        id: 3,
+        name: 'Ещё один селект, получающий данные по url',
+        payload: rapidapiCity
+      }],
+      property: Object,
+      selected: 0,
+      options: readyvaluesoptions,
       selectform: {
         property1: 1
       }
     }
   },
   methods: {
-    convertproperty (property) {
-      const p = property
-      return {
+    onselect (event) {
+      this.property = this.examples[Number(event.target.value) - 1].payload
+    },
+    convertproperty (p) {
+      console.log(p)
+      return [{
         datafield: p.datafield,
         text: p.text,
         select: {
@@ -189,6 +240,7 @@ select: {
           onselect: p.onselect
         }
       }
+      ]
     }
   }
 }

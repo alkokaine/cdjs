@@ -1,17 +1,12 @@
 <template>
-  <div class="cd-prop-example">
-    <div class="prop-example--header">
-      <slot name="header"></slot>
+  <div v-if="property" class="cd-prop-example">
+    <cd-form class="cd-descriptor--editor" :payload="property" :descriptor="options"></cd-form>
+    <div class="cd-descriptor--view">
+      <code>
+        <div>{{ property }}</div>
+      </code>
     </div>
-    <div class="cd-prop-example--content">
-      <cd-form class="cd-descriptor--editor" :payload="property" :descriptor="options"></cd-form>
-      <div class="cd-descriptor--view">
-        <code>
-          <div>{{ property }}</div>
-        </code>
-      </div>
-      <cd-form class="cd-example--form" :payload="payload" :descriptor="descriptor"></cd-form>
-    </div>
+    <cd-form class="cd-example--form" :payload="payload" :descriptor="descriptor"></cd-form>
   </div>
 </template>
 
@@ -38,6 +33,16 @@ export default {
       return [this.convertproperty(this.property)]
     }
   }
+  // watch: {
+  //   payload: {
+  //     deep: true,
+  //     immediate: true,
+  //     handler (newvalue, oldvalue) {
+  //       if (newvalue === undefined) this.descriptor = []
+  //       else this.descriptor = [this.convertproperty(this.property)]
+  //     }
+  //   }
+  // }
 }
 </script>
 

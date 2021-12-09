@@ -1,6 +1,5 @@
 <template>
   <div class="cd-form">
-    <slot name="header"></slot>
     <form class="cd-form--content">
       <slot>
         <template v-if="descriptor.length">
@@ -35,28 +34,21 @@ export default {
   },
   computed: {
     isvisible () {
-      return (property) => utils.ispropertyvisible(property, null, this.formpayload)
+      return (property) => utils.ispropertyvisible(property, null, this.payload)
     },
     iseditable () {
-      return (property) => utils.ispropertyeditable(property, null, this.formpayload)
-    },
-    propertyconfig () {
-      return (property) => utils.propertyconfig.call(this, property, this.formpayload, this.editmode, undefined)
+      return (property) => utils.ispropertyeditable(property, null, this.payload)
     }
   },
   data: function (form) {
     return {
-      formpayload: form.payload
     }
-  }//,
-  // watch: {
-  //   payload: {
-  //     immediate: true,
-  //     handler (newvalue) {
-  //       this.formpayload = newvalue
-  //     }
-  //   }
-  // }
+  },
+  methods: {
+    propertyconfig (property) {
+      return utils.propertyconfig.call(this, property, this.payload, this.editmode, undefined)
+    }
+  }
 }
 </script>
 

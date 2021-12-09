@@ -51,13 +51,6 @@ export default {
       value: cell.config.value
     }
   },
-  watch: {
-    value: {
-      handler (nvalue, ovalue) {
-        this.config.propertychange({ newvalue: nvalue, oldvalue: ovalue })
-      }
-    }
-  },
   methods: {
   }
 }
