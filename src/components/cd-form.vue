@@ -38,15 +38,13 @@ export default {
     },
     iseditable () {
       return (property) => utils.ispropertyeditable(property, null, this.payload)
+    },
+    propertyconfig () {
+      return (property) => utils.propertyconfig.call(this, property, this.payload, this.editmode, undefined)
     }
   },
   data: function (form) {
     return {
-    }
-  },
-  methods: {
-    propertyconfig (property) {
-      return utils.propertyconfig.call(this, property, this.payload, this.editmode, undefined)
     }
   }
 }

@@ -5,7 +5,7 @@
     <select v-model="selected" v-on:change="onselect">
       <option v-for="(option) in examples" :key="option.id" :value="option.id" :label="option.name">{{ option.name }}</option>
     </select>
-    <cd-prop-example v-if="selected" :property="property" :options="options" :payload="selectform" :convertproperty="convertproperty"></cd-prop-example>
+    <cd-prop-example v-if="property" :property="property" :options="options" :payload="selectform" :convertproperty="convertproperty"></cd-prop-example>
   </div>
 </template>
 
@@ -84,8 +84,10 @@ const rapidapiCountry = {
   resolveresult: (response) => (response.data.data),
   isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
   params: (payload) => ({
-    limit: 10,
-    namePrefix: payload.namePrefix
+    params: {
+      limit: 10,
+      namePrefix: payload.namePrefix
+    }
   })
 }
 const rapidapiCity = {
@@ -207,7 +209,7 @@ select: {
         name: 'Ещё один селект, получающий данные по url',
         payload: rapidapiCity
       }],
-      property: Object,
+      property: false,
       selected: 0,
       options: readyvaluesoptions,
       selectform: {
