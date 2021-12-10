@@ -5,7 +5,7 @@
         <span>{{ config.value }}</span>
       </template>
       <template v-else-if="config.select">
-        <cd-select :payload="config.select.payload"
+        <cd-select :payload="config.select.resolvepayload"
           :keyfield="config.select.valuekey"
           :labelkey="config.select.labelkey"
           :collection="config.select.values"

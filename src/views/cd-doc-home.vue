@@ -82,11 +82,13 @@ const rapidapiCountry = {
   url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
   method: 'get',
   resolveresult: (response) => (response.data.data),
-  isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
-  params: (payload) => ({
-    limit: 10,
-    namePrefix: payload.namePrefix
-  })
+  resolvepayload: (payload) => ({
+    params: {
+      limit: 10,
+      namePrefix: payload.namePrefix
+    }
+  }),
+  isdisabled: (payload, option) => option.wikiDataId.endsWith(7)
 }
 const rapidapiCity = {
   datafield: 'id',
@@ -96,13 +98,15 @@ const rapidapiCity = {
   labelkey: 'city',
   valuekey: 'id',
   resolveresult: (response) => (response.data.data),
-  params: (payload) => ({
-    limit: 10,
-    minPopulation: null,
-    namePrefix: null,
-    distanceUnit: null,
-    offset: 0,
-    excludedCountryIds: null
+  resolvepayload: (payload) => ({
+    params: {
+      limit: 10,
+      minPopulation: null,
+      namePrefix: null,
+      distanceUnit: null,
+      offset: 0,
+      excludedCountryIds: null
+    }
   })
 }
 
@@ -234,8 +238,8 @@ select: {
           },
           values: p.values,
           resolveresult: p.resolveresult,
+          resolvepayload: p.resolvepayload,
           isdisabled: p.isdisabled,
-          params: p.params,
           onselect: p.onselect
         }
       }

@@ -94,6 +94,7 @@ function createSelect (property, propertyholder, payload) {
       crud: select.crud,
       resolveresult: select.resolveresult, // функция, возвращающая итоговые данные
       // для списка опций селекта
+      resolvepayload: resolvePropertyValue(select, 'resolvepayload', propertyholder),
       // определяем, задизаблена ли опция
       isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
       // выполняем onselect
