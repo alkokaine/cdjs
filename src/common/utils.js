@@ -89,7 +89,7 @@ function createSelect (property, propertyholder, payload) {
     return compress({
       valuekey: select.valuekey, // свойство ключа коллекции опций
       labelkey: select.labelkey, // свойство опции, которое мы видим в дропдауне
-      payload: select.params, // параметры получения данных,
+      payload: resolvePropertyValue(select, 'params', propertyholder), // параметры получения данных,
       values: select.values,
       crud: select.crud,
       resolveresult: select.resolveresult, // функция, возвращающая итоговые данные

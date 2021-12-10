@@ -84,10 +84,8 @@ const rapidapiCountry = {
   resolveresult: (response) => (response.data.data),
   isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
   params: (payload) => ({
-    params: {
-      limit: 10,
-      namePrefix: payload.namePrefix
-    }
+    limit: 10,
+    namePrefix: payload.namePrefix
   })
 }
 const rapidapiCity = {
