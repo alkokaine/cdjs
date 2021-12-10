@@ -5,7 +5,7 @@
     <select v-model="selected" v-on:change="onselect">
       <option v-for="(option) in examples" :key="option.id" :value="option.id" :label="option.name">{{ option.name }}</option>
     </select>
-    <cd-prop-example v-if="property" :property="property" :options="options" :payload="selectform" :convertproperty="convertproperty"></cd-prop-example>
+    <cd-prop-example v-if="property" :property="property.payload" :options="options" :payload="selectform" :convertproperty="convertproperty" :paramsdescriptor="property.paramsdescriptor"></cd-prop-example>
   </div>
 </template>
 
@@ -201,18 +201,21 @@ select: {
       examples: [{
         id: 1,
         name: 'Простой селект с синхронными данными',
-        payload: selectexample
+        payload: selectexample,
+        paramsdescriptor: []
       }, {
         id: 2,
         name: 'Асинхронный селект, получающий данные по url',
-        payload: rapidapiCountry
+        payload: rapidapiCountry,
+        paramsdescriptor: []
       }, {
         id: 3,
         name: 'Ещё один селект, получающий данные по url',
-        payload: rapidapiCity
+        payload: rapidapiCity,
+        paramsdescriptor: []
       }],
       property: false,
-      selected: 0,
+      selected: 1,
       options: readyvaluesoptions,
       selectform: {
         property1: 1
@@ -221,7 +224,7 @@ select: {
   },
   methods: {
     onselect (event) {
-      this.property = this.examples[Number(event.target.value) - 1].payload
+      this.selected = (Number(event.target.value) - 1)
     },
     convertproperty (p) {
       return [{
