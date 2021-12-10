@@ -84,27 +84,29 @@ function createInput (property, propertyholder, payload) {
  * элемента формы select
  */
 function createSelect (property, propertyholder, payload) {
-  const select = property.select
-  if (select) {
-    return compress({
-      valuekey: select.valuekey, // свойство ключа коллекции опций
-      labelkey: select.labelkey, // свойство опции, которое мы видим в дропдауне
-      payload: resolvePropertyValue(select, 'params', propertyholder), // параметры получения данных,
-      values: select.values,
-      crud: select.crud,
-      resolveresult: select.resolveresult, // функция, возвращающая итоговые данные
-      // для списка опций селекта
-      resolvepayload: resolvePropertyValue(select, 'resolvepayload', propertyholder),
-      // определяем, задизаблена ли опция
-      isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
-      // выполняем onselect
-      onselect: (option) => {
-        Vue.set(propertyholder, property.datafield, option[select.valuekey])
-        if (select.onselect && typeof select.onselect === 'function') select.onselect(option, propertyholder)
+  const select = compress({
+    valuekey: property.valuekey, // свойство ключа коллекции опций
+    labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
+    payload: resolvePropertyValue(property, 'params', propertyholder), // параметры получения данных,
+    values: property.values,
+    crud: {
+      get: {
+        url: property.url,
+        method: property.method
       }
-    })
-  }
-  return undefined
+    },
+    resolveresult: property.resolveresult, // функция, возвращающая итоговые данные
+    // для списка опций селекта
+    resolvepayload: resolvePropertyValue(property, 'resolvepayload', propertyholder),
+    // определяем, задизаблена ли опция
+    isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
+    // выполняем onselect
+    onselect: (option) => {
+      Vue.set(propertyholder, property.datafield, option[property.valuekey])
+      if (property.onselect && typeof property.onselect === 'function') property.onselect(option, propertyholder)
+    }
+  })
+  return select
 }
 
 const hasProperty = Object.prototype.hasOwnProperty
@@ -187,7 +189,7 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
   const p = property
   return compress({
     input: createInput(property, propertyholder, payload),
-    select: createSelect(property, propertyholder, payload),
+    select: property.input === 'select' ? compress(createSelect(property, propertyholder, payload)) : undefined,
     datafield: property.datafield,
     text: property.text,
     readonly: !isreadonly,
