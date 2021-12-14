@@ -56,6 +56,7 @@ function createInput (property, propertyholder, payload) {
   if (hasProperty.call(property, 'input') && !inputtype.includes(property.input)) {
     console.warn(`[CDJS] Получено значение ${property.input}, ожидалось одно из ${inputtype}`)
   }
+  const parent = this
   return compress({
     type: (property.input || 'text'),
     pattern: resolvePropertyValue(property, 'pattern', propertyholder),
@@ -66,7 +67,7 @@ function createInput (property, propertyholder, payload) {
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
     checked: resolvePropertyValue(property, 'checked', propertyholder),
     placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
-    ondebounce: (value, event) => { Vue.set(propertyholder, property.datafield, value) }
+    ondebounce (value, event) { parent.onpropertychange(property, value) }
   })
 }
 
@@ -84,6 +85,7 @@ function createInput (property, propertyholder, payload) {
  * элемента формы select
  */
 function createSelect (property, propertyholder, payload) {
+  const parent = this
   const select = compress({
     valuekey: property.valuekey, // свойство ключа коллекции опций
     labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
@@ -102,8 +104,9 @@ function createSelect (property, propertyholder, payload) {
     isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
     // выполняем onselect
     onselect: (option) => {
-      Vue.set(propertyholder, property.datafield, option[property.valuekey])
-      if (property.onselect && typeof property.onselect === 'function') property.onselect(option, propertyholder)
+      parent.onpropertychange(property, option)
+      // Vue.set(propertyholder, property.datafield, option[property.valuekey])
+      if (property.onselect && typeof property.onselect === 'function') property.onselect(option, parent)
     }
   })
   return select
@@ -157,14 +160,6 @@ const flatterer = function (arr, accum) {
   }, accum)
 }
 
-function oninput (event, property, propertyholder) {
-  if (property.oninput) {
-    if (typeof property.oninput === 'function') {
-      property.oninput(event, propertyholder)
-    }
-  }
-}
-
 /**
  * собственно ради чего всё задумывалось
  * функция, возвращающая настройки клетки таблицы или поля на форме
@@ -185,20 +180,14 @@ function oninput (event, property, propertyholder) {
  * @returns {Object} настройки ячейки таблицы или поля на форме
  */
 const propertyconfig = function (property, propertyholder, isreadonly, payload = {}) {
-  const ph = propertyholder
-  const p = property
-  return compress({
-    input: createInput(property, propertyholder, payload),
-    select: property.input === 'select' ? compress(createSelect(property, propertyholder, payload)) : undefined,
+  return {
+    input: createInput.call(this, property, propertyholder, payload),
+    select: property.input === 'select' ? createSelect.call(this, property, propertyholder, payload) : undefined,
     datafield: property.datafield,
     text: property.text,
     readonly: !isreadonly,
-    value: ph[p.datafield],
-    oninput: (event) => oninput(event, property, propertyholder),
-    propertychange: ({ newvalue, oldvalue }) => {
-      Vue.set(propertyholder, property.datafield, newvalue)
-    }
-  })
+    value: () => propertyholder[property.datafield]
+  }
 }
 
 /**
