@@ -23,12 +23,14 @@ export default {
     'cd-fieldset': fieldset
   },
   props: {
-    payload: { type: Object, required: true, description: 'Объект, который изначально размещается на форме' },
+    onpropertychange: { type: Function, default: (property, value) => {}, description: 'Функция, которая выполнится при изменении свойства объекта payload' },
+    payload: { type: Object, required: true, description: 'Объект, который размещается на форме' },
     descriptor: {
       type: Array,
       default: function () {
         return []
-      }
+      },
+      description: 'Массив объектов-дескрипторов свойств объекта, который будет показан на форме'
     },
     editmode: { type: Boolean, default: true }
   },
