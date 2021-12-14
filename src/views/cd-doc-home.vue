@@ -2,17 +2,26 @@
   <div>
     <cd-doc :content="content"></cd-doc>
     <cd-info v-for="(info, index) in select" :key="index" :component="info" property="props"></cd-info>
-    <select v-model="selected" v-on:change="onselect">
+    <select v-model="selected">
       <option v-for="(option) in examples" :key="option.id" :value="option.id" :label="option.name">{{ option.name }}</option>
     </select>
-    <cd-prop-example v-if="property" :property="property.payload" :options="options" :payload="selectform" :convertproperty="convertproperty" :paramsdescriptor="property.paramsdescriptor"></cd-prop-example>
+    <cd-prop-example>
+      <cd-form slot="editor" :descriptor="options" :payload="payload" :onpropertychange="onpropertyedit"></cd-form>
+      <div slot="preview">
+        {{ property.payload }}
+      </div>
+      <cd-form slot="sandbox" :descriptor="[property.payload]" :payload="selectform"></cd-form>
+    </cd-prop-example>
+
   </div>
 </template>
 
 <script>
+import Vue from 'vue'
 import CDInfo from '../generic/cd-doc-component-info.vue'
 import CdDocGeneric from '../generic/cd-doc-generic.vue'
 import inputype from '../common/inputtype'
+import CDForm from '../components/cd-form.vue'
 import CDSelect from '../components/cd-select.vue'
 import CDPropExample from '../generic/cd-prop-example.vue'
 
@@ -51,67 +60,27 @@ const readyvaluesoptions = [
       {
         datafield: 'isdisabled',
         text: 'isdisabled'
-      },
-      {
-        datafield: 'params',
-        text: 'params'
       }
     ]
   }
 ]
 
-const selectexample = {
-  datafield: 'property1',
-  text: 'Выберите что-то',
-  labelkey: 'labelkey',
-  valuekey: 'valuekey',
-  values: [{ labelkey: 'label key 1', valuekey: 1 }, { labelkey: 'label key 2', valuekey: 2 }, { labelkey: 'label key 3', valuekey: 3 }],
-  isdisabled: 'isdisabled',
-  params (payload) {
-    return payload
-  },
-  onselect (...args) {
-    console.log(args)
-  }
+const countryParams = {
+  limit: 10,
+  namePrefix: ''
 }
-const rapidapiCountry = {
-  datafield: 'wikiDataId',
-  text: 'Страна',
-  valuekey: 'wikiDataId',
-  labelkey: 'name',
-  url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
-  method: 'get',
-  resolveresult: (response) => (response.data.data),
-  resolvepayload: (payload) => ({
-    params: {
-      limit: 10,
-      namePrefix: payload.namePrefix
-    }
-  }),
-  isdisabled: (payload, option) => option.wikiDataId.endsWith(7)
-}
-const rapidapiCity = {
-  datafield: 'id',
-  text: 'Город',
-  url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
-  method: 'get',
-  labelkey: 'city',
-  valuekey: 'id',
-  resolveresult: (response) => (response.data.data),
-  resolvepayload: (payload) => ({
-    params: {
-      limit: 10,
-      minPopulation: null,
-      namePrefix: null,
-      distanceUnit: null,
-      offset: 0,
-      excludedCountryIds: null
-    }
-  })
+
+const cityParams = {
+  limit: 10,
+  minPopulation: null,
+  namePrefix: null,
+  distanceUnit: null,
+  offset: 0,
+  excludedCountryIds: null
 }
 
 export default {
-  components: { 'cd-doc': CdDocGeneric, 'cd-info': CDInfo, 'cd-prop-example': CDPropExample },
+  components: { 'cd-doc': CdDocGeneric, 'cd-info': CDInfo, 'cd-form': CDForm, 'cd-prop-example': CDPropExample },
   name: 'cd-doc-home',
   data (home) {
     return {
@@ -201,18 +170,54 @@ select: {
       examples: [{
         id: 1,
         name: 'Простой селект с синхронными данными',
-        payload: selectexample,
+        payload: {
+          datafield: 'property1',
+          text: 'Выберите что-то',
+          labelkey: 'labelkey',
+          valuekey: 'valuekey',
+          input: 'select',
+          values: [{ labelkey: 'label key 1', valuekey: 1 }, { labelkey: 'label key 2', valuekey: 2 }, { labelkey: 'label key 3', valuekey: 3 }],
+          params (payload) {
+            return payload
+          },
+          onselect (...args) {
+            console.log(args)
+          }
+        },
         paramsdescriptor: []
       }, {
         id: 2,
         name: 'Асинхронный селект, получающий данные по url',
-        payload: rapidapiCountry,
+        payload: {
+          datafield: 'wikiDataId',
+          text: 'Страна',
+          input: 'select',
+          valuekey: 'wikiDataId',
+          labelkey: 'name',
+          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+          method: 'get',
+          resolveresult: (response) => (response.data.data),
+          resolvepayload: home.resolveCountryPayload,
+          isdisabled: (payload, option) => option.wikiDataId.endsWith(7)
+        },
+        params: countryParams,
         paramsdescriptor: []
       }, {
         id: 3,
         name: 'Ещё один селект, получающий данные по url',
-        payload: rapidapiCity,
-        paramsdescriptor: []
+        payload: {
+          datafield: 'id',
+          text: 'Город',
+          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
+          method: 'get',
+          input: 'select',
+          labelkey: 'city',
+          valuekey: 'id',
+          resolveresult: (response) => (response.data.data),
+          resolvepayload: home.resolveCityPayload
+        },
+        paramsdescriptor: [],
+        params: cityParams
       }],
       property: false,
       selected: 1,
@@ -222,31 +227,28 @@ select: {
       }
     }
   },
-  methods: {
-    onselect (event) {
-      this.selected = (Number(event.target.value) - 1)
-    },
-    convertproperty (p) {
-      return [{
-        datafield: p.datafield,
-        text: p.text,
-        select: {
-          labelkey: p.labelkey,
-          valuekey: p.valuekey,
-          crud: {
-            get: {
-              url: p.url,
-              method: p.method
-            }
-          },
-          values: p.values,
-          resolveresult: p.resolveresult,
-          resolvepayload: p.resolvepayload,
-          isdisabled: p.isdisabled,
-          onselect: p.onselect
-        }
+  watch: {
+    selected: {
+      immediate: true,
+      handler (newvalue, oldvalue) {
+        this.property = this.examples[Number(newvalue) - 1]
+        this.payload = this.property.payload
       }
-      ]
+    }
+  },
+  methods: {
+    onpropertyedit (property, value) {
+      Vue.set(this.property.payload, property.datafield, value)
+    },
+    resolveCityPayload (payload) {
+      return {
+        params: this.property.params
+      }
+    },
+    resolveCountryPayload (payload) {
+      return {
+        params: this.property.params
+      }
     }
   }
 }
