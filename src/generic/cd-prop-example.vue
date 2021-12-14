@@ -1,45 +1,23 @@
 <template>
   <div class="cd-prop-example--content">
     <div class="cd-descriptor--editor">
-      <cd-form class="cd-property-editor" :payload="property" :descriptor="options"></cd-form>
-      <cd-form class="cd-params-editor" :payload="propertypayload" :descriptor="paramsdescriptor"></cd-form>
+      <slot name="editor"></slot>
     </div>
     <div class="cd-descriptor--view">
       <code>
-        <div>{{ property }}</div>
-        <div>{{ propertypayload }}</div>
+        <slot name="preview"></slot>
       </code>
     </div>
-    <cd-form class="cd-example--form" :payload="payload" :descriptor="convertproperty(property)"></cd-form>
+    <div class="cd-example--form">
+      <slot name="sandbox"></slot>
+    </div>
   </div>
 </template>
 
 <script>
-import CDForm from '@/components/cd-form.vue'
 
 export default {
-  name: 'cd-prop-example',
-  components: {
-    'cd-form': CDForm
-  },
-  props: {
-    property: { type: Object, reqiuired: true },
-    options: { type: Array, required: true },
-    paramsdescriptor: { type: Array, required: true },
-    convertproperty: { type: Function },
-    payload: { type: Object, required: true }
-  },
-  data (example) {
-    return {
-    }
-  },
-  computed: {
-    propertypayload () {
-      const property = this.property
-      if (property) return this.property.resolvepayload(this.payload)
-      return false
-    }
-  }
+  name: 'cd-prop-example'
 }
 </script>
 
