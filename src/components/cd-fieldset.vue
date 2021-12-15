@@ -7,10 +7,11 @@
                 :isvisible="isvisible"
                 :iseditable="iseditable"
                 :propertyconfig="propertyconfig"
-                :descriptor="property.descriptor">
+                :descriptor="property.descriptor"
+                :readonly="readonly">
                 <legend v-if="haslegend(property)" class="cd-legend w-auto">{{ property.text }}</legend>
             </cd-fieldset>
-            <cd-cell v-else :config="propertyconfig(property)">
+            <cd-cell v-else :config="propertyconfig(property)" :readonly="readonly">
               <label class="cd-label" :for="property.datafield" slot="label">{{ property.text }}</label>
             </cd-cell>
         </div>
@@ -25,7 +26,8 @@ export default {
   name: 'cd-fieldset',
   mixins: [props],
   props: {
-    propertyconfig: { type: Function }
+    propertyconfig: { type: Function },
+    readonly: { type: Boolean }
   },
   components: {
     'cd-cell': cell
