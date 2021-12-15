@@ -2,7 +2,7 @@
   <div class="cd-list" v-on:mouseleave="listleave">
     <slot name="header"></slot>
     <ul v-if="showitems" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]">
-      <li v-for="(row, index) in list"
+      <li v-for="(row, index) in collection"
         :key="rowkey(row)" class="cd-list--item" :class="rowclassResolved(row)"
           v-on:click.stop="listitemclicked($event, { row, index })"
           v-on:mouseenter="listitementered($event, { row, index})">

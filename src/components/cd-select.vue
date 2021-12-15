@@ -1,7 +1,7 @@
 <template>
   <select v-model="current" class="cd-select form-control form-control-sm" v-on:input="oninput">
     <option v-if="error" value="reload" :label="error"/>
-    <option v-for="(option) in list" :key="option[keyfield]" :value="option[keyfield]" :label="option[labelkey]" :disabled="isdisabled(option)"/>
+    <option v-for="(option) in collection" :key="option[keyfield]" :value="option[keyfield]" :label="option[labelkey]" :disabled="isdisabled(option)"/>
   </select>
 </template>
 
@@ -31,7 +31,7 @@ export default {
   methods: {
     oninput (event) {
       if (event.target.value === 'reload') this.loaddata(this.payload)
-      const selected = this.list.find(option => String(option[this.keyfield]) === event.target.value)
+      const selected = this.collection.find(option => String(option[this.keyfield]) === event.target.value)
       if (selected !== null && selected !== undefined) {
         this.current = selected[this.keyfield]
         this.onselect(selected)

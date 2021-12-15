@@ -107,12 +107,11 @@ export default {
       return (row) => row[local.keyfield]
     },
     hasdata () {
-      return this.list.length
+      return this.collection.length
     }
   },
   data (col) {
     return {
-      list: col.collection,
       error: false
     }
   },
@@ -127,13 +126,13 @@ export default {
         try {
           request.exec(request.url, local.resolvepayload(payload))
             .then((response) => {
-              local.list = local.resolvedata(response)
+              local.resolvedata(response)
               local.error = false
             }).catch((reason) => {
               local.error = reason
             })
         } catch (error) {
-          local.list = local.collection
+          // local.list = local.collection
           // по-хорошему, такой ситуации быть не может
           // либо к нам приходит коллекция, либо мы получаем её
           local.error = false
@@ -156,7 +155,7 @@ export default {
             .then((response) => {
               if (Object.prototype.hasOwnProperty.call(response, 'success')) {
                 if (response.success) {
-                  local.list.push(response.data)
+                  local.collection.push(response.data)
                 } else if (Object.prototype.hasOwnProperty.call(response, 'message')) {
                   console.error(response.message)
                 } else {

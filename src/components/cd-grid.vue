@@ -49,7 +49,7 @@
         <tbody class="cd-grid--table-content">
           <template v-if="hasdata">
             <!-- проходим в цикле по list -->
-            <tr class="cd-grid--row" v-for="(row, rindex) in list" :key="rowkey(row)">
+            <tr class="cd-grid--row" v-for="(row, rindex) in collection" :key="rowkey(row)">
               <!-- можно выбирать строки? -->
               <td v-if="selectrows" class="cd-checkbox--cell">
                   <input :id="cbkey(row, rindex)" class="cd-checkbox"
