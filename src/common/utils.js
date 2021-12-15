@@ -137,7 +137,6 @@ const propertyconfig = function (property, propertyholder, payload = {}) {
     select: createSelect(property.select, propertyholder, payload),
     datafield: property.datafield,
     text: property.text,
-    readonly: false,
     value: () => ph[p.datafield]
   })
 }

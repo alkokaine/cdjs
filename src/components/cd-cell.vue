@@ -14,9 +14,9 @@
         <textarea :id="config.datafield"/>
       </template>
       <template v-else-if="config.input">
-        <input :type="config.input.type" :name="config.datafield" :readonly="config.readonly"
+        <input :type="config.input.type" :name="config.datafield" :readonly="readonly"
           :value="value" :required="config.required" :pattern="config.input.pattern"
-          :class="{'is-readonly': config.readonly}" :placeholder="config.input.placeholder"
+          :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
           :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
           :maxlength="config.input.maxlength"
           :checked="config.input.checked"/>
@@ -34,7 +34,8 @@ export default {
   },
   props: {
     config: { type: Object, required: true },
-    showlabel: { type: Boolean, default: false }
+    showlabel: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: true }
   },
   computed: {
     value () {

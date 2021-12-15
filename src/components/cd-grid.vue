@@ -14,8 +14,7 @@
       <slot name="cd-grid-buttons"></slot>
     </div>
     <div class="cd-grid--content">
-      <template v-if="hasdata">
-        <table class="table cd-grid--table">
+      <table class="table cd-grid--table">
           <caption>
             <slot name="table-caption"></slot>
           </caption>
@@ -48,6 +47,7 @@
             </tr>
           </thead>
           <tbody class="cd-grid--table-content">
+            <template v-if="list.length">
             <!-- проходим в цикле по list -->
             <tr class="cd-grid--row" v-for="(row, rindex) in list" :key="rowkey(row)">
               <!-- можно выбирать строки? -->
@@ -72,16 +72,16 @@
                       :payload="row"/>
               </td>
             </tr>
+            </template>
+            <template v-else>
+              <div class="cd-grid--no-data">
+                <slot name="no-data">
+                  Нет данных
+                </slot>
+              </div>
+            </template>
           </tbody>
         </table>
-      </template>
-      <template v-else>
-        <div class="cd-grid--no-data">
-          <slot name="no-data">
-            Нет данных
-          </slot>
-        </div>
-      </template>
     </div>
     <div class="cd-grid--footer">
       <template v-if="paging && total">
