@@ -180,13 +180,14 @@ const flatterer = function (arr, accum) {
  * @returns {Object} настройки ячейки таблицы или поля на форме
  */
 const propertyconfig = function (property, propertyholder, isreadonly, payload = {}) {
+  const ph = propertyholder
+  const p = property
   return {
     input: createInput.call(this, property, propertyholder, payload),
     select: property.input === 'select' ? createSelect.call(this, property, propertyholder, payload) : undefined,
     datafield: property.datafield,
     text: property.text,
-    readonly: !isreadonly,
-    value: () => propertyholder[property.datafield]
+    value: () => ph[p.datafield]
   }
 }
 

@@ -24,7 +24,7 @@
       <!--  если у менюшки в свойстве property есть дочернее меню, нарисуем его -->
       <cd-menu v-if="scope.row[property] && isselected(scope)" class="cd-menu--children" :class="{ 'is-collapsed': iscollapsed, 'is-active': isselected(scope) }"
           :inner="true" :menu="scope.row[property]" :itemkey="itemkey" :icon="icon" :property="property" :text="text" :iscollapsed="iscollapsed"
-          :showitems="isselected(scope)" :isactive="isselected(scope)">
+          :showitems="isselected(scope)" :isactive="isselected(scope)" :menuitemclicked="menuitemclicked">
           <!--  а если менюшка коллапсед, текст пойдёт в заголовок дочерней менюшки-->
           <div v-if="iscollapsed && isselected(scope)" class="cd-menu-children--header is-collapsed" slot="menu-header">
             <span class="cd-menu-item--text">{{ scope.row[text] }}</span>
