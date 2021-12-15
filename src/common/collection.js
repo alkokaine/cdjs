@@ -1,5 +1,11 @@
 export default {
   props: {
+    resolvepayload: {
+      type: Function,
+      default: function (payload) {
+        return payload
+      }
+    },
     /**
      * функция, которая из ответа сервера вернёт непосредственно коллекцию
      */
@@ -75,7 +81,7 @@ export default {
             const request = Object.prototype.hasOwnProperty.call(localcrud.get, 'method')
               ? { url: localcrud.get.url, exec: local.$http[localcrud.get.method] }
               : { url: localcrud.get, exec: local.$http.post }
-            request.exec(request.url, { params: newvalue })
+            request.exec(request.url, local.resolvepayload(newvalue))
               .then((response) => {
                 local.list = local.resolvedata(response)
               }).catch((reason) => {
