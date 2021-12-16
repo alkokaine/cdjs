@@ -37,6 +37,9 @@ function resolvePropertyValue (object, propertyname, payload, another = undefine
   }
   return undefined
 }
+function createRouterLink (property, propertyholder, payload) {
+  return resolvePropertyValue(property, 'route', propertyholder)
+}
 /**
  * функция, возвращающая настройки поля <input>
  * для свойства property с именем property.datafield
@@ -185,9 +188,10 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
   return {
     input: createInput.call(this, property, propertyholder, payload),
     select: property.input === 'select' ? createSelect.call(this, property, propertyholder, payload) : undefined,
+    route: property.route ? createRouterLink.call(this, property, propertyholder, payload) : undefined,
     datafield: property.datafield,
     text: property.text,
-    value: () => ph[p.datafield]
+    value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield]
   }
 }
 
