@@ -1,5 +1,5 @@
 <template>
-  <fieldset class="cd-fieldset border p-2">
+  <fieldset class="cd-fieldset border p-2 form-control">
         <slot></slot>
         <div class="cd-field" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
             <cd-fieldset v-if="hasdescriptor(property)"
