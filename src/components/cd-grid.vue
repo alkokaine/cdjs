@@ -47,7 +47,7 @@
           </tr>
         </thead>
         <tbody class="cd-grid--table-content">
-          <template v-if="hasdata">
+          <template v-if="collection.length">
             <!-- проходим в цикле по list -->
             <tr class="cd-grid--row" v-for="(row, rindex) in collection" :key="rowkey(row)">
               <!-- можно выбирать строки? -->
@@ -125,7 +125,7 @@ export default {
   },
   data (grid) {
     return {
-      header: utils.headerrows(grid.descriptor, grid.payload),
+      // header: utils.headerrows(grid.descriptor, grid.payload),
       currentrow: {}
     }
   },
@@ -135,6 +135,9 @@ export default {
     },
     propertyconfig: function () {
       return (property, row) => utils.propertyconfig.call(this, property, row, this.iscurrentrow(row), this.payload)
+    },
+    header: function () {
+      return utils.headerrows(this.descriptor, this.payload)
     }
   },
   name: 'cd-grid',
