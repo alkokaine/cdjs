@@ -23,7 +23,7 @@ export default {
     'cd-fieldset': fieldset
   },
   props: {
-    onpropertychange: { type: Function, default: (property, value) => {}, description: 'Функция, которая выполнится при изменении свойства объекта payload' },
+    onpropertychange: { type: Function, required: true, description: 'Функция, которая выполнится при изменении свойства объекта payload' },
     payload: { type: Object, required: true, description: 'Объект, который размещается на форме' },
     descriptor: {
       type: Array,
