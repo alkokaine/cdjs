@@ -2,7 +2,12 @@
   <div class="cd-cell">
       <slot name="label"></slot>
       <template v-if="readonly">
-        <span>{{ value }}</span>
+        <template v-if="config.route">
+          <router-link :to="config.route">{{ value }}</router-link>
+        </template>
+        <template v-else>
+          <span>{{ value }}</span>
+        </template>
       </template>
       <template v-else>
       <template v-if="config.select">
@@ -53,7 +58,7 @@ export default {
   },
   data (cell) {
     return {
-      value: cell.config.value()
+      value: cell.config.value
     }
   }
 }
