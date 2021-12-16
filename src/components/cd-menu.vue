@@ -15,7 +15,7 @@
     <div slot-scope="scope" class="cd-menu-item--block"
       :class="{ 'is-collapsed': iscollapsed, 'is-active': isselected(scope), 'inner': inner }">
       <!-- блок заголовка: -->
-      <div class="cd-menu-item--header" :class="{'is-collapsed': iscollapsed, 'is-active': isselected(scope) }">
+      <div v-if="scope.row.is_drop" class="cd-menu-item--header" :class="{'is-collapsed': iscollapsed, 'is-active': isselected(scope) }">
         <!-- пиктограмма, взятая из свойства icon объекта scope.row  -->
         <i class="cd-menu-item--icon" :class="scope.row[icon]"></i>
         <!--  и, если менюшка не коллапсед, текст из свойства text объекта scope.row -->
@@ -23,13 +23,23 @@
       </div>
       <!--  если у менюшки в свойстве property есть дочернее меню, нарисуем его -->
       <cd-menu v-if="scope.row[property] && isselected(scope)" class="cd-menu--children" :class="{ 'is-collapsed': iscollapsed, 'is-active': isselected(scope) }"
-          :inner="true" :menu="scope.row[property]" :itemkey="itemkey" :icon="icon" :property="property" :text="text" :iscollapsed="iscollapsed"
-          :showitems="isselected(scope)" :isactive="isselected(scope)" :menuitemclicked="menuitemclicked">
-          <!--  а если менюшка коллапсед, текст пойдёт в заголовок дочерней менюшки-->
-          <div v-if="iscollapsed && isselected(scope)" class="cd-menu-children--header is-collapsed" slot="menu-header">
-            <span class="cd-menu-item--text">{{ scope.row[text] }}</span>
-          </div>
-        </cd-menu>
+        :inner="true" :menu="scope.row[property]" :itemkey="itemkey" :icon="icon" :property="property" :text="text" :iscollapsed="iscollapsed"
+        :showitems="isselected(scope)" :isactive="isselected(scope)" :menuitemclicked="menuitemclicked">
+        <!--  а если менюшка коллапсед, текст пойдёт в заголовок дочерней менюшки-->
+        <div v-if="iscollapsed && isselected(scope)" class="cd-menu-children--header is-collapsed" slot="menu-header">
+          <span class="cd-menu-item--text">{{ scope.row[text] }}</span>
+        </div>
+      </cd-menu>
+      <!-- блок заголовка: -->
+      <div v-if="!scope.row.is_drop" class="cd-menu-item--header" :class="{'is-collapsed': iscollapsed, 'is-active': isselected(scope) }">
+        <!-- пиктограмма, взятая из свойства icon объекта scope.row  -->
+        <i class="cd-menu-item--icon" :class="scope.row[icon]"></i>
+        <!--  и, если менюшка не коллапсед, текст из свойства text объекта scope.row -->
+        <span v-if="!iscollapsed || isactive" class="cd-menu-item--text">{{ scope.row[text] }}</span>
+      </div>
+    </div>
+    <div slot="footer">
+      <slot name="menu-footer"></slot>
     </div>
   </cd-list>
 </template>
