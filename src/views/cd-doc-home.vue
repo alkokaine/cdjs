@@ -2,15 +2,13 @@
   <div>
     <cd-doc :content="content"></cd-doc>
     <cd-info v-for="(info, index) in select" :key="index" :component="info" property="props"></cd-info>
-    <select v-model="selected">
+    <select v-model="selected" v-on:change="onpropertyselect">
       <option v-for="(option) in examples" :key="option.id" :value="option.id" :label="option.name">{{ option.name }}</option>
     </select>
-    <cd-prop-example>
-      <cd-form slot="editor" :descriptor="options" :payload="payload" :onpropertychange="onpropertyedit"></cd-form>
-      <div slot="preview">
-        {{ property.payload }}
-      </div>
-      <cd-form slot="sandbox" :descriptor="[property.payload]" :payload="selectform"></cd-form>
+    <cd-prop-example v-if="property">
+      <cd-form slot="editor" :descriptor="options" :payload="property.payload" :onpropertychange="onpropertychange(property.payload)"></cd-form>
+      <code slot="preview">{{ property.payload }}</code>
+      <cd-form slot="sandbox" :descriptor="[property.payload]" :payload="selectform" :onpropertychange="onpropertychange(selectform)"></cd-form>
     </cd-prop-example>
 
   </div>
@@ -46,6 +44,11 @@ const readyvaluesoptions = [
         text: 'valuekey'
       },
       {
+        datafield: 'values',
+        text: 'values',
+        input: 'code'
+      },
+      {
         datafield: 'url',
         text: 'url'
       },
@@ -55,11 +58,18 @@ const readyvaluesoptions = [
       },
       {
         datafield: 'resolveresult',
-        text: 'resolveresult'
+        text: 'resolveresult',
+        input: 'code'
+      },
+      {
+        datafield: 'resolvepayload',
+        text: 'resolvepayload',
+        input: 'code'
       },
       {
         datafield: 'isdisabled',
-        text: 'isdisabled'
+        text: 'isdisabled',
+        input: 'code'
       }
     ]
   }
@@ -176,13 +186,7 @@ select: {
           labelkey: 'labelkey',
           valuekey: 'valuekey',
           input: 'select',
-          values: [{ labelkey: 'label key 1', valuekey: 1 }, { labelkey: 'label key 2', valuekey: 2 }, { labelkey: 'label key 3', valuekey: 3 }],
-          params (payload) {
-            return payload
-          },
-          onselect (...args) {
-            console.log(args)
-          }
+          values: [{ labelkey: 'label key 1', valuekey: 1 }, { labelkey: 'label key 2', valuekey: 2 }, { labelkey: 'label key 3', valuekey: 3 }]
         },
         paramsdescriptor: []
       }, {
@@ -196,7 +200,7 @@ select: {
           labelkey: 'name',
           url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
           method: 'get',
-          resolveresult: (response) => (response.data.data),
+          resolveresult: (response) => response.data.data,
           resolvepayload: home.resolveCountryPayload,
           isdisabled: (payload, option) => option.wikiDataId.endsWith(7)
         },
@@ -213,7 +217,7 @@ select: {
           input: 'select',
           labelkey: 'city',
           valuekey: 'id',
-          resolveresult: (response) => (response.data.data),
+          resolveresult: (response) => response.data.data,
           resolvepayload: home.resolveCityPayload
         },
         paramsdescriptor: [],
@@ -224,21 +228,28 @@ select: {
       options: readyvaluesoptions,
       selectform: {
         property1: 1
-      }
+      },
+      payload: false
     }
   },
   watch: {
     selected: {
       immediate: true,
-      handler (newvalue, oldvalue) {
-        this.property = this.examples[Number(newvalue) - 1]
-        this.payload = this.property.payload
+      handler (newvalue) {
+        if (newvalue) {
+          this.property = this.examples.find(e => e.id === newvalue)
+        }
       }
     }
   },
   methods: {
-    onpropertyedit (property, value) {
-      Vue.set(this.property.payload, property.datafield, value)
+    onpropertyselect (event) {
+      this.selected = Number(event.target.value)
+    },
+    onpropertychange (payload) {
+      return (event) => {
+        Vue.set(payload, event.property.datafield, event.value)
+      }
     },
     resolveCityPayload (payload) {
       return {
