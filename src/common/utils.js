@@ -70,7 +70,7 @@ function createInput (property, propertyholder, payload) {
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
     checked: resolvePropertyValue(property, 'checked', propertyholder),
     placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
-    ondebounce (value, event) { parent.onpropertychange(property, value) }
+    ondebounce (value, event) { parent.onpropertychange({ property, value }) }
   })
 }
 
@@ -102,12 +102,12 @@ function createSelect (property, propertyholder, payload) {
     },
     resolveresult: property.resolveresult, // функция, возвращающая итоговые данные
     // для списка опций селекта
-    resolvepayload: resolvePropertyValue(property, 'resolvepayload', propertyholder),
+    resolvepayload: () => resolvePropertyValue(property, 'resolvepayload', propertyholder),
     // определяем, задизаблена ли опция
     isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
     // выполняем onselect
     onselect: (option) => {
-      parent.onpropertychange(property, option)
+      parent.onpropertychange({ property, option })
       // Vue.set(propertyholder, property.datafield, option[property.valuekey])
       if (property.onselect && typeof property.onselect === 'function') property.onselect(option, parent)
     }
@@ -186,12 +186,21 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
   const ph = propertyholder
   const p = property
   return {
-    input: createInput.call(this, property, propertyholder, payload),
-    select: property.input === 'select' ? createSelect.call(this, property, propertyholder, payload) : undefined,
-    route: property.route ? createRouterLink.call(this, property, propertyholder, payload) : undefined,
-    datafield: property.datafield,
-    text: property.text,
-    value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield]
+    input: createInput.call(this, p, ph, payload),
+    select: p.input === 'select' ? createSelect.call(this, p, ph, payload) : undefined,
+    route: p.route ? createRouterLink.call(this, p, ph, payload) : undefined,
+    datafield: p.datafield,
+    text: p.text,
+    value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield],
+    onchange (event) {
+
+    },
+    onblur (event) {
+
+    },
+    oninput (event) {
+
+    }
   }
 }
 
