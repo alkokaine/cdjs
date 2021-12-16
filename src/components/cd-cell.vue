@@ -15,25 +15,27 @@
           :keyfield="config.select.valuekey"
           :labelkey="config.select.labelkey"
           :crud="config.select.crud"
-          :resolvedata="config.select.resolveresult"
+          :collection="values"
+          :isdisabled="config.select.isdisabled"
+          :clearable="config.select.clearable"
+          :resolveresult="resolveresult"
           :onselect="config.select.onselect"></cd-select>
-        <!-- <select class="form-select form-select-sm" :multiple="config.select.multiple" :name="config.datafield"
-          :required="config.required">
-          <option v-for="(option) in config.select.options()" :key="option[config.select.valuekey]"
-            :disabled="config.select.isdisabled(option)" :label="option[config.select.labelkey]"
-            :value="option[config.select.valuekey]"></option>
-        </select>-->
         </template>
         <template v-else-if="config.textarea">
           <textarea :id="config.datafield"/>
         </template>
         <template v-else-if="config.input">
-          <input :type="config.input.type" :name="config.datafield" :readonly="readonly"
-            :value="value" :required="config.required" :pattern="config.input.pattern"
-            :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
-            :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
-            :maxlength="config.input.maxlength"
-            :checked="config.input.checked"/>
+          <code v-if="config.input.type === 'code'">
+            {{ config.value }}
+          </code>
+          <template v-else>
+            <input v-debounce:1s.cancelonempty="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
+              :value="config.value" :required="config.required" :pattern="config.input.pattern"
+              :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
+              :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
+              :maxlength="config.input.maxlength"
+              :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
+            </template>
         </template>
       </template>
   </div>
@@ -58,7 +60,13 @@ export default {
   },
   data (cell) {
     return {
-      value: cell.config.value
+      value: cell.config.value,
+      values: cell.config.select ? (cell.config.select.values || []) : []
+    }
+  },
+  methods: {
+    resolveresult (response) {
+      this.values = this.config.select.resolveresult(response)
     }
   }
 }
