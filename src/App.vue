@@ -110,7 +110,53 @@ export default {
       ],
       menu: [
         { id: 1, icon: 'bi bi-list-ul', text: 'Список', url: '/Collection' },
-        { id: 2, icon: 'bi bi-menu-button-wide', text: 'Меню', url: '/Menu' },
+        {
+          id: 2,
+          icon: 'bi bi-menu-button-wide',
+          text: 'Меню',
+          url: '/Menu',
+          drop: true,
+          menu: [
+            {
+              id: 5,
+              text: 'нисходящее',
+              drop: true,
+              menu: [
+                {
+                  text: 'нисходящее меню 1',
+                  id: 7
+                },
+                {
+                  text: 'нисходящее меню 2',
+                  id: 8
+                },
+                {
+                  text: 'нисходящее меню 3',
+                  id: 9
+                }
+              ]
+            },
+            {
+              id: 6,
+              text: 'восходящее',
+              drop: false,
+              menu: [
+                {
+                  text: 'восходящее меню 1',
+                  id: 10
+                },
+                {
+                  text: 'восходящее меню 2',
+                  id: 11
+                },
+                {
+                  text: 'восходящее меню 3',
+                  id: 12
+                }
+              ]
+            }
+          ]
+        },
         {
           id: 3,
           icon: 'bi bi-table',
