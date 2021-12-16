@@ -3,7 +3,10 @@
     <form class="cd-form--content">
       <slot>
         <template v-if="descriptor.length">
-            <cd-fieldset :descriptor="descriptor" :isvisible="isvisible" :iseditable="iseditable" :propertyconfig="propertyconfig"></cd-fieldset>
+            <cd-fieldset :descriptor="descriptor"
+              :isvisible="isvisible"
+              :iseditable="iseditable"
+              :propertyconfig="propertyconfig"></cd-fieldset>
         </template>
         <template v-else>
             <span>Напишите в внутри тэга cd-form содержимое формы, или используйте свойство descriptor для встроенного рендеринга</span>
