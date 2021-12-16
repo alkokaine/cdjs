@@ -4,7 +4,7 @@ export default {
     /**
      * функция, которая из ответа сервера вернёт непосредственно коллекцию
      */
-    resolvedata: {
+    resolveresult: {
       type: Function,
       default: function (response) {
         return response.data
@@ -121,9 +121,9 @@ export default {
           ? { url: localcrud.get.url, exec: local.$http[localcrud.get.method] }
           : { url: localcrud.get, exec: local.$http.post }
         try {
-          request.exec(request.url, local.resolvepayload(payload))
+          request.exec(request.url, payload)
             .then((response) => {
-              local.resolvedata(response)
+              local.resolveresult(response)
               local.error = false
             }).catch((reason) => {
               local.error = reason
