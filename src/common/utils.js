@@ -189,6 +189,7 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
     input: createInput.call(this, p, ph, payload),
     select: p.input === 'select' ? createSelect.call(this, p, ph, payload) : undefined,
     route: p.route ? createRouterLink.call(this, p, ph, payload) : undefined,
+    clearable: p.clearable,
     datafield: p.datafield,
     text: p.text,
     value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield],

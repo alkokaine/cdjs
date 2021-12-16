@@ -38,6 +38,7 @@
             </template>
         </template>
       </template>
+      <button v-if="config.clearable">x</button>
   </div>
 </template>
 

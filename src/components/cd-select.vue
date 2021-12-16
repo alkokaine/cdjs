@@ -7,6 +7,7 @@
 
 <script>
 import collection from '../common/collection'
+
 export default {
   name: 'cd-select',
   mixins: [collection],
@@ -18,7 +19,6 @@ export default {
       },
       description: 'Функция, которая вычисляет disabled для option и payload'
     },
-    clearable: { type: Boolean, default: true, description: 'Есть ли рядом с select кнопка очистки выбранной опции' },
     keyfield: { type: String, required: true, description: 'Свойство-идентификатор объектов в опциях select' },
     labelkey: { type: String, required: true, description: 'Свойство-заголовок объектов в опциях select' },
     value: { type: [Number, String], description: 'Текущее значение select' },
