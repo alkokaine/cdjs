@@ -105,9 +105,6 @@ export default {
     rowkey () {
       const local = this
       return (row) => row[local.keyfield]
-    },
-    hasdata () {
-      return this.collection.length
     }
   },
   data (col) {
