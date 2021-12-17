@@ -6,9 +6,6 @@ export default {
      */
     resolveresult: {
       type: Function,
-      default: function (response) {
-        return response.data
-      },
       returns: Array,
       description: 'возвращает ту часть ответа сервера, которую мы собирались поместить в коллекцию'
     },

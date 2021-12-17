@@ -47,7 +47,7 @@
           </tr>
         </thead>
         <tbody class="cd-grid--table-content">
-          <template v-if="collection.length">
+          <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
             <tr class="cd-grid--row" v-for="(row, rindex) in collection" :key="rowkey(row)">
               <!-- можно выбирать строки? -->
@@ -121,7 +121,18 @@ export default {
     total: { type: Number, description: 'При постраничной загрузке данных, эта штука возвращается контроллером вместе с коллекцией, означает сколько-всего-элементов-в-коллекции' },
     page: { type: Number, description: 'При постраничной загрузке данных, номер текущей страницы' },
     pageSize: { type: Number, description: 'При постраничной загрузке данных, размер страницы в элементах' },
-    selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' }
+    selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' },
+    resolveresult: {
+      type: Function,
+      default: function (response) {
+        return response.data
+      }
+    },
+    collection: {
+      type: Array,
+      required: true,
+      description: 'Коллекция для отображения в гриде'
+    }
   },
   data (grid) {
     return {
