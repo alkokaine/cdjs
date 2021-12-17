@@ -11,7 +11,7 @@
       </template>
       <template v-else>
       <template v-if="config.select">
-        <cd-select :payload="config.select.payload"
+        <cd-select class="form-control" :payload="config.select.payload"
           :keyfield="config.select.valuekey"
           :labelkey="config.select.labelkey"
           :crud="config.select.crud"
@@ -22,14 +22,14 @@
           :onselect="config.select.onselect"></cd-select>
         </template>
         <template v-else-if="config.textarea">
-          <textarea :id="config.datafield"/>
+          <textarea class="form-control" :id="config.datafield"/>
         </template>
         <template v-else-if="config.input">
-          <code v-if="config.input.type === 'code'">
+          <code v-if="config.input.type === 'code'" class="form-control">
             {{ config.value }}
           </code>
           <template v-else>
-            <input v-debounce:1s.cancelonempty="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
+            <input class="form-control" v-debounce:1s.cancelonempty="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
               :value="config.value" :required="config.required" :pattern="config.input.pattern"
               :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
               :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
