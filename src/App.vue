@@ -163,7 +163,8 @@ export default {
           text: 'Таблица',
           url: '/Grid'
         },
-        { id: 4, icon: 'bi bi-input-cursor-text', text: 'Форма', url: '/Form' }
+        { id: 4, icon: 'bi bi-input-cursor-text', text: 'Форма', url: '/Form' },
+        { id: 10, text: 'Диалог', url: '/Dialog' }
       ],
       iscollapsed: window.innerWidth <= 1024,
       totalrows: 0
