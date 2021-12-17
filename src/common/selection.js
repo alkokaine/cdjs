@@ -32,7 +32,7 @@ export default {
           if (this.allselected) {
             selection.selectedrows = []
           } else {
-            const unselected = selection.list.filter(row => !selection.isrowselected(row))
+            const unselected = selection.collection.filter(row => !selection.isrowselected(row))
             unselected.forEach(u => selection.selectedrows.push(u[selection.keyfield]))
           }
         }
@@ -51,12 +51,16 @@ export default {
   },
   data () {
     return {
-      selectedrows: []
+      selectedrows: [],
+      allselected: false
     }
   },
-  computed: {
-    allselected () {
-      return this.selectedrows.length === this.list.length
+  watch: {
+    'selectedrows.length': {
+      handler (newvalue, oldvalue) {
+        if (oldvalue === this.collection.length && newvalue < this.collection.length) this.allselected = false
+        if (newvalue === this.collection.length && oldvalue < this.collection.length) this.allselected = true
+      }
     }
   }
 }
