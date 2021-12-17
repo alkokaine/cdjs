@@ -2,6 +2,7 @@
   <div>
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
+    <cd-grid :crud="crud" :descriptor="descriptor" keyfield="id" :payload="payload" :resolveresult="resolveresult" :collection="cities"></cd-grid>
   </div>
 </template>
 
@@ -14,18 +15,75 @@ export default {
   name: 'cd-doc-grid',
   components: {
     'cd-doc': CDDocGeneric,
-    'cd-info': ComponentInfo
+    'cd-info': ComponentInfo,
+    'cd-grid': CDGrid
   },
   data (view) {
     return {
       infos: CDGrid.mixins.concat(CDGrid),
+      crud: {
+        get: {
+          method: 'get',
+          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
+        }
+      },
+      descriptor: [
+        {
+          datafield: 'city',
+          text: 'city'
+        },
+        {
+          datafield: 'country',
+          text: 'country'
+        },
+        {
+          datafield: 'countryCode',
+          text: 'countryCode'
+        },
+        {
+          datafield: 'latitude',
+          text: 'latitude'
+        },
+        {
+          datafield: 'longitude',
+          text: 'longitude'
+        },
+        {
+          datafield: 'region',
+          text: 'region'
+        },
+        {
+          datafield: 'regionCode',
+          text: 'regionCode'
+        },
+        {
+          datafield: 'wikiDataId',
+          text: 'wikiDataId'
+        }
+      ],
       doc: [
         {
           id: 'grid-a',
           header: 'CD-GRID',
           description: ['Что-то будет']
         }
-      ]
+      ],
+      payload: {
+        params: {
+          limit: 10,
+          minPopulation: null,
+          namePrefix: null,
+          distanceUnit: null,
+          offset: 0,
+          excludedCountryIds: null
+        }
+      },
+      cities: []
+    }
+  },
+  methods: {
+    resolveresult (response) {
+      this.cities = response.data.data
     }
   }
 }
