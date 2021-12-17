@@ -5,6 +5,7 @@ import CDGridView from '../views/cd-doc-grid.vue'
 import CDFormView from '../views/cd-doc-form.vue'
 import CDMenuView from '../views/cd-doc-menu.vue'
 import CDListView from '../views/cd-doc-list.vue'
+import CDModalView from '../views/cd-doc-modal.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -31,6 +32,11 @@ const routes = [
     path: '/Form',
     name: 'form',
     component: CDFormView
+  },
+  {
+    path: '/Dialog',
+    name: 'dialog',
+    component: CDModalView
   }
 ]
 const router = new VueRouter({
