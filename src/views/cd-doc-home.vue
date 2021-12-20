@@ -247,6 +247,21 @@ select: {
             text: 'namePrefix'
           },
           {
+            datafield: 'wikiDataId',
+            text: 'Страна',
+            input: 'select',
+            valuekey: 'wikiDataId',
+            labelkey: 'name',
+            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+            method: 'get',
+            resolveresult: (response) => response.data.data,
+            resolvepayload: home.resolveCountryPayload,
+            isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
+            onselect: (payload, option) => {
+              Vue.set(payload, 'countryIds', `${option.code},`)
+            }
+          },
+          {
             datafield: 'countryIds',
             text: 'countryIds'
           }
@@ -279,6 +294,7 @@ select: {
     onpropertychange (payload) {
       return (event) => {
         Vue.set(payload, event.property.datafield, event.value)
+        // todo: after property changed
       }
     },
     resolveCityPayload (payload) {
