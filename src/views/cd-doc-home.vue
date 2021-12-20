@@ -7,10 +7,16 @@
     </select>
     <cd-prop-example v-if="property">
       <cd-form slot="editor" :descriptor="options" :payload="property.payload" :onpropertychange="onpropertychange(property.payload)"></cd-form>
-      <code slot="preview">{{ property.payload }}</code>
+      <div slot="preview">
+        <code>{{ property.payload }}</code>
+        <div v-if="property.params">
+          <h3>Давайте издеваться!</h3>
+          <div>На форме ниже мы видим значения свойств объекта, который улетит с запросом</div>
+          <cd-form :descriptor="property.paramsdescriptor" :payload="property.params" :onpropertychange="onpropertychange(property.params)"></cd-form>
+        </div>
+      </div>
       <cd-form slot="sandbox" :descriptor="[property.payload]" :payload="selectform" :onpropertychange="onpropertychange(selectform)"></cd-form>
     </cd-prop-example>
-
   </div>
 </template>
 
@@ -77,13 +83,15 @@ const readyvaluesoptions = [
 
 const countryParams = {
   limit: 10,
-  namePrefix: ''
+  namePrefix: '',
+  offset: 0
 }
 
 const cityParams = {
   limit: 10,
   minPopulation: null,
   namePrefix: null,
+  countryIds: '',
   distanceUnit: null,
   offset: 0,
   excludedCountryIds: null
@@ -205,7 +213,16 @@ select: {
           isdisabled: (payload, option) => option.wikiDataId.endsWith(7)
         },
         params: countryParams,
-        paramsdescriptor: []
+        paramsdescriptor: [
+          {
+            datafield: 'limit',
+            text: 'limit'
+          },
+          {
+            datafield: 'namePrefix',
+            text: 'namePrefix'
+          }
+        ]
       }, {
         id: 3,
         name: 'Ещё один селект, получающий данные по url',
@@ -220,7 +237,20 @@ select: {
           resolveresult: (response) => response.data.data,
           resolvepayload: home.resolveCityPayload
         },
-        paramsdescriptor: [],
+        paramsdescriptor: [
+          {
+            datafield: 'offset',
+            text: 'offset'
+          },
+          {
+            datafield: 'namePrefix',
+            text: 'namePrefix'
+          },
+          {
+            datafield: 'countryIds',
+            text: 'countryIds'
+          }
+        ],
         params: cityParams
       }],
       property: false,
