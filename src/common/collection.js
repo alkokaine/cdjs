@@ -4,7 +4,7 @@ export default {
     resolvepayload: {
       type: Function,
       returns: Object,
-      description: 'Возвращает изменённый объект payload, подходящий запроса. По умолчанию возвращается неизменённый объект',
+      description: 'Возвращает изменённый объект payload, подходящий для отправки с запросом. По умолчанию возвращается неизменённый объект',
       default: (payload) => (payload)
     },
     /**
