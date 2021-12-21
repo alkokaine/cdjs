@@ -1,6 +1,12 @@
 export default {
   name: 'collection',
   props: {
+    resolvepayload: {
+      type: Function,
+      returns: Object,
+      description: 'Возвращает изменённый объект payload, подходящий запроса. По умолчанию возвращается неизменённый объект',
+      default: (payload) => (payload)
+    },
     /**
      * функция, которая из ответа сервера вернёт непосредственно коллекцию
      */
@@ -106,7 +112,7 @@ export default {
           ? { url: localcrud.get.url, exec: local.$http[localcrud.get.method] }
           : { url: localcrud.get, exec: local.$http.post }
         try {
-          request.exec(request.url, payload)
+          request.exec(request.url, local.resolvepayload(payload))
             .then((response) => {
               local.resolveresult(response)
               local.error = false
