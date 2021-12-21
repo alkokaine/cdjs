@@ -91,7 +91,7 @@ export default {
       this.total = response.data.metadata.totalCount
     },
     onpagechange (event, pageargs) {
-      this.payload.offset = pageargs.row.pageNum * this.payload.limit
+      this.payload.offset = pageargs.row.offset
     }
   }
 }
