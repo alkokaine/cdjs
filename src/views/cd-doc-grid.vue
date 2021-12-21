@@ -2,7 +2,7 @@
   <div>
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
-    <cd-grid :crud="crud" :descriptor="descriptor" keyfield="id" :payload="payload" :resolveresult="resolveresult" :collection="cities"></cd-grid>
+    <cd-grid :crud="crud" :descriptor="descriptor" keyfield="id" :payload="payload" :resolveresult="resolveresult" :collection="cities" :total="total" :paging="true" :pageSize="10" :resolvepayload="resolvepayload" :onpagechange="onpagechange"></cd-grid>
   </div>
 </template>
 
@@ -69,21 +69,29 @@ export default {
         }
       ],
       payload: {
-        params: {
-          limit: 10,
-          minPopulation: null,
-          namePrefix: null,
-          distanceUnit: null,
-          offset: 0,
-          excludedCountryIds: null
-        }
+        limit: 10,
+        minPopulation: null,
+        namePrefix: null,
+        distanceUnit: null,
+        offset: 0,
+        excludedCountryIds: null
       },
-      cities: []
+      cities: [],
+      total: 0
     }
   },
   methods: {
+    resolvepayload (payload) {
+      return {
+        params: payload
+      }
+    },
     resolveresult (response) {
       this.cities = response.data.data
+      this.total = response.data.metadata.totalCount
+    },
+    onpagechange (event, pageargs) {
+      this.payload.offset = pageargs.row.pageNum * this.payload.limit
     }
   }
 }
