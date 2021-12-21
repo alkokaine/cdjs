@@ -1,7 +1,7 @@
 <template>
   <cd-list class="cd-pagination--container" listclass="cd-pagination pagination" rowclass="page-item" keyfield="pageNum" :collection="pages" :listitemclicked="onpagechange">
     <div slot-scope="scope">
-      <a class="page-link" :class="{ 'active': scope.row.pageNum == page}" href="#">{{ scope.row.pageNum }}</a>
+      <span class="page-link" :class="{ 'active': scope.row.pageNum == page}">{{ scope.row.pageNum }}</span>
     </div>
   </cd-list>
 </template>
@@ -67,5 +67,6 @@ export default {
   }
   .page-item {
     float: left;
+    cursor: pointer;
   }
 </style>>

@@ -87,15 +87,12 @@
       </table>
     </div>
     <div class="cd-grid--footer">
-      <template v-if="paging && total">
-        <cd-paging :onpagechange="onpagechange" :total="total" :pageSize="pageSize" :page="page"></cd-paging>
-      </template>
+      <cd-paging v-if="showPaging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage"></cd-paging>
     </div>
   </div>
 </template>
 
 <script>
-import Vue from 'vue'
 import collection from '../common/collection'
 import selection from '../common/selection'
 import props from '../common/property-decorator'
@@ -119,8 +116,8 @@ export default {
     usefilter: { type: Boolean, default: false, description: 'Использовать ли фильтр (показывать ли форму-редактор аргументов запроса получения данных)' },
     paging: { type: Boolean, default: false, description: 'Использовать ли постраничную загрузку' },
     total: { type: Number, description: 'При постраничной загрузке данных, эта штука возвращается контроллером вместе с коллекцией, означает сколько-всего-элементов-в-коллекции' },
-    page: { type: Number, description: 'При постраничной загрузке данных, номер текущей страницы' },
     pageSize: { type: Number, description: 'При постраничной загрузке данных, размер страницы в элементах' },
+    onpagechange: { type: Function, description: 'Что проиозойдёт при смене страницы', default: function (event, pageargs) {} },
     selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' },
     resolveresult: {
       type: Function,
@@ -137,7 +134,8 @@ export default {
   data (grid) {
     return {
       // header: utils.headerrows(grid.descriptor, grid.payload),
-      currentrow: {}
+      currentrow: {},
+      currentpage: 1
     }
   },
   computed: {
@@ -147,17 +145,21 @@ export default {
     propertyconfig: function () {
       return (property, row) => utils.propertyconfig.call(this, property, row, this.iscurrentrow(row), this.payload)
     },
+    showPaging: function () {
+      return this.paging && (this.pageSize < this.total)
+    },
     header: function () {
       return utils.headerrows(this.descriptor, this.payload)
     }
   },
   name: 'cd-grid',
   methods: {
-    onpagechange (event, scope) {
-      Vue.set(this.payload, 'offset', scope.row.offset)
-    },
     iscurrentrow (row) {
       return row[this.keyfield] === this.currentrow[this.keyfield] && this.currentrow[this.keyfield] !== undefined
+    },
+    gridpagechange (event, scope) {
+      this.currentpage = scope.row.pageNum
+      this.onpagechange(event, scope)
     }
   }
 }
