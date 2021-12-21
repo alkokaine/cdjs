@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import inputtype from './inputtype' // а здесь его будем использовать
 
+function range (start, end, step) {
+  return Array.from({ length: (end - start) / step + 1 }, (_, i) => start + i * step)
+}
+
 /**
  * функция, удаляющая все свойства объекта object,
  * которые имеют значение undefined
@@ -287,6 +291,7 @@ const extractarguments = function getArgs (func) {
   return result
 }
 export default {
+  range,
   ispropertyeditable,
   ispropertyvisible,
   flatterer,
