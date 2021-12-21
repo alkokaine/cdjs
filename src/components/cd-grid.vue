@@ -14,7 +14,7 @@
       <slot name="cd-grid-buttons"></slot>
     </div>
     <div class="cd-grid--content">
-      <table class="table cd-grid--table">
+      <table class="table cd-grid--table table-responsive">
         <caption>
           <slot name="table-caption"></slot>
         </caption>
@@ -87,7 +87,7 @@
       </table>
     </div>
     <div class="cd-grid--footer">
-      <cd-paging v-if="showPaging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage"></cd-paging>
+      <cd-paging v-if="showPaging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage" :viewRange="pagesvisible"></cd-paging>
     </div>
   </div>
 </template>
@@ -119,6 +119,7 @@ export default {
     pageSize: { type: Number, description: 'При постраничной загрузке данных, размер страницы в элементах' },
     onpagechange: { type: Function, description: 'Что проиозойдёт при смене страницы', default: function (event, pageargs) {} },
     selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' },
+    pagesvisible: { type: Number, default: 5, description: 'Диапазон страниц, видимый без разрывов в компоненте постраничной загрузки' },
     resolveresult: {
       type: Function,
       default: function (response) {
