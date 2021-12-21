@@ -1,6 +1,12 @@
 export default {
   name: 'collection',
   props: {
+    /**
+     * без неё никуда
+     * но шутка в том, что объект параметры-запроса может отличаться для разных
+     * запросов
+     * да и resolveresult в общем-то тоже
+     */
     resolvepayload: {
       type: Function,
       returns: Object,
@@ -41,7 +47,7 @@ export default {
      * как правило, ссылки получались постоянные, но чем чёрт не шутит,
      * пусть это будет функцией от параметров загрузки данных, см. watch.payload
      */
-    crud: { type: [Object, Function], description: 'Пусть это будет объект с четырьма свойствами: get, update, delete, add { method: String, url: String }, для получения коллекции, добавления, удаления и редактирования объектов коллекци. В свойстве method будем указывать метод http запроса (post, get...) в свойстве url адрес метода ' },
+    crud: { type: [Object, Function], description: '!!!!! кандидат на пересмотр !!!!! Пусть это будет объект с четырьма свойствами: get, update, delete, add { method: String, url: String }, для получения коллекции, добавления, удаления и редактирования объектов коллекци. В свойстве method будем указывать метод http запроса (post, get...) в свойстве url адрес метода ' },
     /**
      * функция, возвращающая новый объект коллекции
      * параметрами её будут payload и resolve
@@ -89,6 +95,9 @@ export default {
     }
   },
   computed: {
+    // вообще всё не так
+    // возможна ли вообще здесь crud как функция от payload, параметров загрузки данных
+    // поскольку payload известен там же, где и определение crud
     urls () {
       if (typeof this.crud === 'function') return this.crud(this.payload)
       return this.crud
