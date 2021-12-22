@@ -15,7 +15,7 @@
     </div>
     <!-- для каждого элемента списка нарисуем такое -->
     <div slot-scope="scope" class="cd-menu-item--block"
-      :class="{ 'is-collapsed': iscollapsed, 'is-active': isselected(scope), 'inner': inner, 'reversed': scope.row.is_drop }">
+      :class="{ 'is-collapsed': iscollapsed, 'is-active': isselected(scope), 'inner': inner, 'reversed': !scope.row.is_drop }">
       <!-- блок заголовка: -->
       <div class="cd-menu-item--header" :class="{'is-collapsed': iscollapsed, 'is-active': isselected(scope) }">
         <!-- пиктограмма, взятая из свойства icon объекта scope.row  -->
