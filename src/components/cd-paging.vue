@@ -60,7 +60,7 @@ export default {
       const paging = this
       return {
         caption: '...',
-        pageNum: paging.page - paging.viewRange - 1,
+        pageNum: paging.page - paging.viewRange + 1,
         offset: (paging.page - paging.viewRange) * paging.pageSize
       }
     }
