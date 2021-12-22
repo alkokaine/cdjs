@@ -5,8 +5,8 @@
         <div v-if="!iscollapsed" class="cdjs-name--block">
           <router-link to="/">CDJS</router-link>
         </div>
-        <div class="cdjs-name--collapse">
-          <i class='collapse-menu' :class="[iscollapsed ? 'bi bi-list' : 'bi bi-x']" v-on:click="collapse"></i>
+        <div class="cdjs-name--collapse" v-on:click="collapse">
+          <i class='collapse-menu' :class="[iscollapsed ? 'bi bi-list' : 'bi bi-x']"></i>
         </div>
       </div>
     </cd-menu>
@@ -119,38 +119,38 @@ export default {
           menu: [
             {
               id: 5,
-              text: 'нисходящее',
-              drop: true,
+              text: 'восходящее',
+              is_drop: true,
               menu: [
                 {
-                  text: 'нисходящее меню 1',
+                  text: 'восходящее меню 1',
                   id: 7
                 },
                 {
-                  text: 'нисходящее меню 2',
+                  text: 'восходящее меню 2',
                   id: 8
                 },
                 {
-                  text: 'нисходящее меню 3',
+                  text: 'восходящее меню 3',
                   id: 9
                 }
               ]
             },
             {
               id: 6,
-              text: 'восходящее',
-              drop: false,
+              text: 'падающее',
+              is_drop: false,
               menu: [
                 {
-                  text: 'восходящее меню 1',
+                  text: 'падающее меню 1',
                   id: 10
                 },
                 {
-                  text: 'восходящее меню 2',
+                  text: 'падающее меню 2',
                   id: 11
                 },
                 {
-                  text: 'восходящее меню 3',
+                  text: 'падающее меню 3',
                   id: 12
                 }
               ]
@@ -188,6 +188,7 @@ export default {
 
 <style>
   @import '~bootstrap/dist/css/bootstrap.css';
+  @import '~bootstrap-icons/font/bootstrap-icons.css';
   :root {
     --icon-width: 40px;
     --icon-height: 40px;

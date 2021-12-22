@@ -68,7 +68,8 @@ export default {
   methods: {
     resolvepages (currentpage) {
       const paging = this
-      if (currentpage < paging.viewRange) return utils.range(1, paging.viewRange, 1).concat([paging.nextPages, paging.pagesCount])
+      if (paging.pagesCount <= paging.viewRange) return utils.range(1, paging.pagesCount, 1)
+      if (currentpage <= paging.viewRange) return utils.range(1, paging.viewRange, 1).concat([paging.nextPages, paging.pagesCount])
       if (currentpage > (paging.pagesCount - paging.viewRange)) return [1, paging.prevPages].concat(utils.range(paging.pagesCount - paging.viewRange, paging.pagesCount, 1))
       return [1, paging.prevPages].concat(utils.range(currentpage - 2, currentpage + 2, 1)).concat([paging.nextPages, paging.pagesCount])
     }
