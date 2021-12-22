@@ -159,7 +159,8 @@ export default {
       return row[this.keyfield] === this.currentrow[this.keyfield] && this.currentrow[this.keyfield] !== undefined
     },
     gridpagechange (event, scope) {
-      this.currentpage = scope.row.pageNum
+      if (scope.row.pageNum > 0) this.currentpage = scope.row.pageNum
+      else if (scope.row.pageNum < 0) this.currentpage += (scope.row.pageNum) * this.pagesvisible
       this.onpagechange(event, scope)
     }
   }
