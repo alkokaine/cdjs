@@ -4,6 +4,7 @@
     :onlistleave="onmenuleave"
     :listitementered="onmenuitementer"
     :listitemclicked="onmenuclicked"
+    :listleave="onmenuleave"
     :keyfield="itemkey" :inner="inner"
     :class="{ 'inner': inner,'is-collapsed': iscollapsed }"
     :collection="menu">
