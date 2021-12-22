@@ -52,7 +52,7 @@ export default {
       const paging = this
       return {
         caption: '...',
-        pageNum: paging.page + paging.viewRange + 1,
+        pageNum: paging.page + paging.viewRange,
         offset: (paging.page + paging.viewRange) * paging.pageSize
       }
     },
@@ -68,8 +68,8 @@ export default {
   methods: {
     resolvepages (currentpage) {
       const paging = this
-      if (paging.pagesCount <= paging.viewRange) return Array.from(Array(paging.pagesCount).keys()).map(m => m + 1)
-      if (currentpage < paging.viewRange) return utils.range(1, paging.viewRange, 1).concat([paging.nextPages, paging.pagesCount])
+      if (paging.pagesCount <= paging.viewRange) return utils.range(1, paging.pagesCount, 1)
+      if (currentpage <= paging.viewRange) return utils.range(1, paging.viewRange, 1).concat([paging.nextPages, paging.pagesCount])
       if (currentpage > (paging.pagesCount - paging.viewRange)) return [1, paging.prevPages].concat(utils.range(paging.pagesCount - paging.viewRange, paging.pagesCount, 1))
       return [1, paging.prevPages].concat(utils.range(currentpage - 2, currentpage + 2, 1)).concat([paging.nextPages, paging.pagesCount])
     }
