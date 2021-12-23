@@ -11,6 +11,7 @@
         </div>
       </li>
     </ul>
+    <slot name="footer"></slot>
   </div>
 </template>
 
