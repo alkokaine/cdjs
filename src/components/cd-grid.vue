@@ -62,7 +62,9 @@
               <!-- на td вешаем oncellclick(prop, row, $event) -->
               <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
                   :key="prop.datafield + pindex">
-                  <cd-cell :config="propertyconfig(prop, row)"></cd-cell>
+                  <slot :row="row" :prop="prop">
+                    <cd-cell :config="propertyconfig(prop, row)"></cd-cell>
+                  </slot>
               </td>
               <!-- нарисуем строку с кнопками -->
               <td v-if="showmethods" class="cd-grid--cell method-row">
