@@ -2,7 +2,7 @@
   <div class="cd-grid">
     <div class="grid-tuner">
       <slot name="grid-tuner">
-        <cd-filter v-if="usefilter" :payload="payload" :descriptor="filter"></cd-filter>
+        <cd-form v-if="usefilter && payload" :descriptor="filter" :payload="payload" :onpropertychange="onfilterchange"></cd-form>
       </slot>
     </div>
     <div class="cd-grid-buttons--row">
@@ -16,7 +16,7 @@
     <div class="cd-grid--content">
       <table class="table cd-grid--table table-responsive">
         <caption>
-          <slot name="table-caption"></slot>
+          <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(payload)">{{ error }}</div></slot>
         </caption>
         <thead v-if="!hideheader" class="cd-grid--header">
           <tr v-for="(row, index) in header" :key="index" class="cd-grid--header-row">
@@ -80,7 +80,6 @@
               <td class="cd-grid--no-data" :colspan="columns.length">
                 <slot name="no-data">
                   <div>Нет данных</div>
-                  <div class="no-data--reload" v-if="error" v-on:click="loaddata(payload)">{{ error }}</div>
                 </slot>
               </td>
             </tr>
@@ -95,21 +94,22 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import collection from '../common/collection'
 import selection from '../common/selection'
 import props from '../common/property-decorator'
 import methods from '../common/methods'
 import utils from '../common/utils'
 import cell from './cd-cell.vue'
-import filter from './cd-grid-filter.vue'
 import paging from './cd-paging.vue'
+import form from './cd-form.vue'
 
 export default {
   mixins: [collection, props, methods, selection],
   components: {
     'cd-cell': cell,
-    'cd-filter': filter,
-    'cd-paging': paging
+    'cd-paging': paging,
+    'cd-form': form
   },
   props: {
     allownew: { type: Boolean, description: 'Можно ли добавлять новые строки в грид' },
@@ -164,6 +164,9 @@ export default {
       if (scope.row.pageNum > 0) this.currentpage = scope.row.pageNum
       else if (scope.row.pageNum < 0) this.currentpage += (scope.row.pageNum) * this.pagesvisible
       this.onpagechange(event, scope)
+    },
+    onfilterchange (property, value) {
+      Vue.set(this.payload, property.datafield, value)
     }
   }
 }

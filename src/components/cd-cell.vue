@@ -14,7 +14,7 @@
         <cd-select class="form-control" :payload="config.select.payload"
           :keyfield="config.select.valuekey"
           :labelkey="config.select.labelkey"
-          :crud="config.select.crud"
+          :get="config.select.get"
           :collection="values"
           :isdisabled="config.select.isdisabled"
           :clearable="config.select.clearable"
@@ -29,7 +29,7 @@
             {{ config.value }}
           </code>
           <template v-else>
-            <input class="form-control" v-debounce:1s.cancelonempty="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
+            <input class="form-control" v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
               :value="config.value" :required="config.required" :pattern="config.input.pattern"
               :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
               :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"

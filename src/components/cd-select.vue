@@ -1,7 +1,11 @@
 <template>
   <select v-model="current" class="cd-select form-control form-control-sm" v-on:input="oninput">
-    <option v-if="error" value="reload" :label="error"/>
-    <option v-for="(option) in collection" :key="option[keyfield]" :value="option[keyfield]" :label="option[labelkey]" :disabled="isdisabled(option)"/>
+    <template v-if="error">
+      <option v-if="error" value="reload" :label="error"/>
+    </template>
+    <template v-else>
+      <option v-for="(option) in collection" :key="option[keyfield]" :value="option[keyfield]" :label="option[labelkey]" :disabled="isdisabled(option)"/>
+    </template>
   </select>
 </template>
 

@@ -74,7 +74,7 @@ function createInput (property, propertyholder, payload) {
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
     checked: resolvePropertyValue(property, 'checked', propertyholder),
     placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
-    ondebounce (value, event) { parent.onpropertychange({ property, value }) }
+    ondebounce (value, event) { parent.onpropertychange(property, value) }
   })
 }
 
@@ -99,11 +99,9 @@ function createSelect (property, propertyholder, payload) {
     payload: resolvePropertyValue(property, 'resolvepayload', propertyholder), // параметры получения данных,
     values: property.values,
     clearable: property.clearable,
-    crud: {
-      get: {
-        url: property.url,
-        method: property.method
-      }
+    get: {
+      url: property.url,
+      method: property.method
     },
     resolveresult: property.resolveresult, // функция, возвращающая нужные данные
     // для списка опций селекта из ответа сервера

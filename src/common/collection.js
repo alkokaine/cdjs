@@ -47,7 +47,8 @@ export default {
      * как правило, ссылки получались постоянные, но чем чёрт не шутит,
      * пусть это будет функцией от параметров загрузки данных, см. watch.payload
      */
-    crud: { type: [Object, Function], description: '!!!!! кандидат на пересмотр !!!!! Пусть это будет объект с четырьма свойствами: get, update, delete, add { method: String, url: String }, для получения коллекции, добавления, удаления и редактирования объектов коллекци. В свойстве method будем указывать метод http запроса (post, get...) в свойстве url адрес метода ' },
+    // crud: { type: [Object, Function], description: '!!!!! кандидат на пересмотр !!!!! Пусть это будет объект с четырьма свойствами: get, update, delete, add { method: String, url: String }, для получения коллекции, добавления, удаления и редактирования объектов коллекци. В свойстве method будем указывать метод http запроса (post, get...) в свойстве url адрес метода ' },
+    get: { type: Object, description: 'Объект, содержащий урл и заголовок метода' },
     /**
      * функция, возвращающая новый объект коллекции
      * параметрами её будут payload и resolve
@@ -98,10 +99,10 @@ export default {
     // вообще всё не так
     // возможна ли вообще здесь crud как функция от payload, параметров загрузки данных
     // поскольку payload известен там же, где и определение crud
-    urls () {
-      if (typeof this.crud === 'function') return this.crud(this.payload)
-      return this.crud
-    },
+    // urls () {
+    //   if (typeof this.crud === 'function') return this.crud(this.payload)
+    //   return this.crud
+    // },
     rowkey () {
       const local = this
       return (row) => row[local.keyfield]
@@ -115,26 +116,17 @@ export default {
   methods: {
     loaddata (payload) {
       const local = this
-      const localcrud = local.urls
-      if (localcrud && localcrud.get) {
-        const request = Object.prototype.hasOwnProperty.call(localcrud.get, 'method')
-          ? { url: localcrud.get.url, exec: local.$http[localcrud.get.method] }
-          : { url: localcrud.get, exec: local.$http.post }
-        try {
-          request.exec(request.url, local.resolvepayload(payload))
-            .then((response) => {
-              local.resolveresult(response)
-              local.error = false
-            }).catch((reason) => {
-              local.error = reason
-            })
-        } catch (error) {
-          // local.list = local.collection
-          // по-хорошему, такой ситуации быть не может
-          // либо к нам приходит коллекция, либо мы получаем её
-          local.error = false
-        }
-      }
+      const request = { url: local.get.url, exec: local.$http[local.get.method] }
+      setTimeout(() => {
+        request.exec(request.url, local.resolvepayload(payload))
+          .then((response) => {
+            local.resolveresult(response)
+            local.error = false
+          })
+          .catch((reason) => {
+            local.error = reason
+          })
+      }, 1001)
     },
     delete (row) {
       console.log('Deleting ', this.urls.remove, row)
