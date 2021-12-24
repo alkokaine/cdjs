@@ -117,16 +117,14 @@ export default {
     loaddata (payload) {
       const local = this
       const request = { url: local.get.url, exec: local.$http[local.get.method] }
-      setTimeout(() => {
-        request.exec(request.url, local.resolvepayload(payload))
-          .then((response) => {
-            local.resolveresult(response)
-            local.error = false
-          })
-          .catch((reason) => {
-            local.error = reason
-          })
-      }, 1001)
+      request.exec(request.url, local.resolvepayload(payload))
+        .then((response) => {
+          local.resolveresult(response)
+          local.error = false
+        })
+        .catch((reason) => {
+          local.error = reason
+        })
     },
     delete (row) {
       console.log('Deleting ', this.urls.remove, row)
