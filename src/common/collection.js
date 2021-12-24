@@ -75,6 +75,18 @@ export default {
   },
   watch: {
     /**
+     * попробуем так
+     * будем смотреть ещё и на урл
+     */
+    'get.url': {
+      handler (newvalue, oldvalue) {
+        const local = this
+        if (newvalue) {
+          local.loaddata(newvalue, local.payload)
+        }
+      }
+    },
+    /**
      * собственно, реактивность
      * изменение свойств параметров загрузки данных (фильтра)
      * обработается функцией handler
@@ -89,8 +101,8 @@ export default {
       handler (newvalue) {
         const local = this
 
-        if ((newvalue && typeof newvalue !== 'function') && (local.$http)) {
-          local.loaddata(newvalue)
+        if ((newvalue && typeof newvalue !== 'function') && (local.$http) && local.get.url !== '') {
+          local.loaddata(local.get.url, newvalue)
         }
       }
     }
@@ -114,17 +126,19 @@ export default {
     }
   },
   methods: {
-    loaddata (payload) {
+    loaddata (url, payload) {
       const local = this
-      const request = { url: local.get.url, exec: local.$http[local.get.method] }
-      request.exec(request.url, local.resolvepayload(payload))
-        .then((response) => {
-          local.resolveresult(response)
-          local.error = false
-        })
-        .catch((reason) => {
-          local.error = reason
-        })
+      const request = local.$http[local.get.method]
+      setTimeout(() => {
+        request(url, local.resolvepayload(payload))
+          .then((response) => {
+            local.resolveresult(response)
+            local.error = false
+          })
+          .catch((reason) => {
+            local.error = reason
+          })
+      }, 1001)
     },
     delete (row) {
       console.log('Deleting ', this.urls.remove, row)

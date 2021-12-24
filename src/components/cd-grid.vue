@@ -16,7 +16,7 @@
     <div class="cd-grid--content">
       <table class="table cd-grid--table table-responsive">
         <caption>
-          <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(payload)">{{ error }}</div></slot>
+          <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(get.url, payload)">{{ error }}</div></slot>
         </caption>
         <thead v-if="!hideheader" class="cd-grid--header">
           <tr v-for="(row, index) in header" :key="index" class="cd-grid--header-row">
