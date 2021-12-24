@@ -3,7 +3,7 @@
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
     <cd-grid :get="get" :descriptor="descriptor" keyfield="id" :payload="payload" :resolveresult="resolveresult" :collection="cities" :total="total" :paging="true" :pageSize="10" :resolvepayload="resolvepayload" :onpagechange="onpagechange"></cd-grid>
-    <cd-grid :get="get" :descriptor="descriptor" keyfield="id" :payload="payload2" :resolveresult="resolveresult2" :collection="cities2" :total="total2" :paging="true" :pageSize="10" :resolvepayload="resolvepayload" :onpagechange="onpagechange2" :usefilter="true" :filter="filter"></cd-grid>
+    <cd-grid :get="get2" :descriptor="descriptor" keyfield="id" :payload="payload2" :resolveresult="resolveresult2" :collection="cities2" :total="total2" :paging="true" :pageSize="10" :resolvepayload="resolvepayload" :onpagechange="onpagechange2" :usefilter="true" :filter="filter"></cd-grid>
   </div>
 </template>
 
@@ -50,8 +50,30 @@ export default {
             }
           },
           isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
-          onselect: (payload, option) => {
+          onselect: (payload, option, descriptor) => {
+            const region = descriptor.find(p => p.datafield === 'region_id')
+            if (region) Vue.set(region, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.code}/regions`)
             Vue.set(payload, 'countryIds', `${option.code},`)
+          }
+        },
+        {
+          datafield: 'region_id',
+          text: 'regions',
+          input: 'select',
+          valuekey: 'wikiDataId',
+          labelkey: 'name',
+          url: '',
+          method: 'get',
+          resolveresult: (response) => response.data.data,
+          resolvepayload: (payload) => {
+            return {
+              params: { limit: 10 }
+            }
+          },
+          isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
+          onselect (payload, option, descriptor) {
+            console.log(option)
+            Vue.set(view.get2, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.fipsCode}/cities`)
           }
         }
       ],
@@ -67,6 +89,10 @@ export default {
       cities2: [],
       infos: CDGrid.mixins.concat(CDGrid),
       get: {
+        method: 'get',
+        url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
+      },
+      get2: {
         method: 'get',
         url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
       },
