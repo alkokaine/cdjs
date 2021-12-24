@@ -41,9 +41,7 @@ export default {
       formpayload: {
         namePrefix: ''
       },
-      crud: {
-        get: { url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities', method: 'get' }
-      },
+      get: { url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities', method: 'get' },
       payload: {
         limit: 10,
         minPopulation: null,
