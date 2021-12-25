@@ -2,7 +2,7 @@
   <div class="cd-grid">
     <div class="grid-tuner">
       <slot name="grid-tuner">
-        <cd-form v-if="usefilter && payload" :descriptor="filter" :payload="payload" :onpropertychange="onfilterchange"></cd-form>
+        <!-- <cd-form v-if="usefilter && payload" :descriptor="filter" :payload="payload" :onpropertychange="onfilterchange"></cd-form> -->
       </slot>
     </div>
     <div class="cd-grid-buttons--row">
@@ -94,22 +94,20 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import collection from '../common/collection'
 import selection from '../common/selection'
 import props from '../common/property-decorator'
 import methods from '../common/methods'
 import utils from '../common/utils'
 import cell from './cd-cell.vue'
+import watchurl from '../common/get-url-watch'
 import paging from './cd-paging.vue'
-import form from './cd-form.vue'
 
 export default {
-  mixins: [collection, props, methods, selection],
+  mixins: [collection, watchurl, props, methods, selection],
   components: {
     'cd-cell': cell,
-    'cd-paging': paging,
-    'cd-form': form
+    'cd-paging': paging
   },
   props: {
     allownew: { type: Boolean, description: 'Можно ли добавлять новые строки в грид' },
@@ -164,9 +162,6 @@ export default {
       if (scope.row.pageNum > 0) this.currentpage = scope.row.pageNum
       else if (scope.row.pageNum < 0) this.currentpage += (scope.row.pageNum) * this.pagesvisible
       this.onpagechange(event, scope)
-    },
-    onfilterchange (property, value) {
-      Vue.set(this.payload, property.datafield, value)
     }
   }
 }
