@@ -292,8 +292,8 @@ select: {
       this.selected = Number(event.target.value)
     },
     onpropertychange (payload) {
-      return (event) => {
-        Vue.set(payload, event.property.datafield, event.value)
+      return (property, value) => {
+        Vue.set(payload, property.datafield, value)
         // todo: after property changed
       }
     },
