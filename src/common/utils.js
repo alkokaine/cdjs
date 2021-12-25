@@ -109,9 +109,8 @@ function createSelect (property, propertyholder, payload) {
     isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
     // выполняем onselect
     onselect: (option) => {
-      parent.onpropertychange({ property, value: option })
-      // Vue.set(propertyholder, property.datafield, option[property.valuekey])
-      if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent.descriptor)
+      parent.onpropertychange({ property, value: option[property.valuekey] })
+      if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
     }
   })
   return select
