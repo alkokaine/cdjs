@@ -2,7 +2,7 @@
   <div>
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
-    <cd-list :collection="gridexamples" keyfield="name" :listitemclicked="selectexample">
+    <cd-list class="examples-list" listclass="examples-inner" rowclass="example-tab" :collection="gridexamples" keyfield="name" :listitemclicked="selectexample">
       <div class="grid-example-header" slot-scope="scope">{{ scope.row.name }}</div>
       <cd-grid slot="footer" v-if="selected" keyfield="id"
         :key="selected.name"
@@ -197,5 +197,12 @@ export default {
 </script>
 
 <style>
-
+  .examples-inner {
+    list-style-type: none;
+    display: flex;
+    flex-grow: 1;
+  }
+  .example-tab {
+    padding: 10px;
+  }
 </style>
