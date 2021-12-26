@@ -10,6 +10,9 @@
           <slot :row="row" :index="index"></slot>
         </div>
       </li>
+      <li v-if="$slots.placeholder" class="cd-list--placeholder">
+        <slot name="placeholder"></slot>
+      </li>
     </ul>
     <slot name="footer"></slot>
   </div>
@@ -50,10 +53,10 @@ export default {
 </script>
 
 <style>
-  .cd-list--item {
-    background-color: inherit;
-  }
   .cd-list--wrap {
     background-color: inherit;
+  }
+  .cd-list--placeholder {
+    width: 100%;
   }
 </style>
