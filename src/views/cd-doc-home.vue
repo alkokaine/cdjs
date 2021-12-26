@@ -28,58 +28,7 @@ import inputype from '../common/inputtype'
 import CDForm from '../components/cd-form.vue'
 import CDSelect from '../components/cd-select.vue'
 import CDPropExample from '../generic/cd-prop-example.vue'
-
-const readyvaluesoptions = [
-  {
-    datafield: 'datafield',
-    text: 'Имя свойства объекта'
-  },
-  {
-    datafield: 'text',
-    text: 'Человеческое имя свойства'
-  },
-  {
-    text: 'select',
-    descriptor: [
-      {
-        datafield: 'labelkey',
-        text: 'labelkey'
-      },
-      {
-        datafield: 'valuekey',
-        text: 'valuekey'
-      },
-      {
-        datafield: 'values',
-        text: 'values',
-        input: 'code'
-      },
-      {
-        datafield: 'url',
-        text: 'url'
-      },
-      {
-        datafield: 'method',
-        text: 'method'
-      },
-      {
-        datafield: 'resolveresult',
-        text: 'resolveresult',
-        input: 'code'
-      },
-      {
-        datafield: 'resolvepayload',
-        text: 'resolvepayload',
-        input: 'code'
-      },
-      {
-        datafield: 'isdisabled',
-        text: 'isdisabled',
-        input: 'code'
-      }
-    ]
-  }
-]
+import readyvaluesoptions from '../examples/propertyoptions'
 
 const countryParams = {
   limit: 10,
@@ -162,20 +111,18 @@ export default {
                 {
                   header: 'Свойство <code><b>select</b></code> объекта-дескриптора',
                   description: [
-                    'Для рендеринга элемента <code><b>select</b></code> будем использовать свойство объекта-дескриптора <b>select</b>.</br>',
+                    'Для рендеринга элемента <code><b>select</b></code> будем использовать такой объект.</br>',
                     `<pre>
 <code>
 datafield: String,
 text: String,
-select: {
-  valuekey: String, // имя свойства, содержащее ключевое значение опций selecta
-  labelkey: String, // имя свойства, содержащее значение для заголовка опции
-  url: String, // урл, по которому получим опции
-  method: String, // метод
-  resolveresult: Function, // функция (response) => Array, которая возвращает список опций из ответа axios 
-  isdisabled: Function, // функция (payload, option) => Boolean, которая дисаблит option для свойства datafield объекта payload
-  params: Function // функция, которая возвращает параметры запроса к url для получения списка опций
-}
+valuekey: String, // имя свойства, содержащее ключевое значение опций selecta
+labelkey: String, // имя свойства, содержащее значение для заголовка опции
+url: String, // урл, по которому получим опции
+method: String, // метод
+resolveresult: Function, // функция (response) => Array, которая возвращает список опций из ответа axios 
+isdisabled: Function, // функция (payload, option) => Boolean, которая дисаблит option для свойства datafield объекта payload
+params: Function // функция, которая возвращает параметры запроса к url для получения списка опций
 </code>
 </pre>`
                   ]
