@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import inputtype from './inputtype' // а здесь его будем использовать
 
 function range (start, end, step) {
   return Array.from({ length: (end - start) / step + 1 }, (_, i) => start + i * step)
@@ -57,12 +56,6 @@ function createRouterLink (property, propertyholder, payload) {
  * @returns {Object} настройки элемента <input>
  */
 function createInput (property, propertyholder, payload) {
-  // если дескриптор property содержит свойство input и его значение
-  // не содержится в массиве inputtype
-  // предупредим в консоли
-  if (hasProperty.call(property, 'input') && !inputtype.includes(property.input)) {
-    console.warn(`[CDJS] Получено значение ${property.input}, ожидалось одно из ${inputtype}`)
-  }
   const parent = this
   return compress({
     type: (property.input || 'text'),
