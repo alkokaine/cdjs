@@ -58,6 +58,7 @@ export default {
   .cd-label {
     font-weight: bold;
     font-size: inherit;
+    margin-bottom: unset;
   }
   .cd-label::after {
     content: ":";
