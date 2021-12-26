@@ -18,8 +18,14 @@
         :resolvepayload="resolvepayload"
         :onpagechange="onpagechange">
         <div slot="grid-tuner">
-          <cd-form v-if="selected.usefilter" :descriptor="selected.filter"
+          <cd-descriptor-editor v-if="selected.filter" :descriptor="selected.filter">
+            <div class="editor-header" slot="editor-header">
+              <span>Опишем свойства фильтра вот таким массивом объектов</span>
+            </div>
+          </cd-descriptor-editor>
+          <cd-form v-if="selected.usefilter" class="cd-grid--filter" :descriptor="selected.filter"
             :payload="payload"
+            :inline="true"
             :onpropertychange="onfilterchange"></cd-form>
         </div>
       </cd-grid>
@@ -34,7 +40,7 @@ import ComponentInfo from '../generic/cd-doc-component-info.vue'
 import CDGrid from '../components/cd-grid.vue'
 import CDList from '../components/cd-list.vue'
 import CDForm from '../components/cd-form.vue'
-
+import CDDescriptorEditor from '../generic/cd-descriptor-editor.vue'
 export default {
   name: 'cd-doc-grid',
   components: {
@@ -42,7 +48,8 @@ export default {
     'cd-info': ComponentInfo,
     'cd-grid': CDGrid,
     'cd-list': CDList,
-    'cd-form': CDForm
+    'cd-form': CDForm,
+    'cd-descriptor-editor': CDDescriptorEditor
   },
   props: {
     gridexamples: {
@@ -125,15 +132,6 @@ export default {
             total: 0,
             usefilter: true,
             collection: []
-          },
-          {
-            name: 'aaa',
-            caption: 'Колонки грида',
-            collection: [],
-            get: {
-              method: 'get',
-              url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
-            }
           }
         ]
       }
@@ -240,8 +238,6 @@ export default {
     border-bottom: 1px solid  rgb(100, 100, 100);
     border-left: 1px solid darkgray;
     cursor: pointer;
-  }
-  .example-tab:first-of-type {
   }
   .example-tab.active {
     background: linear-gradient(to top, white, lightgrey);
