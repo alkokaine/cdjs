@@ -56,8 +56,6 @@ export default {
     margin: 10px;
     flex-grow: 1;
   }
-  .property-editor {
-  }
   .property-list {
     width: 100%;
     display: flex;
