@@ -1,5 +1,5 @@
 <template>
-  <select v-model="current" class="cd-select form-control form-control-sm" v-on:input="oninput">
+  <select v-model="current" class="cd-select form-control form-select-sm" v-on:input="oninput">
     <template v-if="error">
       <option v-if="error" value="reload" :label="error"/>
     </template>

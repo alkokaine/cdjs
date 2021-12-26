@@ -14,7 +14,7 @@
       <slot name="cd-grid-buttons"></slot>
     </div>
     <div class="cd-grid--content">
-      <table class="table cd-grid--table table-responsive">
+      <table class="table cd-grid--table table-responsive table-sm">
         <caption>
           <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(get.url, payload)">{{ error }}</div></slot>
         </caption>
