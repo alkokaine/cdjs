@@ -1,5 +1,5 @@
 <template>
-  <fieldset class="cd-fieldset border p-2 form-control form-control-sm">
+  <fieldset class="cd-fieldset border p-2 form-control form-control-sm" :class="{ 'inline': inline }">
         <slot></slot>
         <div class="cd-field" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
             <cd-fieldset v-if="hasdescriptor(property)"
@@ -8,7 +8,8 @@
                 :iseditable="iseditable"
                 :propertyconfig="propertyconfig"
                 :descriptor="property.descriptor"
-                :readonly="readonly">
+                :readonly="readonly"
+                :inline="inline">
                 <legend v-if="haslegend(property)" class="cd-legend w-auto form-label">{{ property.text }}</legend>
             </cd-fieldset>
             <cd-cell v-else :config="propertyconfig(property)" :readonly="readonly">
@@ -27,7 +28,8 @@ export default {
   mixins: [props],
   props: {
     propertyconfig: { type: Function },
-    readonly: { type: Boolean }
+    readonly: { type: Boolean },
+    inline: { type: Boolean, default: false }
   },
   components: {
     'cd-cell': cell
@@ -63,5 +65,10 @@ export default {
   .cd-label::after {
     content: ":";
     margin-right: 5px;
+  }
+  .cd-fieldset.inline {
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 1;
   }
 </style>

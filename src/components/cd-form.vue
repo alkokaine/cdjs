@@ -1,11 +1,13 @@
 <template>
   <div class="cd-form">
+    <slot name="header"></slot>
     <form class="cd-form--content">
       <slot>
         <template v-if="descriptor.length">
             <cd-fieldset :descriptor="descriptor"
               :isvisible="isvisible"
               :iseditable="iseditable"
+              :inline="inline"
               :propertyconfig="propertyconfig"></cd-fieldset>
         </template>
         <template v-else>
@@ -13,6 +15,7 @@
         </template>
       </slot>
     </form>
+    <slot name="footer"></slot>
   </div>
 </template>
 
@@ -26,6 +29,7 @@ export default {
     'cd-fieldset': fieldset
   },
   props: {
+    inline: { type: Boolean, default: false, description: 'fieldset рисуется с display: flex, flex-wrap, flex-grow' },
     onpropertychange: { type: Function, required: true, description: 'Функция, которая выполнится при изменении свойства объекта payload' },
     payload: { type: Object, required: true, description: 'Объект, который размещается на форме' },
     descriptor: {
