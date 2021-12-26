@@ -1,9 +1,17 @@
 <template>
   <cd-list class="cd-descriptor-editor" :collection="descriptor" keyfield="datafield"  :listitemclicked="selectproperty" listclass="property-list" rowclass="cd-code--example">
-    <cd-form slot="header" :descriptor="propertydescriptor" :payload="selected" :onpropertychange="updateproperty" class="property-editor"></cd-form>
-    <div class="card" slot-scope="scope">
-      <code class="card-body">{{ scope.row }}</code>
+    <div class="editor-header--wrap" slot="header">
+      <slot name="editor-header"></slot>
     </div>
+    <div class="card" slot-scope="scope">
+      <div class="card-body">
+        <code class="card-body property-code">{{ scope.row }}</code>
+        <cd-descriptor-editor v-if="scope.row.descriptor" :descriptor="scope.row.descriptor"></cd-descriptor-editor>
+      </div>
+    </div>
+    <cd-form slot="footer" :descriptor="propertydescriptor" :payload="selected" :onpropertychange="updateproperty" class="property-editor" :inline="true">
+      <div slot="header">Здесь можно отредактировать объект-дескриптор</div>
+    </cd-form>
   </cd-list>
 </template>
 
@@ -39,23 +47,25 @@ export default {
 </script>
 
 <style>
+  .property-code {
+    cursor: pointer!important;
+  }
   .cd-code--example {
     white-space: pre-wrap;
-    width: 250px;
     display: block;
     margin: 10px;
+    flex-grow: 1;
   }
   .property-editor {
-    width: 30%;
   }
   .property-list {
-    width: 70%;
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
+    padding-inline-start: unset;
   }
   .cd-descriptor-editor {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
+    display: block;
+    width: 100%;
   }
 </style>
