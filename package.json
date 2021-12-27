@@ -5,9 +5,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build-examples": "vue-cli-service build --dest dist/cdjs-doc --target app ./src/main.js",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "build:lib": "vue-cli-service build --target lib --name cdjs ./src/index.js"
+    "build:lib": "vue-cli-service build --target lib --dest dist/cdjs --name cdjs ./src/index.js"
   },
   "main": "./src/index.js",
   "files": [
