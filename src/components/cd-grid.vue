@@ -1,9 +1,7 @@
 <template>
   <div class="cd-grid">
     <div class="grid-tuner">
-      <slot name="grid-tuner">
-        <!-- <cd-form v-if="usefilter && payload" :descriptor="filter" :payload="payload" :onpropertychange="onfilterchange"></cd-form> -->
-      </slot>
+      <slot name="grid-tuner"></slot>
     </div>
     <div class="cd-grid-buttons--row">
       <button v-if="allownew" class="cd-grid--createnew" v-on:click="callcreate">
