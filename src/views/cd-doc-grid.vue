@@ -2,34 +2,33 @@
   <div>
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
-    <cd-list class="examples-list" listclass="examples-inner" :rowclass="resolvetabclass" :collection="gridexamples" keyfield="name" :listitemclicked="selectexample">
-      <div class="grid-example-header" slot-scope="scope">{{ scope.row.caption }}</div>
-      <div class="example-tabs--placeholder" slot="placeholder"></div>
-      <cd-grid class="example-grid" slot="footer" v-if="selected" keyfield="id"
-        :key="selected.name"
-        :get="selected.get"
-        :payload="payload"
-        :descriptor="descriptor"
-        :resolveresult="resolveresult"
-        :collection="selected.collection"
-        :total="selected.total"
-        :paging="true"
-        :pageSize="10"
-        :resolvepayload="resolvepayload"
-        :onpagechange="onpagechange">
-        <div slot="grid-tuner">
-          <cd-descriptor-editor v-if="selected.filter" :descriptor="selected.filter">
-            <div class="editor-header" slot="editor-header">
-              <span>Опишем свойства фильтра вот таким массивом объектов</span>
-            </div>
-          </cd-descriptor-editor>
-          <cd-form v-if="selected.usefilter" class="cd-grid--filter" :descriptor="selected.filter"
-            :payload="payload"
-            :inline="true"
-            :onpropertychange="onfilterchange"></cd-form>
-        </div>
-      </cd-grid>
-    </cd-list>
+    <cd-list class="examples-list" listclass="nav nav-tabs mp3" listrole="tablist" :rowclass="resolvetabclass" :collection="gridexamples" keyfield="name" :listitemclicked="selectexample">
+        <button slot-scope="scope" :ref="tabid(scope.index)" class="nav-link" role="tab" :class="{ 'active': scope.index === currentindex }" :tabindex="scope.index">{{ scope.row.caption }}</button>
+        <cd-grid class="example-grid" slot="footer" v-if="selected" keyfield="id"
+          :key="selected.name"
+          :get="selected.get"
+          :payload="payload"
+          :descriptor="descriptor"
+          :resolveresult="resolveresult"
+          :collection="selected.collection"
+          :total="selected.total"
+          :paging="true"
+          :pageSize="10"
+          :resolvepayload="resolvepayload"
+          :onpagechange="onpagechange">
+          <div slot="grid-tuner">
+            <cd-descriptor-editor v-if="selected.filter" :descriptor="selected.filter">
+              <div class="editor-header" slot="editor-header">
+                <span>Опишем свойства фильтра вот таким массивом объектов</span>
+              </div>
+            </cd-descriptor-editor>
+            <cd-form v-if="selected.usefilter" class="cd-grid--filter" :descriptor="selected.filter"
+              :payload="payload"
+              :inline="true"
+              :onpropertychange="onfilterchange"></cd-form>
+          </div>
+        </cd-grid>
+      </cd-list>
   </div>
 </template>
 
@@ -140,7 +139,8 @@ export default {
   data (view) {
     return {
       infos: CDGrid.mixins.concat(CDGrid),
-      selected: view.gridexamples[0],
+      currentindex: 0,
+      selected: Object,
       descriptor: [
         {
           datafield: 'city',
@@ -193,12 +193,27 @@ export default {
       ]
     }
   },
+  computed: {
+    tabid () {
+      return (index) => `tab${index}`
+    }
+  },
+  watch: {
+    currentindex: {
+      immediate: true,
+      handler (newvalue, oldvalue) {
+        if (newvalue >= 0) {
+          this.selected = this.gridexamples[newvalue]
+        }
+      }
+    }
+  },
   methods: {
     onfilterchange (property, value) {
       Vue.set(this.payload, property.datafield, value)
     },
     selectexample (event, args) {
-      this.selected = args.row
+      this.currentindex = args.index
     },
     resolvepayload (payload) {
       return {
@@ -206,9 +221,7 @@ export default {
       }
     },
     resolvetabclass (tab) {
-      return tab.name === this.selected.name
-        ? 'example-tab active'
-        : 'example-tab'
+      return tab.name === this.selected.name ? 'nav-item active' : 'nav-item'
     },
     resolveresult (response) {
       Vue.set(this.selected, 'total', response.data.metadata.totalCount)
@@ -222,40 +235,4 @@ export default {
 </script>
 
 <style>
-  .examples-inner {
-    list-style-type: none;
-    display: flex;
-    flex-grow: 1;
-    background-color:  rgba(153, 153, 153, 0.144);
-  }
-  .example-tab {
-    box-sizing: border-box;
-    display: inline-block;
-    color: black;
-    background: linear-gradient(225deg, transparent 7px, rgba(153, 153, 153, 0.459) 7px);
-    padding: 10px;
-    font-weight: bold;
-    border-bottom: 1px solid  rgb(100, 100, 100);
-    border-left: 1px solid darkgray;
-    cursor: pointer;
-  }
-  .example-tab.active {
-    background: linear-gradient(to top, white, lightgrey);
-    border-image-source: linear-gradient(to top, darkgray, white);
-    border-left: 1px solid;
-    border-right: 1px solid;
-    border-bottom: none;
-  }
-  .example-tabs--placeholder {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-bottom: 1px solid;
-  }
-  .examples-list {
-    border: 1px solid darkgray;
-    border-radius: 5px;
-    margin: 10px;
-    padding: 10px;
-  }
 </style>
