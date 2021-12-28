@@ -66,4 +66,17 @@ export default {
     display: block;
     width: 100%;
   }
+  .card-body {
+    height: 200px;
+    overflow: hidden;
+  }
+  .card-body:before {
+    content:'';
+    width:100%;
+    height:100%;
+    position:absolute;
+    left:0;
+    top:0;
+    background:linear-gradient(transparent 100px, white);
+  }
 </style>
