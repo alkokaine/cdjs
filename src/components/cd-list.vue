@@ -1,11 +1,12 @@
 <template>
   <div class="cd-list" v-on:mouseleave="listleave">
     <slot name="header"></slot>
-    <ul v-if="showitems" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]">
+    <ul v-if="showitems" :role="listrole" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]">
       <li v-for="(row, index) in collection"
         :key="rowkey(row)" class="cd-list--item" :class="rowclassResolved(row)"
           v-on:click.stop="listitemclicked($event, { row, index })"
-          v-on:mouseenter="listitementered($event, { row, index})">
+          v-on:mouseenter="listitementered($event, { row, index})"
+          role="presentation">
         <div class="cd-list--item-content">
           <slot :row="row" :index="index"></slot>
         </div>
@@ -38,7 +39,8 @@ export default {
     listitementered: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при входе мыши на элемент списка' },
     listitemleaved: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при выходе из элемента списка' },
     listleave: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при выходе мыши из списка' },
-    listenter: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при входе мыши в список' }
+    listenter: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при входе мыши в список' },
+    listrole: { type: String }
   },
   computed: {
     rowclassResolved () {
