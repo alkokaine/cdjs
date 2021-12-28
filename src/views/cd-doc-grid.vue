@@ -2,9 +2,8 @@
   <div>
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
-    <cd-list class="examples-list" listclass="nav nav-tabs mp3" listrole="tablist" :rowclass="resolvetabclass" :collection="gridexamples" keyfield="name" :listitemclicked="selectexample">
-        <button slot-scope="scope" :ref="tabid(scope.index)" class="nav-link" role="tab" :class="{ 'active': scope.index === currentindex }" :tabindex="scope.index">{{ scope.row.caption }}</button>
-        <cd-grid class="example-grid" slot="footer" v-if="selected" keyfield="id"
+    <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
+        <cd-grid class="example-grid" v-if="selected" keyfield="id"
           :key="selected.name"
           :get="selected.get"
           :payload="payload"
@@ -28,7 +27,7 @@
               :onpropertychange="onfilterchange"></cd-form>
           </div>
         </cd-grid>
-      </cd-list>
+      </cd-tabs>
   </div>
 </template>
 
@@ -37,8 +36,8 @@ import Vue from 'vue'
 import CDDocGeneric from '../generic/cd-doc-generic.vue'
 import ComponentInfo from '../generic/cd-doc-component-info.vue'
 import CDGrid from '../components/cd-grid.vue'
-import CDList from '../components/cd-list.vue'
 import CDForm from '../components/cd-form.vue'
+import CDTabs from '../components/cd-tabs.vue'
 import CDDescriptorEditor from '../generic/cd-descriptor-editor.vue'
 export default {
   name: 'cd-doc-grid',
@@ -46,8 +45,8 @@ export default {
     'cd-doc': CDDocGeneric,
     'cd-info': ComponentInfo,
     'cd-grid': CDGrid,
-    'cd-list': CDList,
     'cd-form': CDForm,
+    'cd-tabs': CDTabs,
     'cd-descriptor-editor': CDDescriptorEditor
   },
   props: {
@@ -191,11 +190,6 @@ export default {
           description: ['Что-то будет']
         }
       ]
-    }
-  },
-  computed: {
-    tabid () {
-      return (index) => `tab${index}`
     }
   },
   watch: {
