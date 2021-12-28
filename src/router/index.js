@@ -6,6 +6,8 @@ import CDFormView from '../views/cd-doc-form.vue'
 import CDMenuView from '../views/cd-doc-menu.vue'
 import CDListView from '../views/cd-doc-list.vue'
 import CDModalView from '../views/cd-doc-modal.vue'
+import CDTabView from '../views/cd-doc-tabs.vue'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -17,6 +19,11 @@ const routes = [
     path: '/Collection',
     name: 'collection',
     component: CDListView
+  },
+  {
+    path: '/Tabs',
+    name: 'tabs',
+    component: CDTabView
   },
   {
     path: '/Grid',
