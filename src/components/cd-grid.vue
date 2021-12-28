@@ -178,6 +178,7 @@ export default {
   }
   .cd-grid {
     margin: auto;
+    padding-top: 10px;
   }
   .cd-grid--table {
     margin: auto;
