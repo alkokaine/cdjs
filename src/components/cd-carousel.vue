@@ -5,12 +5,12 @@
 <script>
 import CDList from './cd-list.vue'
 export default {
-    components: {
-        'cd-list': CDList
-    },
-    props: {
-        carousel: { type: Array }
-    }
+  components: {
+    'cd-list': CDList
+  },
+  props: {
+    carousel: { type: Array }
+  }
 }
 </script>
 
