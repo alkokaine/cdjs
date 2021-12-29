@@ -1,10 +1,10 @@
 export default [
   {
-      datafield: 'datafield',
-      text: 'datafield'
+    datafield: 'datafield',
+    text: 'datafield'
   },
   {
-      datafield: 'text',
-      text: 'text'
+    datafield: 'text',
+    text: 'text'
   }
 ]

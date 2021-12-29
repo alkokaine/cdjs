@@ -58,12 +58,19 @@
               </td>
               <!-- проходим в цикле по flatten -->
               <!-- на td вешаем oncellclick(prop, row, $event) -->
-              <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
-                  :key="prop.datafield + pindex">
-                  <slot :row="row" :prop="prop">
-                    <cd-cell :config="propertyconfig(prop, row)"></cd-cell>
-                  </slot>
-              </td>
+              <template v-if="columns.length">
+                 <!-- проходим в цикле по flatten -->
+              <!-- на td вешаем oncellclick(prop, row, $event) -->
+                <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
+                    :key="prop.datafield + pindex">
+                    <slot :row="row" :prop="prop">
+                      <cd-cell :config="propertyconfig(prop, row)"></cd-cell>
+                    </slot>
+                </td>
+              </template>
+              <template v-else>
+                <td class="cd-grid--cell">{{ row }}</td>
+              </template>
               <!-- нарисуем строку с кнопками -->
               <td v-if="showmethods" class="cd-grid--cell method-row">
                   <cd-method-row

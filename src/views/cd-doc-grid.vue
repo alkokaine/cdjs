@@ -3,12 +3,12 @@
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
     <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
-        <cd-grid class="example-grid" v-if="selected" keyfield="id"
+        <cd-grid class="example-grid" v-if="isselected" :keyfield="selected.keyfield"
           :key="selected.name"
           :get="selected.get"
           :payload="payload"
-          :descriptor="descriptor"
-          :resolveresult="resolveresult"
+          :descriptor="selected.descriptor"
+          :resolveresult="selected.resolveresult"
           :collection="selected.collection"
           :total="selected.total"
           :paging="true"
@@ -16,7 +16,7 @@
           :resolvepayload="resolvepayload"
           :onpagechange="onpagechange">
           <div slot="grid-tuner">
-            <cd-descriptor-editor v-if="selected.filter" :descriptor="selected.filter">
+            <cd-descriptor-editor v-if="selected.filter && !selected.noedit" :descriptor="selected.filter">
               <div class="editor-header" slot="editor-header">
                 <span>Опишем свойства фильтра вот таким массивом объектов</span>
               </div>
@@ -39,6 +39,10 @@ import CDGrid from '../components/cd-grid.vue'
 import CDForm from '../components/cd-form.vue'
 import CDTabs from '../components/cd-tabs.vue'
 import CDDescriptorEditor from '../generic/cd-descriptor-editor.vue'
+// const api = {
+//   'Application Id': '84b4d2ad-2779-40cd-91f1-14b50f71f744',
+//   'Application Secret': '649fd0b1a90b5c149e5e066b1e3b996d77e95bf302075e9be0082200101a6e83a1423604a257a55610ce1ba69a5bb0dca76f4e6c278fb33972c6daad01b557fc79704fedc8df093e9c312ecd189fe6ab27c22cb748a50174f35f6b00abea2a52056773d92ebd818421f2faedd474eb50'
+// }
 export default {
   name: 'cd-doc-grid',
   components: {
@@ -54,6 +58,42 @@ export default {
       type: Array,
       default: function () {
         const view = this
+
+        const descriptor = [
+          {
+            datafield: 'city',
+            text: 'city'
+          },
+          {
+            datafield: 'country',
+            text: 'country'
+          },
+          {
+            datafield: 'countryCode',
+            text: 'countryCode'
+          },
+          {
+            datafield: 'latitude',
+            text: 'latitude'
+          },
+          {
+            datafield: 'longitude',
+            text: 'longitude'
+          },
+          {
+            datafield: 'region',
+            text: 'region'
+          },
+          {
+            datafield: 'regionCode',
+            text: 'regionCode'
+          },
+          {
+            datafield: 'wikiDataId',
+            text: 'wikiDataId'
+          }
+        ]
+
         return [
           {
             name: 'simple',
@@ -62,12 +102,17 @@ export default {
               method: 'get',
               url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
             },
+            keyfield: 'Id',
             collection: [],
-            total: 0
+            total: 0,
+            descriptor: descriptor,
+            resolveresult: view.resolveresult
           },
           {
             name: 'filtered',
+            keyfield: 'Id',
             caption: 'Грид с фильтром',
+            descriptor: descriptor,
             get: {
               method: 'get',
               url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
@@ -129,7 +174,70 @@ export default {
             ],
             total: 0,
             usefilter: true,
-            collection: []
+            collection: [],
+            resolveresult: (response) => {
+              view.resolveresult(response)
+            }
+          },
+          {
+            name: 'make-your-own-grid-in-5-min',
+            caption: 'Сделай свой грид за 5 минут',
+            collection: [],
+            descriptor: [],
+            keyfield: '',
+            total: 0,
+            resolveresult: (response) => {
+              Vue.set(view.selected, 'collection', response.data)
+            },
+            filter: [
+              {
+                datafield: 'gridsource',
+                text: 'Источник данных для грида',
+                input: 'select',
+                valuekey: 'key',
+                labelkey: 'label',
+                values: [
+                  {
+                    key: 1,
+                    method: 'get',
+                    keyfield: 'Id',
+                    url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
+                    label: 'Уже знакомые города',
+                    resolveresult: (response) => {
+                      view.resolveresult(response)
+                    }
+                  },
+                  {
+                    key: 2,
+                    method: 'get',
+                    url: 'https://api.openbrewerydb.org/breweries',
+                    keyfield: 'id',
+                    resolveresult: (response) => {
+                      Vue.set(view.selected, 'collection', response.data)
+                    },
+                    label: 'пивоварни'
+                  },
+                  {
+                    key: 3,
+                    method: 'get',
+                    url: 'https://imdb8.p.rapidapi.com/title/get-coming-soon-movies',
+                    label: 'Источник 3'
+                  }
+                ],
+                onselect (payload, option) {
+                  Vue.set(view.selected, 'keyfield', option.keyfield)
+                  Vue.set(view.selected.get, 'method', option.method)
+                  Vue.set(view.selected, 'resolveresult', option.resolveresult)
+                  Vue.set(view.selected.get, 'url', option.url)
+                }
+              }
+            ],
+            usefilter: true,
+            noedit: true,
+            get: {
+              method: 'get',
+              url: ''
+            }
           }
         ]
       }
@@ -140,40 +248,6 @@ export default {
       infos: CDGrid.mixins.concat(CDGrid),
       currentindex: 0,
       selected: Object,
-      descriptor: [
-        {
-          datafield: 'city',
-          text: 'city'
-        },
-        {
-          datafield: 'country',
-          text: 'country'
-        },
-        {
-          datafield: 'countryCode',
-          text: 'countryCode'
-        },
-        {
-          datafield: 'latitude',
-          text: 'latitude'
-        },
-        {
-          datafield: 'longitude',
-          text: 'longitude'
-        },
-        {
-          datafield: 'region',
-          text: 'region'
-        },
-        {
-          datafield: 'regionCode',
-          text: 'regionCode'
-        },
-        {
-          datafield: 'wikiDataId',
-          text: 'wikiDataId'
-        }
-      ],
       payload: {
         limit: 10,
         minPopulation: null,
@@ -196,10 +270,18 @@ export default {
     currentindex: {
       immediate: true,
       handler (newvalue, oldvalue) {
+        this.isselected = false
         if (newvalue >= 0) {
           this.selected = this.gridexamples[newvalue]
+          this.isselected = true
         }
       }
+    }
+  },
+  computed: {
+    resolvedescriptor () {
+      if (this.selected.descriptor) return this.selected.descriptor
+      return this.descriptor
     }
   },
   methods: {
