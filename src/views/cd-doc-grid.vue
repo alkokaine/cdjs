@@ -58,7 +58,6 @@ export default {
       type: Array,
       default: function () {
         const view = this
-
         const descriptor = [
           {
             datafield: 'city',
@@ -93,7 +92,6 @@ export default {
             text: 'wikiDataId'
           }
         ]
-
         return [
           {
             name: 'simple',
@@ -104,15 +102,17 @@ export default {
             },
             keyfield: 'Id',
             collection: [],
+            descriptor,
             total: 0,
-            descriptor: descriptor,
-            resolveresult: view.resolveresult
+            resolveresult: (response) => {
+              view.resolveresult(response)
+            }
           },
           {
             name: 'filtered',
             keyfield: 'Id',
             caption: 'Грид с фильтром',
-            descriptor: descriptor,
+            descriptor,
             get: {
               method: 'get',
               url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
@@ -183,12 +183,8 @@ export default {
             name: 'make-your-own-grid-in-5-min',
             caption: 'Сделай свой грид за 5 минут',
             collection: [],
-            descriptor: [],
             keyfield: '',
             total: 0,
-            resolveresult: (response) => {
-              Vue.set(view.selected, 'collection', response.data)
-            },
             filter: [
               {
                 datafield: 'gridsource',
@@ -201,6 +197,7 @@ export default {
                     key: 1,
                     method: 'get',
                     keyfield: 'Id',
+                    descriptor,
                     url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
                     label: 'Уже знакомые города',
                     resolveresult: (response) => {
@@ -210,23 +207,39 @@ export default {
                   {
                     key: 2,
                     method: 'get',
+                    descriptor: [],
                     url: 'https://api.openbrewerydb.org/breweries',
                     keyfield: 'id',
                     resolveresult: (response) => {
-                      Vue.set(view.selected, 'collection', response.data)
+                      const collection = response.data
+                      const descriptor = view.selected.descriptor
+                      if (descriptor === undefined || descriptor.length === 0) {
+                        const touch = collection[0]
+                        const d = []
+                        for (const [key] of Object.entries(touch)) {
+                          d.push({ datafield: key, text: key })
+                        }
+                        Vue.set(view.selected, 'descriptor', d)
+                      }
+                      delete view.selected.total
+                      Vue.set(view.selected, 'collection', collection)
                     },
                     label: 'пивоварни'
                   },
                   {
                     key: 3,
                     method: 'get',
-                    url: 'https://imdb8.p.rapidapi.com/title/get-coming-soon-movies',
-                    label: 'Источник 3'
+                    label: 'Мои коммиты в гитхаб',
+                    descriptor: [],
+                    url: 'https://'
                   }
                 ],
                 onselect (payload, option) {
+                  Vue.set(view.selected, 'collection', [])
+                  Vue.set(view.selected, 'descriptor', [])
                   Vue.set(view.selected, 'keyfield', option.keyfield)
                   Vue.set(view.selected.get, 'method', option.method)
+                  Vue.set(view.selected, 'descriptor', option.descriptor)
                   Vue.set(view.selected, 'resolveresult', option.resolveresult)
                   Vue.set(view.selected.get, 'url', option.url)
                 }
@@ -286,7 +299,7 @@ export default {
   },
   methods: {
     onfilterchange (property, value) {
-      Vue.set(this.payload, property.datafield, value)
+      // Vue.set(this.payload, property.datafield, value)
     },
     selectexample (event, args) {
       this.currentindex = args.index
