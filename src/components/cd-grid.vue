@@ -56,8 +56,6 @@
                       :checked="isrowselected(row)"
                       />
               </td>
-              <!-- проходим в цикле по flatten -->
-              <!-- на td вешаем oncellclick(prop, row, $event) -->
               <template v-if="columns.length">
                  <!-- проходим в цикле по flatten -->
               <!-- на td вешаем oncellclick(prop, row, $event) -->
