@@ -67,11 +67,7 @@ export default {
     /**
      * нужна ли постраничная загрузка
      */
-    paging: { type: Boolean, default: false, description: 'Нужна ли постраничная загрузка' },
-    /**
-     * свойство-признак того, что эта коллекция вложена в другую
-     */
-    inner: { type: Boolean, default: false, description: 'Признак того, что коллекция вложенная' }
+    paging: { type: Boolean, default: false, description: 'Нужна ли постраничная загрузка' }
   },
   watch: {
     /**

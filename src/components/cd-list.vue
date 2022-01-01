@@ -40,6 +40,10 @@ export default {
     listitemleaved: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при выходе из элемента списка' },
     listleave: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при выходе мыши из списка' },
     listenter: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при входе мыши в список' },
+    /**
+     * свойство-признак того, что эта коллекция вложена в другую
+     */
+    inner: { type: Boolean, default: false, description: 'Признак того, что коллекция вложенная' },
     listrole: { type: String }
   },
   computed: {
