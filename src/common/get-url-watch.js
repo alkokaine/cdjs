@@ -4,6 +4,7 @@ export default {
   },
   watch: {
     'get.url': {
+      immediate: true,
       handler (newvalue, oldvalue) {
         const parent = this
         if (newvalue) {

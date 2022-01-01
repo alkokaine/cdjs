@@ -77,7 +77,6 @@ export default {
      */
     payload: {
       deep: true,
-      immediate: true,
       /**
        *
        * @param {Object} newvalue новое значение объекта payload
