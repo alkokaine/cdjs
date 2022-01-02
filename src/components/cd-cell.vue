@@ -1,44 +1,44 @@
 <template>
   <div class="cd-cell">
-      <slot name="label"></slot>
-      <template v-if="readonly">
-        <template v-if="config.route">
-          <router-link :to="config.route">{{ value }}</router-link>
-        </template>
-        <template v-else>
-          <span>{{ value }}</span>
-        </template>
+    <slot name="label"></slot>
+    <template v-if="readonly">
+      <template v-if="config.route">
+        <router-link :to="config.route">{{ config.value }}</router-link>
       </template>
       <template v-else>
-      <template v-if="config.select">
-        <cd-select :payload="config.select.payload"
-          :keyfield="config.select.valuekey"
-          :labelkey="config.select.labelkey"
-          :get="config.select.get"
-          :collection="values"
-          :isdisabled="config.select.isdisabled"
-          :clearable="config.select.clearable"
-          :resolveresult="resolveresult"
-          :onselect="config.select.onselect"></cd-select>
-        </template>
-        <template v-else-if="config.textarea">
-          <textarea class="form-control form-control-sm" :id="config.datafield"/>
-        </template>
-        <template v-else-if="config.input">
-          <code v-if="config.input.type === 'code'" class="form-control form-control-sm">
-            {{ config.value }}
-          </code>
-          <template v-else>
-            <input class="form-control form-control-sm" v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
-              :value="config.value" :required="config.required" :pattern="config.input.pattern"
-              :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
-              :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
-              :maxlength="config.input.maxlength"
-              :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
-            </template>
-        </template>
+        <span>{{ config.value }}</span>
       </template>
-      <button v-if="config.clearable">x</button>
+    </template>
+    <template v-else>
+    <template v-if="config.select">
+      <cd-select :payload="config.select.payload"
+        :keyfield="config.select.valuekey"
+        :labelkey="config.select.labelkey"
+        :get="config.select.get"
+        :collection="values"
+        :isdisabled="config.select.isdisabled"
+        :clearable="config.select.clearable"
+        :resolveresult="resolveresult"
+        :onselect="config.select.onselect"></cd-select>
+      </template>
+      <template v-else-if="config.textarea">
+        <textarea class="form-control form-control-sm" :id="config.datafield"/>
+      </template>
+      <template v-else-if="config.input">
+        <code v-if="config.input.type === 'code'" class="form-control form-control-sm">
+          {{ config.value }}
+        </code>
+        <template v-else>
+          <input class="form-control form-control-sm" v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
+            :value="config.value" :required="config.required" :pattern="config.input.pattern"
+            :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
+            :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
+            :maxlength="config.input.maxlength"
+            :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
+          </template>
+      </template>
+    </template>
+    <button v-if="config.clearable">x</button>
   </div>
 </template>
 
@@ -61,7 +61,6 @@ export default {
   },
   data (cell) {
     return {
-      value: cell.config.value,
       values: cell.config.select ? (cell.config.select.values || []) : []
     }
   },
