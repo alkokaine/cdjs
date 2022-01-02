@@ -102,8 +102,8 @@ function createSelect (property, propertyholder, payload) {
     isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
     // выполняем onselect
     onselect: (option) => {
-      parent.onpropertychange(property, option[property.valuekey])
       if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
+      if (parent.onpropertychange) parent.onpropertychange(property, option[property.valuekey])
     }
   })
   return select
