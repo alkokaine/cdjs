@@ -11,10 +11,10 @@
 
 <script>
 import collection from '../common/collection'
-import urlwatch from '../common/get-url-watch'
+import watchurl from '../common/get-url-watch'
 export default {
   name: 'cd-select',
-  mixins: [collection, urlwatch],
+  mixins: [collection, watchurl],
   props: {
     isdisabled: {
       type: Function,
