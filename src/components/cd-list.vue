@@ -4,12 +4,10 @@
     <ul v-if="showitems" :role="listrole" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]">
       <li v-for="(row, index) in collection"
         :key="rowkey(row)" class="cd-list--item" :class="rowclassResolved(row)"
-          v-on:click.stop="listitemclicked($event, { row, index })"
-          v-on:mouseenter="listitementered($event, { row, index})"
-          role="presentation">
-        <div class="cd-list--item-content">
-          <slot :row="row" :index="index"></slot>
-        </div>
+        v-on:click.stop="listitemclicked($event, { row, index })"
+        v-on:mouseenter="listitementered($event, { row, index })"
+        role="presentation">
+        <slot :row="row" :index="index"></slot>
       </li>
       <li v-if="$slots.placeholder" class="cd-list--placeholder">
         <slot name="placeholder"></slot>
