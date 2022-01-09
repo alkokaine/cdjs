@@ -3,7 +3,7 @@
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
     <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
-      <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload"></cd-form>
+      <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
       <cd-prop-list v-if="settingform" :descriptor="grid.descriptor" :cangenerate="collection.length > 0" :generateproperties="generateproperties"></cd-prop-list>
       <cd-grid v-if="grid" class="example-grid" ref="example" :keyfield="grid.keyfield"
         :get="grid.get"
@@ -19,7 +19,8 @@
         <div slot="grid-tuner">
           <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter"
             :payload="payload"
-            :inline="true"></cd-form>
+            :inline="true"
+            :onpropertychange="onfilterchange"></cd-form>
         </div>
       </cd-grid>
     </cd-tabs>
@@ -323,6 +324,9 @@ export default {
     }
   },
   methods: {
+    onsettingchanged (property, value) {
+      console.log(property, value)
+    },
     generateproperties () {
       this.grid.descriptor = []
       const touch = this.collection[0]
