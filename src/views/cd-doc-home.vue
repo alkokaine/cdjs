@@ -141,6 +141,7 @@ params: Function // функция, которая возвращает пара
           labelkey: 'labelkey',
           valuekey: 'valuekey',
           input: 'select',
+          clearable: true,
           values: [{ labelkey: 'label key 1', valuekey: 1 }, { labelkey: 'label key 2', valuekey: 2 }, { labelkey: 'label key 3', valuekey: 3 }]
         },
         paramsdescriptor: []

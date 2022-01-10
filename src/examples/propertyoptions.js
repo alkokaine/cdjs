@@ -1,11 +1,13 @@
 export default [
   {
     datafield: 'datafield',
-    text: 'Имя свойства объекта'
+    text: 'Имя свойства объекта',
+    clearable: true
   },
   {
     datafield: 'text',
-    text: 'Человеческое имя свойства'
+    text: 'Человеческое имя свойства',
+    clearable: true
   },
   {
     datafield: 'labelkey',
