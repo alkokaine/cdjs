@@ -14,6 +14,7 @@
       <cd-select :payload="config.select.payload"
         :keyfield="config.select.valuekey"
         :labelkey="config.select.labelkey"
+        :value="config.value"
         :get="config.select.get"
         :collection="values"
         :isdisabled="config.select.isdisabled"
@@ -35,10 +36,10 @@
             :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
             :maxlength="config.input.maxlength"
             :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
-          </template>
+        </template>
       </template>
     </template>
-    <button v-if="config.clearable">x</button>
+    <button v-if="config.clearable" class="btn bg-transparent cd-clear--button btn-sm" v-on:click.stop="config.reset"><i class="bi bi-x-circle" ></i></button>
   </div>
 </template>
 
@@ -73,6 +74,14 @@ export default {
 </script>
 
 <style>
+  .cd-cell {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+  }
+  .cd-clear--button {
+    margin-left: -40px;
+  }
   input.is-readonly {
     border-style: none;
     cursor: default;

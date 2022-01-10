@@ -28,6 +28,14 @@ export default {
     value: { type: [Number, String], description: 'Текущее значение select' },
     onselect: { type: Function, required: true, description: 'Что произойдёт по выбору опции' }
   },
+  watch: {
+    value: {
+      immediate: true,
+      handler (newvalue) {
+        this.current = newvalue
+      }
+    }
+  },
   data (select) {
     return {
       current: select.value

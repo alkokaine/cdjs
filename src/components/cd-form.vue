@@ -1,7 +1,7 @@
 <template>
   <div class="cd-form">
     <slot name="header"></slot>
-    <form class="cd-form--content">
+    <form class="cd-form--content" v-on:submit.prevent="validateform">
       <slot>
         <template v-if="descriptor.length">
             <cd-fieldset :descriptor="descriptor"
@@ -50,6 +50,10 @@ export default {
     },
     propertyconfig () {
       return (property) => utils.propertyconfig.call(this, property, this.payload, this.editmode, undefined)
+    }
+  },
+  methods: {
+    validateform (...args) {
     }
   },
   data: function (form) {

@@ -195,6 +195,9 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
     },
     oninput (event) {
 
+    },
+    reset (event) {
+      Vue.set(propertyholder, property.datafield, null)
     }
   }
 }
