@@ -6,7 +6,7 @@
         <template v-if="descriptor.length">
             <cd-fieldset :descriptor="descriptor"
               :isvisible="isvisible"
-              :iseditable="iseditable"
+              :readonly="isreadonly"
               :inline="inline"
               :propertyconfig="propertyconfig"></cd-fieldset>
         </template>
@@ -45,8 +45,8 @@ export default {
     isvisible () {
       return (property) => utils.ispropertyvisible(property, null, this.payload)
     },
-    iseditable () {
-      return (property) => utils.ispropertyeditable(property, null, this.payload)
+    isreadonly () {
+      return (property) => !utils.ispropertyeditable(property, null, this.payload)
     },
     propertyconfig () {
       return (property) => utils.propertyconfig.call(this, property, this.payload, this.editmode, undefined)

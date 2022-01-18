@@ -5,14 +5,13 @@
             <cd-fieldset v-if="hasdescriptor(property)"
                 :class="property.class"
                 :isvisible="isvisible"
-                :iseditable="iseditable"
                 :propertyconfig="propertyconfig"
                 :descriptor="property.descriptor"
                 :readonly="readonly"
                 :inline="inline">
                 <legend v-if="haslegend(property)" class="cd-legend w-auto form-label">{{ property.text }}</legend>
             </cd-fieldset>
-            <cd-cell v-else :config="propertyconfig(property)" :readonly="readonly">
+            <cd-cell v-else :config="propertyconfig(property)" :readonly="readonly(property)">
               <label class="cd-label form-label" :for="property.datafield" slot="label">{{ property.text }}</label>
             </cd-cell>
         </div>
@@ -28,7 +27,7 @@ export default {
   mixins: [props],
   props: {
     propertyconfig: { type: Function },
-    readonly: { type: Boolean },
+    readonly: { type: Function },
     inline: { type: Boolean, default: false }
   },
   components: {
