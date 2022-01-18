@@ -20,7 +20,7 @@
             <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
               <div slot="header">
                 <span>{{ tutorial[step].text }}</span>
-                <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty"></cd-prop-list>
+                <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-prop-list>
               </div>
               <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
             </cd-list>
@@ -363,7 +363,7 @@ export default {
           ]
         },
         {
-          text: 'Дальше я ещё не придумал',
+          text: 'Займёмся заголовками',
           descriptor: () => view.grid.descriptor
         }
       ],
