@@ -1,7 +1,8 @@
 export default [
   {
     datafield: 'datafield',
-    text: 'datafield'
+    text: 'datafield',
+    canedit: false
   },
   {
     datafield: 'text',
