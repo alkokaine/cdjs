@@ -4,7 +4,6 @@
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
     <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
       <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
-      <cd-prop-list v-if="settingform" :descriptor="grid.descriptor" :cangenerate="collection.length > 0" :generateproperties="generateproperties"></cd-prop-list>
       <cd-grid v-if="grid" class="example-grid" ref="example" :keyfield="grid.keyfield"
         :get="grid.get"
         :payload="payload"
@@ -17,10 +16,20 @@
         :pageSize="10"
         :onpagechange="onpagechange">
         <div slot="grid-tuner">
+          <div v-if="currentindex === 2">
+            <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
+              <div slot="header">
+                <span>{{ tutorial[step].text }}</span>
+                <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty"></cd-prop-list>
+              </div>
+              <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
+            </cd-list>
+          </div>
           <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter"
             :payload="payload"
             :inline="true"
-            :onpropertychange="onfilterchange"></cd-form>
+            :onpropertychange="onfilterchange">
+          </cd-form>
         </div>
       </cd-grid>
     </cd-tabs>
@@ -34,6 +43,7 @@ import ComponentInfo from '../generic/cd-doc-component-info.vue'
 import CDGrid from '../components/cd-grid.vue'
 import CDForm from '../components/cd-form.vue'
 import CDTabs from '../components/cd-tabs.vue'
+import CDList from '../components/cd-list.vue'
 import CDPropList from '../generic/cd-prop-list.vue'
 export default {
   name: 'cd-doc-grid',
@@ -42,6 +52,7 @@ export default {
     'cd-info': ComponentInfo,
     'cd-grid': CDGrid,
     'cd-form': CDForm,
+    'cd-list': CDList,
     'cd-tabs': CDTabs,
     'cd-prop-list': CDPropList
   },
@@ -241,6 +252,7 @@ export default {
           onselect (property, option, parent) {
             Vue.set(examples, 'collection', [])
             Vue.set(examples, 'grid', option.grid)
+            Vue.set(examples, 'step', 0)
           }
         }
         return source
@@ -283,10 +295,79 @@ export default {
     }
   },
   data (view) {
+    const increase = () => { Vue.set(view, 'step', view.step + 1) }
     return {
       infos: CDGrid.mixins.concat(CDGrid),
       currentindex: 0,
       selected: Object,
+      preview: [],
+      tutorial: [
+        {
+          text: 'Итак, мы получили из урл json данные, отображаемые в гриде. Но выглядит это не совсем так, как мы хотим, правда?',
+          buttons: [
+            {
+              id: 1,
+              text: 'Давайте добавим колонки!',
+              click (event) {
+                increase()
+              }
+            }
+          ]
+        },
+        {
+          text: 'Мы можем сгенерировать колонки автоматически и посмотреть что получится.',
+          buttons: [
+            {
+              id: 1,
+              text: 'Сгенерировать колонки автоматически',
+              click (event) {
+                increase()
+                view.generateproperties()
+              }
+            }
+          ]
+        },
+        {
+          text: 'Наш художник-декоратор сгенерировал из свойств объектов коллекции следующие колонки:',
+          descriptor: () => view.preview,
+          buttons: [
+            {
+              id: 1,
+              text: 'Применить полученные колонки к гриду',
+              click (event) {
+                Vue.set(view.grid, 'descriptor', view.preview)
+              }
+            },
+            {
+              id: 2,
+              text: 'Идём дальше',
+              click (event) {
+                increase()
+              },
+              isdisabled: () => view.grid.descriptor === null || view.grid.descriptor === undefined || view.grid.descriptor.length === 0
+            }
+          ]
+        },
+        {
+          text: 'Что ж, почти неплохо! Но нужны ли нам все эти колонки? Попробуйте избавиться от них с помощью крестика возле названия свойства',
+          descriptor: () => view.grid.descriptor,
+          buttons: [
+            {
+              id: 1,
+              text: 'Вперёд!',
+              click (event) {
+                increase()
+              },
+              isdisabled: () => !view.hasremoved
+            }
+          ]
+        },
+        {
+          text: 'Дальше я ещё не придумал',
+          descriptor: () => view.grid.descriptor
+        }
+      ],
+      step: Number,
       grid: {},
       settingform: false,
       total: 0,
@@ -306,7 +387,13 @@ export default {
           description: ['Что-то будет']
         }
       ],
-      collection: []
+      collection: [],
+      hasremoved: false
+    }
+  },
+  computed: {
+    isbuttondisabled () {
+      return (button) => Object.prototype.hasOwnProperty.call(button.row, 'isdisabled') ? button.row.isdisabled() : false
     }
   },
   watch: {
@@ -328,11 +415,10 @@ export default {
       console.log(property, value)
     },
     generateproperties () {
-      this.grid.descriptor = []
       const touch = this.collection[0]
       if (touch) {
         for (const [key] of Object.entries(touch)) {
-          this.grid.descriptor.push({ datafield: key, text: key })
+          this.preview.push({ datafield: key, text: key })
         }
       }
     },
@@ -361,6 +447,10 @@ export default {
     },
     onpagechange (event, pageargs) {
       Vue.set(this.payload, 'offset', pageargs.row.offset)
+    },
+    onremoveproperty (property) {
+      console.log(property)
+      this.hasremoved = true
     }
   }
 }
