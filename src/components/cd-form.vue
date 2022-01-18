@@ -66,7 +66,6 @@ export default {
 <style>
   .cd-form {
     text-align: left;
-    padding-top: 5px;
   }
   .cd-field {
     padding-left: 5px;

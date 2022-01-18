@@ -181,7 +181,6 @@ export default {
   }
   .cd-grid {
     margin: auto;
-    padding-top: 10px;
   }
   .cd-grid--table {
     margin: auto;
@@ -191,8 +190,5 @@ export default {
     padding-top: 50px;
     padding-bottom: 50px;
   }
-  /* table {
-    width: unset!important;
-  } */
 
 </style>
