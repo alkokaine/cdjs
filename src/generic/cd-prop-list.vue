@@ -11,10 +11,6 @@
         <button slot="reference" type="button" class="property-descriptor btn btn-link btn-sm">{{ property.row.datafield }}</button>
       </el-popover>
     </div>
-    <template slot="placeholder">
-      <button type="button" class="btn btn-link btn-sm" :class="{ 'disabled': !cangenerate }" v-on:click="generateproperties">Сгенерировать колонки автоматически</button>
-      <button type="button" class="btn btn-link btn-sm" v-on:click="addproperty">Добавить колонку</button>
-    </template>
   </cd-list>
 </template>
 
@@ -32,8 +28,7 @@ export default {
   },
   props: {
     descriptor: { type: Array, required: true },
-    generateproperties: { type: Function, required: true },
-    cangenerate: { type: Boolean, required: true }
+    onremoveproperty: { type: Function, default: (property) => { } }
   },
   data (proplist) {
     return {
@@ -59,6 +54,7 @@ export default {
     },
     removeproperty (event, args) {
       this.descriptor.splice(args, 1)
+      this.onremoveproperty(args)
     },
     onpropertyclick (event, prop) {
       this.zoomprop = prop
