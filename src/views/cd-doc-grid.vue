@@ -19,7 +19,7 @@
           <div v-if="currentindex === 2">
             <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
               <div slot="header">
-                <span>{{ tutorial[step].text }}</span>
+                <div v-for="(text, index) in tutorial[step].text" :key="index">{{ text }}</div>
                 <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-prop-list>
               </div>
               <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
@@ -101,14 +101,6 @@ export default {
       default: function () {
         const view = this
         return [
-          {
-            datafield: 'minPopulation',
-            text: 'minPopulation'
-          },
-          {
-            datafield: 'namePrefix',
-            text: 'namePrefix'
-          },
           {
             datafield: 'countryIds',
             text: 'Страна',
@@ -303,7 +295,7 @@ export default {
       preview: [],
       tutorial: [
         {
-          text: 'Итак, мы получили из урл json данные, отображаемые в гриде. Но выглядит это не совсем так, как мы хотим, правда?',
+          text: ['Итак, мы получили из урл json данные, отображаемые в гриде. Но выглядит это не совсем так, как мы хотим, правда?'],
           buttons: [
             {
               id: 1,
@@ -315,7 +307,7 @@ export default {
           ]
         },
         {
-          text: 'Мы можем сгенерировать колонки автоматически и посмотреть что получится.',
+          text: ['Мы можем сгенерировать колонки автоматически и посмотреть что получится.'],
           buttons: [
             {
               id: 1,
@@ -328,7 +320,7 @@ export default {
           ]
         },
         {
-          text: 'Наш художник-декоратор сгенерировал из свойств объектов коллекции следующие колонки:',
+          text: ['Наш художник-декоратор сгенерировал из свойств объектов коллекции следующие колонки:'],
           descriptor: () => view.preview,
           buttons: [
             {
@@ -349,7 +341,7 @@ export default {
           ]
         },
         {
-          text: 'Что ж, почти неплохо! Но нужны ли нам все эти колонки? Попробуйте избавиться от них с помощью крестика возле названия свойства',
+          text: ['Что ж, почти неплохо! Но нужны ли нам все эти колонки? Попробуйте избавиться от них с помощью крестика возле названия свойства'],
           descriptor: () => view.grid.descriptor,
           buttons: [
             {
@@ -363,7 +355,10 @@ export default {
           ]
         },
         {
-          text: 'Займёмся заголовками',
+          text: [
+            'Займёмся заголовками. Попробуйте нажать на название свойства в списке ниже. Откроется подсказка, содержащая редактор дескриптора свойства',
+            'Свойство datafield будет задисаблено, чтобы не поломать связи между свойствами строк таблицы и не получить в результате пустой столбец',
+            'Свойство text будет содержать строчку, которая отрисуется в заголовке столбца таблицы'],
           descriptor: () => view.grid.descriptor
         }
       ],
@@ -416,6 +411,7 @@ export default {
     },
     generateproperties () {
       const touch = this.collection[0]
+      this.preview = []
       if (touch) {
         for (const [key] of Object.entries(touch)) {
           this.preview.push({ datafield: key, text: key })
@@ -449,7 +445,6 @@ export default {
       Vue.set(this.payload, 'offset', pageargs.row.offset)
     },
     onremoveproperty (property) {
-      console.log(property)
       this.hasremoved = true
     }
   }

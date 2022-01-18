@@ -49,7 +49,6 @@ export default {
     onpropertychange () {
       return (descriptor) => {
         return (property, value) => {
-          console.log(descriptor, property, value)
           Vue.set(descriptor.row, property.datafield, value)
         }
       }
