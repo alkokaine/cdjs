@@ -2,12 +2,8 @@
   <cd-list class="cd-properties" listclass="property-list" rowclass="property-descriptor" :collection="descriptor" keyfield="datafield" :listitemclicked="onpropertyclick">
     <div class="property-descriptor--inner" slot-scope="property" draggable="true" v-on:drag="ondrag($event, property)" v-on:drop="ondrop($event, property)" v-on:dragover="ondragover($event, property)">
       <button type="button" class="btn btn-link btn-sm bi bi-x-circle" v-on:click.stop="removeproperty($event, property.index)"></button>
-      <el-popover trigger="click" :value="(zoomprop.index === property.index)">
-        <cd-form :payload="property.row" :onpropertychange="onpropertyedited">
-          <div>
-            AAA {{ property }}
-          </div>
-        </cd-form>
+      <el-popover trigger="click" :value="(zoomprop.index === property.index)" :disabled="popoff">
+        <cd-form :descriptor="resolvedescriptor(property)" :payload="property.row" :onpropertychange="onpropertychange(property)"></cd-form>
         <button slot="reference" type="button" class="property-descriptor btn btn-link btn-sm">{{ property.row.datafield }}</button>
       </el-popover>
     </div>
@@ -15,6 +11,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import basedescriptor from '@/examples/base-property-descriptor'
+import inputproperty from '@/examples/input-property-descriptor'
 import elpopover from 'element-ui/packages/popover'
 import CDList from '../components/cd-list.vue'
 import CDForm from '../components/cd-form.vue'
@@ -27,6 +26,7 @@ export default {
     'cd-form': CDForm
   },
   props: {
+    popoff: { type: Boolean, default: false },
     descriptor: { type: Array, required: true },
     onremoveproperty: { type: Function, default: (property) => { } }
   },
@@ -39,6 +39,20 @@ export default {
     isdisabled () {
       const list = this
       return (scope) => scope.index !== list.index
+    },
+    resolvedescriptor () {
+      return (property) => {
+        if (property.input === undefined) return basedescriptor
+        else return inputproperty.concat(basedescriptor)
+      }
+    },
+    onpropertychange () {
+      return (descriptor) => {
+        return (property, value) => {
+          console.log(descriptor, property, value)
+          Vue.set(descriptor.row, property.datafield, value)
+        }
+      }
     }
   },
   methods: {
