@@ -70,4 +70,7 @@ export default {
     flex-wrap: wrap;
     flex-grow: 1;
   }
+  .cd-field {
+    padding-top: 0.5em;
+  }
 </style>
