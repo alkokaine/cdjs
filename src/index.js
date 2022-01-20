@@ -1,5 +1,3 @@
-import 'bootstrap'
-
 import CDForm from './components/cd-form.vue'
 import CDGrid from './components/cd-grid.vue'
 import CDList from './components/cd-list.vue'

@@ -73,4 +73,8 @@ export default {
   .cd-field {
     padding-top: 0.5em;
   }
+  .form-label {
+    margin-bottom: unset;
+    white-space: nowrap;
+  }
 </style>

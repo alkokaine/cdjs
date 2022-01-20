@@ -24,8 +24,6 @@
 </template>
 
 <script>
-import 'bootstrap'
-
 export default {
   name: 'cd-modal',
   props: {

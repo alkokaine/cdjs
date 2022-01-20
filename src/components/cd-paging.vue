@@ -78,8 +78,6 @@ export default {
 </script>
 
 <style>
-  @import '~bootstrap/dist/css/bootstrap.css';
-
   ul.cd-pagination {
     list-style-type: none;
     display: inline-block;
