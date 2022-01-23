@@ -7,7 +7,7 @@ import CDMenuView from '../views/cd-doc-menu.vue'
 import CDListView from '../views/cd-doc-list.vue'
 import CDModalView from '../views/cd-doc-modal.vue'
 import CDTabView from '../views/cd-doc-tabs.vue'
-
+import CDMonthView from '../views/cd-doc-month.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -29,6 +29,11 @@ const routes = [
     path: '/Grid',
     name: 'grid',
     component: CDGridView
+  },
+  {
+    path: '/Calendar',
+    name: 'calendar',
+    component: CDMonthView
   },
   {
     path: '/Menu',
