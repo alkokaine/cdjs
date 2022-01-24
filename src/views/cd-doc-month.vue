@@ -22,7 +22,7 @@ export default {
       holidays: [],
       payload: {
         Year: 2022,
-        MonthID: 3
+        MonthID: 5
       }
     }
   },
@@ -58,5 +58,6 @@ export default {
   }
   .holidays-list {
     list-style: none;
+    padding-inline-start: unset;
   }
 </style>

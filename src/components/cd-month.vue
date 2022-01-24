@@ -135,6 +135,7 @@ export default {
                 if (first.weekdayNumber === 1) return days
                 const result = []
                 let ln = first.weekdayNumber - 1
+                if (ln < 0) ln = 6 - ln - 1
                 while (ln > 0) {
                   result.unshift(day(fd.subtract(1, 'days').toDate()))
                   ln -= 1
