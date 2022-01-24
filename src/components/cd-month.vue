@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import CDList from '@/components/cd-list.vue'
+import CDList from './cd-list.vue'
 import moment from 'moment'
 
 const weekdays = [
@@ -87,19 +87,19 @@ export default {
       validator (value) {
         var hasmonth = true
         var hasyear = true
-        if (!Object.prototype.hasOwnProperty.call(value, 'month')) {
+        if (!Object.prototype.hasOwnProperty.call(value, 'MonthID')) {
           hasmonth = false
-          console.error('[CDJS]payload object must have \'month\' property')
+          console.error('[CDJS]payload object must have \'MonthID\' property')
         }
-        if (!Object.prototype.hasOwnProperty.call(value, 'year')) {
+        if (!Object.prototype.hasOwnProperty.call(value, 'Year')) {
           hasyear = false
-          console.error('[CDJS]payload object must have \'year\' property')
+          console.error('[CDJS]payload object must have \'Year\' property')
         }
         if (!(hasmonth && hasyear)) return false
-        const monthvalue = value.month
+        const monthvalue = value.MonthID
         const ismonth = Number.isInteger(monthvalue) && (monthvalue >= 1 && monthvalue <= 12)
-        if (!ismonth) console.error('[CDJS]payload.month value must be Number and starting from 1, ending by 12')
-        const yearvalue = value.year
+        if (!ismonth) console.error('[CDJS]payload.MonthID value must be Number and starting from 1, ending by 12')
+        const yearvalue = value.Year
         const isyear = yearvalue !== undefined && yearvalue !== null && Number.isInteger(yearvalue)
         return ismonth && isyear
       }
@@ -111,19 +111,19 @@ export default {
   data (cdm) {
     return {
       weekdays: weekdays,
-      calendar: [],
       keyfield: 'key',
       dates: []
     }
   },
   watch: {
     payload: {
+      deep: true,
       immediate: true,
       handler (newvalue) {
         const calendar = this
         let _days = []
-        if (newvalue !== undefined && newvalue.year !== undefined && newvalue.month !== undefined) {
-          calendar.$http.get(`https://isdayoff.ru/api/getdata?year=${newvalue.year}&month=${(newvalue.month)}&pre=1&covid=1&sd=0`)
+        if (newvalue !== undefined && newvalue.Year !== undefined && newvalue.MonthID !== undefined) {
+          calendar.$http.get(`https://isdayoff.ru/api/getdata?year=${newvalue.Year}&month=${(newvalue.MonthID)}&pre=1&covid=1&sd=0`)
             .then((response) => {
               _days = Array.from(response.request.response).map(m => Number(m))
             }).catch((error) => {
@@ -131,7 +131,7 @@ export default {
             }).finally(() => {
               const prepend = (days) => {
                 const first = days[0]
-                const fd = date(newvalue.year, newvalue.month, first.day)
+                const fd = date(newvalue.Year, newvalue.MonthID, first.day)
                 if (first.weekdayNumber === 1) return days
                 const result = []
                 let ln = first.weekdayNumber - 1
@@ -141,11 +141,11 @@ export default {
                 }
                 return result.concat(days)
               }
-              const dayscount = daysInMonth(newvalue.year, newvalue.month)
+              const dayscount = daysInMonth(newvalue.Year, newvalue.MonthID)
               _days = (_days.length > 0
                 ? _days.map((_d, index) => ({ code: _d, d: index + 1 }))
                 : Array.from(Array(dayscount).keys()).map((_d, index) => ({ d: index + 1 })))
-                .map(d => (day(date(newvalue.year, newvalue.month, d.d).toDate(), d.code)))
+                .map(d => (day(date(newvalue.Year, newvalue.MonthID, d.d).toDate(), d.code)))
               calendar.dates = prepend(_days)
             })
         }
