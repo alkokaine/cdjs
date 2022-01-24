@@ -1,8 +1,8 @@
 <template>
   <cd-month :payload="payload">
-    <cd-list slot-scope="day" :collection="details(day)" keyfield="day">
+    <cd-list class="day-info" slot-scope="day" listclass="holidays-list" :collection="details(day)" keyfield="day">
       <span slot-scope="holiday">
-        {{ holiday }}
+        {{ holiday.row.name }}
       </span>
     </cd-list>
   </cd-month>
@@ -53,5 +53,10 @@ export default {
 </script>
 
 <style>
-
+  .day-info {
+    margin: 0.5em;
+  }
+  .holidays-list {
+    list-style: none;
+  }
 </style>

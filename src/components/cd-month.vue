@@ -1,10 +1,10 @@
 <template>
   <cd-list class="cd-month" listclass="cd-weekdays" :rowclass="resolverowclass" :collection="weekdays" keyfield="id">
-    <cd-list class="cd-weekday--list" slot-scope="weekday" listclass="cd-weekday--days" :class="weekday.row.class" :collection="weekdaylist(weekday)" keyfield="key">
+    <cd-list class="cd-weekday--list" slot-scope="weekday" listclass="cd-weekday--days" :class="weekday.row.class" rowclass="cd-day--container" :collection="weekdaylist(weekday)" keyfield="key">
       <div class="cd-weekday--name" slot="header">
         {{ weekday.row.name }}
       </div>
-      <div class="cd-day" slot-scope="day" :class="[{ 'cd-holiday': day.row.code === 1 }]">
+      <div class="cd-day" slot-scope="day" :class="[{ 'cd-day--prev-month': isprevmonth(day), 'cd-holiday': day.row.code === 1 }]">
         <div class="cd-day--header">
           <span class="cd-day--number">{{ day.row.day }}</span>
           <span class="cd-day--info">
@@ -156,21 +156,30 @@ export default {
     weekdaylist () {
       const calendar = this
       return (weekday) => calendar.dates.filter(d => d.weekdayNumber === weekday.row.id)
+    },
+    isprevmonth () {
+      const calendar = this
+      return (weekday) => weekday.row.month !== (calendar.payload.MonthID - 1)
     }
   },
   methods: {
     resolverowclass (row) {
       const cdmonth = this
-      // const prevmonth = () => row.date.getMonth() !== (cdmonth.month - 1) ? 'cd-day--prev-month' : ''
-      // const isvisible = () => row.date.getMonth() !== (cdmonth.month - 1) && !cdmonth.showothers ? 'hidden' : ''
-      const weekend = () => [0, 6].indexOf(row.weekdayNumber) !== -1 ? 'cd-day--weekend' : ''
-      return `cd-weekday-container ${weekend()} ${cdmonth.resolvedayclass(row)}`
+      return `cd-weekday-container ${([0, 6].indexOf(row.weekdayNumber) !== -1 ? 'cd-day--weekend' : '')} ${cdmonth.resolvedayclass(row)}`
     }
   }
 }
 </script>
 
 <style>
+  .cd-day--container {
+      padding: 5px;
+      border: 1px solid;
+      border-radius: 0.5em;
+      border-color: rgba(0, 0, 0, 0.205);
+      margin-bottom: 5px;
+      min-height: 125px;
+  }
   .cd-days--list {
     list-style: none;
     margin: 0 0 0 0;
@@ -186,6 +195,11 @@ export default {
     display: flex;
     text-align: right;
     justify-content: space-around;
+    align-items: center;
+  }
+  .cd-day--number {
+    font-size: 2em;
+    font-weight: bold;
   }
   .cd-weekdays {
     list-style: none;
@@ -210,5 +224,8 @@ export default {
   .cd-day--content {
     border-top: 1px solid;
     color: black;
+  }
+  .cd-day--prev-month {
+    opacity: 0.5;
   }
 </style>
