@@ -2,7 +2,7 @@
   <div class="cd-list" v-on:mouseleave="listleave">
     <slot name="header"></slot>
     <ul v-if="showitems" :role="listrole" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]">
-      <li v-for="(row, index) in collection"
+      <li v-for="(row, index) in filtered"
         :key="rowkey(row)" class="cd-list--item" :class="rowclassResolved(row)"
         v-on:click.stop="listitemclicked($event, { row, index })"
         v-on:mouseenter="listitementered($event, { row, index })"
@@ -24,6 +24,7 @@ export default {
   name: 'cd-list',
   mixins: [collection, selection],
   props: {
+    isrowvisible: { type: Function },
     showitems: { type: Boolean, default: true, description: 'Прячем или нет элементы списка' },
     /**
      * строка или функция, возвращающая css-класс для для
@@ -54,6 +55,11 @@ export default {
     }
   },
   computed: {
+    filtered () {
+      const list = this
+      if (list.isrowvisible === undefined) return list.collection
+      return list.collection.filter(row => list.isrowvisible(row))
+    },
     rowclassResolved () {
       const list = this
       return (row) => {
