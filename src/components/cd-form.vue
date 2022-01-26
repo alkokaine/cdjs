@@ -71,4 +71,7 @@ export default {
     padding-left: 5px;
     padding-left: 5px;
   }
+  .form-control-sm {
+    min-height: calc(0.8em + 0.5rem + 2px);
+  }
 </style>

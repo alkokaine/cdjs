@@ -65,7 +65,7 @@ function createInput (property, propertyholder, payload) {
     min: resolvePropertyValue(property, 'min', propertyholder),
     maxlength: resolvePropertyValue(property, 'maxlength', propertyholder),
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
-    checked: resolvePropertyValue(property, 'checked', propertyholder),
+    checked: propertyholder[property.datafield] === 1 || propertyholder[property.datafield] === true,
     placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
     ondebounce (value, event) { parent.onpropertychange(property, value) }
   })
@@ -188,13 +188,13 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
     text: p.text,
     value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield],
     onchange (event) {
-
+      if (property.input === 'checkbox') {
+        property.toogle(propertyholder)
+      }
     },
     onblur (event) {
-
     },
     oninput (event) {
-
     },
     reset (event) {
       Vue.set(propertyholder, property.datafield, null)

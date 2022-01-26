@@ -32,7 +32,7 @@
         <template v-else>
           <input class="form-control form-control-sm" v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
             :value="config.value" :required="config.required" :pattern="config.input.pattern"
-            :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
+            :class="{'is-readonly': readonly, 'form-check-input': config.input.type === 'checkbox' }" :placeholder="config.input.placeholder"
             :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
             :maxlength="config.input.maxlength"
             :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
