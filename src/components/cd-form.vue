@@ -1,10 +1,10 @@
 <template>
   <div class="cd-form">
     <slot name="header"></slot>
-    <form class="cd-form--content" v-on:submit.prevent="validateform">
+    <form class="cd-form--content" :class="formclass" v-on:submit.prevent="validateform">
       <slot>
         <template v-if="descriptor.length">
-            <cd-fieldset :descriptor="descriptor"
+            <cd-fieldset class="cd-fieldset--root" :class="rootclass" :descriptor="descriptor"
               :isvisible="isvisible"
               :readonly="isreadonly"
               :inline="inline"
@@ -29,6 +29,8 @@ export default {
     'cd-fieldset': fieldset
   },
   props: {
+    formclass: { type: String, default: '' },
+    rootclass: { type: String, default: '' },
     inline: { type: Boolean, default: false, description: 'fieldset рисуется с display: flex, flex-wrap, flex-grow' },
     onpropertychange: { type: Function, required: true, description: 'Функция, которая выполнится при изменении свойства объекта payload' },
     payload: { type: Object, required: true, description: 'Объект, который размещается на форме' },
