@@ -15,7 +15,7 @@
       </cd-list>
     </template>
     <template v-else>
-      <cd-list class="cd-month" listclass="cd-weekday--days list-view" rowclass="cd-day--container" :collection="dates" keyfield="key" :isrowvisible="isdayvisible">
+      <cd-list class="cd-month" listclass="cd-weekday--days list-view" rowclass="cd-day--container" :collection="dates" keyfield="key">
         <template slot-scope="day">
           <slot :day="day.row">
             {{ day }}
@@ -120,14 +120,12 @@ export default {
         return ismonth && isyear
       }
     },
-    schedule: { type: Array },
-    isvisible: { type: Function, default: (exist, checking) => (true) },
+    schedule: { type: [Function, Array] },
     showothers: { type: Boolean, default: true },
     resolvedayclass: { type: Function, default: () => ('') }
   },
   data (cdm) {
     return {
-      isweekmode: cdm.payload.mode === 0,
       weekdays: weekdays,
       keyfield: 'key',
       dates: []
@@ -171,10 +169,19 @@ export default {
                 : Array.from(Array(dayscount).keys()).map((_d, index) => ({ d: index + 1 })))
                 .map(d => (day(date(newvalue.Year, newvalue.MonthID, d.d).toDate(), d.code)))
                 // и ещё раз отмаппим, через функцию day, которая вернёт всё, что нам нужно знать об этом дне
-              if (newvalue.mode === 0) {
+              if (calendar.schedule !== undefined) {
+                const scheduledays = calendar.schedule.map(m => m.day)
+                _days.forEach(day => {
+                  const index = scheduledays.findIndex(d => (+day.day) === d)
+                  if (index !== -1) {
+                    Vue.set(day, 'info', calendar.schedule[index])
+                  }
+                })
+              }
+              if (newvalue.mode === 1) {
                 calendar.dates = prepend(_days)
               } else {
-                calendar.dates = _days
+                calendar.dates = _days.filter(f => f.info !== undefined)
               }
             })
         }
@@ -182,6 +189,9 @@ export default {
     }
   },
   computed: {
+    isweekmode () {
+      return this.payload.mode === 1
+    },
     weekdaylist () {
       const calendar = this
       return (weekday) => calendar.dates.filter(d => d.weekdayNumber === weekday.row.id)
@@ -189,14 +199,6 @@ export default {
     isprevmonth () {
       const calendar = this
       return (weekday) => weekday.row.month !== (calendar.payload.MonthID - 1)
-    },
-    isdayvisible () {
-      const calendar = this
-      return (weekday) => {
-        if (calendar.schedule === undefined) return true
-        if (typeof calendar.schedule === 'function') return true
-        return calendar.schedule.findIndex(exists => calendar.isvisible(exists, weekday)) >= 0
-      }
     }
   },
   methods: {
@@ -236,7 +238,8 @@ export default {
   }
   .cd-day--container {
     margin-left: 0.5em;
-    margin-right: 0.5em;
+    margin-top: 0.5em;
+    margin-right: unset;
     flex-grow: 1;
   }
   .cd-day--content {
@@ -249,6 +252,15 @@ export default {
     border: 1px solid;
     border-color: #00000023;
     border-radius: 0.5em;
+  }
+  .cd-weekday--name {
+    text-align: center;
+    font-weight: 700;
+  }
+  .cd-day:hover {
+    -webkit-box-shadow: 0px 5px 5px -2px rgba(34, 60, 80, 0.6);
+    -moz-box-shadow: 0px 5px 5px -2px rgba(34, 60, 80, 0.6);
+    box-shadow: 0px 5px 5px -2px rgba(34, 60, 80, 0.6);
   }
   .col {
     padding-left: unset;
