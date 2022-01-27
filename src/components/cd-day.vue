@@ -22,7 +22,4 @@ export default {
 </script>
 
 <style>
-  .cd-day--content {
-    height: 125px;
-  }
 </style>
