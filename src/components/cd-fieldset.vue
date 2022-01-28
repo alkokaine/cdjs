@@ -11,7 +11,7 @@
                 :inline="inline">
                 <legend v-if="haslegend(property)" class="cd-legend w-auto form-label">{{ property.text }}</legend>
             </cd-fieldset>
-            <cd-cell v-else :config="propertyconfig(property)" :readonly="readonly(property)">
+            <cd-cell v-else :config="propertyconfig(property)" :readonly="readonly(property)" :class="property.class">
               <label class="cd-label form-label" :for="property.datafield" slot="label">{{ property.text }}</label>
             </cd-cell>
         </div>
