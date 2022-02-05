@@ -1,21 +1,25 @@
 <template>
   <fieldset class="cd-fieldset border p-2 form-control form-control-sm" :class="{ 'inline': inline }">
-        <slot></slot>
-        <div class="cd-field" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
-            <cd-fieldset v-if="hasdescriptor(property)"
-                :class="property.class"
-                :isvisible="isvisible"
-                :propertyconfig="propertyconfig"
-                :descriptor="property.descriptor"
-                :readonly="readonly"
-                :inline="inline">
-                <legend v-if="haslegend(property)" class="cd-legend w-auto form-label">{{ property.text }}</legend>
-            </cd-fieldset>
-            <cd-cell v-else :config="propertyconfig(property)" :readonly="readonly(property)" :class="property.class">
-              <label class="cd-label form-label" :for="property.datafield" slot="label">{{ property.text }}</label>
-            </cd-cell>
-        </div>
-    </fieldset>
+    <slot></slot>
+    <div class="cd-field" :class="property.class" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
+      <template v-if="hasdescriptor(property)">
+        <cd-fieldset
+            :class="property.class"
+            :isvisible="isvisible"
+            :propertyconfig="propertyconfig"
+            :descriptor="property.descriptor"
+            :readonly="readonly"
+            :inline="inline">
+            <legend v-if="haslegend(property)" class="cd-legend w-auto form-label">{{ property.text }}</legend>
+        </cd-fieldset>
+      </template>
+      <template v-else>
+        <cd-cell :config="propertyconfig(property)" :readonly="readonly(property)">
+          <label class="cd-label form-label" :for="property.datafield" slot="label">{{ property.text }}</label>
+        </cd-cell>
+      </template>
+    </div>
+  </fieldset>
 </template>
 
 <script>
