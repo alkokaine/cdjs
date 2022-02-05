@@ -81,4 +81,7 @@ export default {
   .cd-list--wrap {
     background-color: inherit;
   }
+  li.no-data {
+    list-style: none;
+  }
 </style>
