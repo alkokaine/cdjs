@@ -1,21 +1,24 @@
 <template>
   <div class="cd-form">
     <slot name="header"></slot>
-    <form class="cd-form--content" :class="formclass" v-on:submit.prevent="validateform">
-      <slot>
-        <template v-if="descriptor.length">
-            <cd-fieldset class="cd-fieldset--root" :class="rootclass" :descriptor="descriptor"
-              :isvisible="isvisible"
-              :readonly="isreadonly"
-              :inline="inline"
-              :propertyconfig="propertyconfig"></cd-fieldset>
-        </template>
-        <template v-else>
-            <span>Напишите в внутри тэга cd-form содержимое формы, или используйте свойство descriptor для встроенного рендеринга</span>
-        </template>
-      </slot>
-    </form>
-    <slot name="footer"></slot>
+    <div class="cd-form-container">
+      <slot name="header"></slot>
+      <form class="cd-form--content" :class="formclass" v-on:submit.prevent="validateform">
+        <slot>
+          <template v-if="descriptor.length">
+              <cd-fieldset class="cd-fieldset--root border-0" :class="rootclass" :descriptor="descriptor"
+                :isvisible="isvisible"
+                :readonly="isreadonly"
+                :inline="inline"
+                :propertyconfig="propertyconfig"></cd-fieldset>
+          </template>
+          <template v-else>
+              <span>Напишите в внутри тэга cd-form содержимое формы, или используйте свойство descriptor для встроенного рендеринга</span>
+          </template>
+        </slot>
+      </form>
+      <slot name="footer"></slot>
+    </div>
   </div>
 </template>
 
@@ -75,5 +78,8 @@ export default {
   }
   .form-control-sm {
     min-height: calc(0.8em + 0.5rem + 2px);
+  }
+  .cd-form--content > .cd-fieldset--root {
+    border: unset!important;
   }
 </style>
