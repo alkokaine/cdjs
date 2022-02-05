@@ -1,18 +1,18 @@
 <template>
-  <cd-list class="cd-month" :listitemclicked="ondayselect" :listclass="[ 'list-unstyled', { 'row': payload.mode }]"
+  <cd-list class="cd-month" :listitemclicked="ondayselect" :listclass="[ 'list-unstyled', { 'row': mode }]"
     :rowclass="rootrowclass" :collection="source" keyfield="key" :isrowvisible="isdayvisible">
     <div class="month-header" slot="header">
       <slot name="month-header">
         <div v-if="showheader">{{ monthheader }}</div>
-        <button v-if="payload.mode && canadd" class="btn btn-sm btn-link" v-on:click="templateselect">Заполнить по расписанию</button>
+        <button v-if="mode && canadd" class="btn btn-sm btn-link" v-on:click="templateselect">Заполнить по расписанию</button>
       </slot>
     </div>
     <div class="month-item-wrap" slot-scope="content" :class="{ 'weekday-container': content.row.id }">
-      <template v-if="payload.mode">
+      <template v-if="mode">
         <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled">
           <div class="weekday-name" slot="header">
             <div v-if="selectweekday">
-              <input type="checkbox" v-on:change="onweekdayselect($event, content)"/>
+              <input type="checkbox" v-on:change="onweekdayselect($event, content)" :checked="isweekdayselected(content)"/>
             </div>
             {{ content.row.short_name }}
           </div>
@@ -42,12 +42,16 @@
         <cd-form :descriptor="templatedescriptor" :payload="newtask" :onpropertychange="ontemplatechange">
           <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
             :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
-            :selectweekday="newtask.id === 3">
+            :isweekdayselected="resolveweekdayselected" :selectweekday="newtask.id === 3">
             <div class="preview-day-number" slot-scope="scope">
               {{ scope.day.day }}
             </div>
           </cd-month>
         </cd-form>
+        <div class="commit-template" slot="footer">
+          <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="closedialog">Отменить</button>
+          <button type="button" class="btn btn-sm btn-primary">Сохранить</button>
+        </div>
       </el-dialog>
     </div>
   </cd-list>
@@ -119,6 +123,7 @@ export default {
       },
       description: 'Массив дней недели'
     },
+    mode: { type: Number, default: 1 },
     isdayselected: { type: Function },
     format: { type: String, default: 'YYYY-MM-DD' },
     schedule: { type: [Function, Array], description: 'Данные, которые мы хотим показать в календаре' },
@@ -126,7 +131,8 @@ export default {
     resolvedayclass: { type: Function, default: () => (''), description: 'Функция, возвращающая класс для элемента cd-day' },
     ondayselect: { type: Function, default: (event, args) => {}, description: 'Функция, которая выполняется при клике на день' },
     selectweekday: { type: Boolean, default: false },
-    onweekdayselect: { type: Function, default: (event, args) => {}, desciption: 'Функция, которая выполнится, если выбрать колонку с днём недели' }
+    onweekdayselect: { type: Function, default: (event, args) => {}, desciption: 'Функция, которая выполнится, если выбрать колонку с днём недели' },
+    isweekdayselected: { type: Function, default: (...args) => (false) }
   },
   data (cdm) {
     return {
@@ -238,10 +244,10 @@ export default {
     },
     scheduleref () {
       const month = this
-      return month.schedule.map(d => moment(d[month.property], month.format).date())
+      return (month.schedule || []).map(d => moment(d[month.property], month.format).date())
     },
     source () {
-      return this.payload.mode === 0 ? this.calendar : this.weekdays
+      return this.mode === 0 ? this.calendar : this.weekdays
     },
     weekdaylist () {
       const month = this
@@ -252,7 +258,7 @@ export default {
     },
     isdayvisible () {
       const month = this
-      if (month.payload.mode) {
+      if (month.mode) {
         return (d) => true
       } else {
         return (d) => {
@@ -263,7 +269,7 @@ export default {
     },
     rootrowclass () {
       const month = this
-      return (row) => ([{ 'weekday-container col': month.payload.mode === 1 }, row.class])
+      return (row) => ([{ 'weekday-container col': month.mode === 1 }, row.class])
     }
   },
   methods: {
@@ -272,19 +278,23 @@ export default {
       this.newtask = {}
     },
     templateselect () {
-      console.log('template select')
       this.runtemplate = true
     },
     addday () {
       console.log('add day')
     },
     ontemplatechange (...args) {
-      console.log(args)
     },
     weekdayselect (event, weekday) {
       const index = this.selectedweekdays.indexOf(weekday.row.id)
       if (index === -1) this.selectedweekdays.push(weekday.row.id)
       else this.selectedweekdays.splice(index, 1)
+    },
+    resolveweekdayselected (weekday) {
+      return this.selectedweekdays.indexOf(weekday.row.id) >= 0
+    },
+    closedialog () {
+      this.runtemplate = false
     }
   }
 }
@@ -346,5 +356,11 @@ export default {
   }
   .preview-day-number {
     padding: 3px;
+  }
+  .commit-template {
+    text-align: right;
+  }
+  .commit-template > .btn {
+    margin-left: 1em;
   }
 </style>

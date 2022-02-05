@@ -1,4 +1,3 @@
-import Vue from 'vue'
 export default {
   props: {
     payload: {
@@ -13,9 +12,6 @@ export default {
         if (!Object.prototype.hasOwnProperty.call(value, 'Year')) {
           hasyear = false
           console.error('[CDJS]payload object must have \'Year\' property')
-        }
-        if (!Object.prototype.hasOwnProperty.call(value, 'mode')) {
-          Vue.set(value, 'mode', 0) // по умолчанию поставим 0
         }
         if (!(hasmonth && hasyear)) return false
         const monthvalue = value.MonthID
