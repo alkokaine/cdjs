@@ -1,134 +1,188 @@
 <template>
-  <div class="calendar-container">
-    <template v-if="isweekmode">
-      <cd-list class="cd-month" listclass="cd-weekdays weeks-view row" :rowclass="resolverowclass" :collection="weekdays" keyfield="id">
-        <cd-list class="cd-weekday--list" slot-scope="weekday" listclass="cd-weekday--days" :class="weekday.row.class" rowclass="row cd-day--container" :collection="weekdaylist(weekday)" keyfield="key">
-          <div class="cd-weekday--name" slot="header">
-            {{ weekday.row.name }}
+  <cd-list class="cd-month" :listitemclicked="ondayselect" :listclass="[ 'list-unstyled', { 'row': payload.mode }]"
+    :rowclass="rootrowclass" :collection="source" keyfield="key" :isrowvisible="isdayvisible">
+    <div class="month-header" slot="header">
+      <slot name="month-header">
+        <div v-if="showheader">{{ monthheader }}</div>
+        <button v-if="payload.mode && canadd" class="btn btn-sm btn-link" v-on:click="templateselect">Заполнить по расписанию</button>
+      </slot>
+    </div>
+    <div class="month-item-wrap" slot-scope="content" :class="{ 'weekday-container': content.row.id }">
+      <template v-if="payload.mode">
+        <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled">
+          <div class="weekday-name" slot="header">
+            <div v-if="selectweekday">
+              <input type="checkbox" v-on:change="onweekdayselect($event, content)"/>
+            </div>
+            {{ content.row.short_name }}
           </div>
-          <template slot-scope="day">
-            <slot :day="day.row">
-              {{ day }}
-            </slot>
-          </template>
+          <div class="month-item-wrap" slot-scope="day"
+            :class="{ 'prev-month': day.row.isprev, 'holiday' : day.row.code == 1, 'selected': resolvedayselected(day) }">
+            <slot :day="day.row"></slot>
+          </div>
         </cd-list>
-      </cd-list>
+      </template>
+      <template v-else>
+        <slot :day="content.row"></slot>
+      </template>
+    </div>
+    <template v-if="canadd && !payload.mode">
+      <div class="cd-day new-day--template container-sm" slot="placeholder">
+        <div class="cd-day--number col btn btn-group btn-group-lg" role="group" aria-label="new-day-group">
+          <button class="btn bi bi-calendar2-week btn-link" v-on:click.stop="templateselect"></button>
+          <button class="btn bi bi-calendar3-event btn-link" v-on:click.stop="addday"></button>
+        </div>
+      </div>
     </template>
-    <template v-else>
-      <cd-list class="cd-month" listclass="cd-weekday--days list-view" rowclass="cd-day--container" :collection="dates" keyfield="key">
-        <template slot-scope="day">
-          <slot :day="day.row">
-            {{ day }}
-          </slot>
-        </template>
-      </cd-list>
-    </template>
-  </div>
+    <div class="month-no-data" slot="no-data">
+      Нет данных
+    </div>
+    <div slot="footer">
+      <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose">
+        <cd-form :descriptor="templatedescriptor" :payload="newtask" :onpropertychange="ontemplatechange">
+          <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
+            :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
+            :selectweekday="newtask.id === 3">
+            <div class="preview-day-number" slot-scope="scope">
+              {{ scope.day.day }}
+            </div>
+          </cd-month>
+        </cd-form>
+      </el-dialog>
+    </div>
+  </cd-list>
 </template>
 
 <script>
-import Vue from 'vue'
 import CDList from './cd-list.vue'
+import CDForm from './cd-form.vue'
 import moment from 'moment'
+import month from '@/common/calendar-mixin'
+import { Dialog } from 'element-ui'
 
-const weekdays = [
-  {
-    id: 1,
-    name: 'Понедельник',
-    short_name: 'ПН'
-  },
-  {
-    id: 2,
-    name: 'Вторник',
-    short_name: 'ВТ'
-  },
-  {
-    id: 3,
-    name: 'Среда',
-    short_name: 'СР'
-  },
-  {
-    id: 4,
-    name: 'Четверг',
-    short_name: 'ЧТ'
-  },
-  {
-    id: 5,
-    name: 'Пятница',
-    short_name: 'ПТ'
-  },
-  {
-    id: 6,
-    name: 'Суббота',
-    short_name: 'СБ',
-    class: 'cd-weekend'
-  },
-  {
-    id: 0,
-    name: 'Воскресенье',
-    short_name: 'ВС',
-    class: 'cd-weekend'
-  }]
-const weekdayFormatter = new Intl.DateTimeFormat('ru-RU', { weekday: 'short' })
-const monthFormatter = new Intl.DateTimeFormat('ru-RU', { month: 'long' })
-const dayFormatter = new Intl.DateTimeFormat('ru-RU', { day: '2-digit' })
-const day = (date, code) => ({
-  day: dayFormatter.format(date),
-  weekdayNumber: date.getDay(),
-  weekday: weekdayFormatter.format(date),
-  month: date.getMonth(),
-  month_name: monthFormatter.format(date),
-  code: code
-})
 const daysInMonth = (year, month) => (moment(`${year}-${month}`, 'YYYY-MM')).daysInMonth()
 const date = (year, month, day) => (moment(`${year}-${month}-${day}`, 'YYYY-MM-DD'))
 
 export default {
   name: 'cd-month',
+  mixins: [month],
   components: {
-    'cd-list': CDList
+    'cd-list': CDList,
+    'cd-form': CDForm,
+    'el-dialog': Dialog
   },
   props: {
-    payload: {
-      type: Object,
-      validator (value) {
-        var hasmonth = true
-        var hasyear = true
-        if (!Object.prototype.hasOwnProperty.call(value, 'MonthID')) {
-          hasmonth = false
-          console.error('[CDJS]payload object must have \'MonthID\' property')
-        }
-        if (!Object.prototype.hasOwnProperty.call(value, 'Year')) {
-          hasyear = false
-          console.error('[CDJS]payload object must have \'Year\' property')
-        }
-        if (!Object.prototype.hasOwnProperty.call(value, 'mode')) {
-          Vue.set(value, 'mode', 0) // по умолчанию поставим 0
-        }
-        if (!(hasmonth && hasyear)) return false
-        const monthvalue = value.MonthID
-        const ismonth = Number.isInteger(monthvalue) && (monthvalue >= 1 && monthvalue <= 12)
-        if (!ismonth) console.error('[CDJS]payload.MonthID value must be Number and starting from 1, ending by 12')
-        const yearvalue = value.Year
-        const isyear = yearvalue !== undefined && yearvalue !== null && Number.isInteger(yearvalue)
-        const modevalue = value.mode
-        const ismode = Number.isInteger(modevalue) && [0, 1].indexOf(modevalue) !== -1
-        if (!ismode) {
-          console.warn('[CDJS]payload.mode property must be Number with value 0 or 1. It will be set to 0 (week mode) now')
-          Vue.set(value, 'mode', 0)
-        }
-        return ismonth && isyear
-      }
+    showheader: { type: Boolean, default: true, description: 'Переключатель видимости месяца-года' },
+    canadd: { type: Boolean, default: true, description: 'Можно ли добавлять события в календарь' },
+    weekdays: {
+      type: Array,
+      default: function () {
+        return [
+          {
+            id: 1,
+            name: 'Понедельник',
+            short_name: 'ПН'
+          },
+          {
+            id: 2,
+            name: 'Вторник',
+            short_name: 'ВТ'
+          },
+          {
+            id: 3,
+            name: 'Среда',
+            short_name: 'СР'
+          },
+          {
+            id: 4,
+            name: 'Четверг',
+            short_name: 'ЧТ'
+          },
+          {
+            id: 5,
+            name: 'Пятница',
+            short_name: 'ПТ'
+          },
+          {
+            id: 6,
+            name: 'Суббота',
+            short_name: 'СБ',
+            class: 'cd-weekend'
+          },
+          {
+            id: 0,
+            name: 'Воскресенье',
+            short_name: 'ВС',
+            class: 'cd-weekend'
+          }
+        ]
+      },
+      description: 'Массив дней недели'
     },
-    schedule: { type: [Function, Array] },
-    showothers: { type: Boolean, default: true },
-    resolvedayclass: { type: Function, default: () => ('') }
+    isdayselected: { type: Function },
+    format: { type: String, default: 'YYYY-MM-DD' },
+    schedule: { type: [Function, Array], description: 'Данные, которые мы хотим показать в календаре' },
+    property: { type: String, description: 'Имя свойства объекта из коллекции schedule, содержащее значение даты события' },
+    resolvedayclass: { type: Function, default: () => (''), description: 'Функция, возвращающая класс для элемента cd-day' },
+    ondayselect: { type: Function, default: (event, args) => {}, description: 'Функция, которая выполняется при клике на день' },
+    selectweekday: { type: Boolean, default: false },
+    onweekdayselect: { type: Function, default: (event, args) => {}, desciption: 'Функция, которая выполнится, если выбрать колонку с днём недели' }
   },
   data (cdm) {
     return {
-      weekdays: weekdays,
-      keyfield: 'key',
-      dates: []
+      calendar: [],
+      runtemplate: false,
+      formatter: new Intl.DateTimeFormat('ru-RU', { month: 'long' }),
+      templatedescriptor: [
+        {
+          datafield: 'template_id',
+          text: 'Выберите шаблон',
+          input: 'select',
+          labelkey: 'text',
+          valuekey: 'id',
+          values: [
+            {
+              id: 1,
+              text: 'Чётные числа',
+              ondayselect (...args) {
+                console.log(args)
+              },
+              daycompare (dayscope) {
+                return dayscope.row.isprev === undefined && (dayscope.row.day % 2 === 0)
+              }
+            },
+            {
+              id: 2,
+              text: 'Нечётные числа',
+              daycompare (dayscope) {
+                return dayscope.row.isprev === undefined && (dayscope.row.day % 2 === 1)
+              }
+            },
+            {
+              id: 3,
+              text: 'Выбрать дни недели',
+              daycompare (dayscope) {
+                return dayscope.row.isprev === undefined && cdm.selectedweekdays.indexOf(dayscope.row.weekday) !== -1
+              }
+            },
+            {
+              id: 4,
+              text: 'Выбрать дни вручную',
+              ondayselect (...args) {
+                console.log(args)
+              },
+              daycompare (...args) {
+                return false
+              }
+            }
+          ],
+          onselect (payload, option) {
+            cdm.newtask = option
+          }
+        }
+      ],
+      newtask: {},
+      selectedweekdays: []
     }
   },
   watch: {
@@ -136,134 +190,161 @@ export default {
       deep: true,
       immediate: true,
       handler (newvalue) {
-        const calendar = this
-        let _days = []
+        const month = this
+        let days = []
         if (newvalue !== undefined && newvalue.Year !== undefined && newvalue.MonthID !== undefined) {
-          calendar.$http.get(`https://isdayoff.ru/api/getdata?year=${newvalue.Year}&month=${(newvalue.MonthID)}&pre=1&covid=1&sd=0`)
+          month.$http.get(`https://isdayoff.ru/api/getdata?year=${newvalue.Year}&month=${(newvalue.MonthID)}&pre=1&covid=1&sd=0`)
             .then((response) => {
               // приходит строчка из нулей, единиц, двоек и четвёрок, индекс символа указывает на номер дня (начиная с нуля)
               // а значение -- код дня в производственном календаре
               // для начала переведём строчку в массив нулей, единиц, двоек и четвёрок
-              _days = Array.from(response.request.response).map(m => Number(m))
+              days = Array.from(response.request.response)
+                .map((m, index) => ({ day: index + 1, code: Number(m), weekday: date(newvalue.Year, newvalue.MonthID, index + 1).day(), month: newvalue.MonthID }))
             }).catch((error) => {
-              console.error(error)
+              console.error(`[CDJS] ${error}`)
+              days = Array.from(Array(daysInMonth(newvalue.Year, newvalue.MonthID)).keys()).map((_d, index) => ({ day: index + 1 }))
             }).finally(() => {
-              const prepend = (days) => {
-                const first = days[0]
-                const fd = date(newvalue.Year, newvalue.MonthID, first.day)
-                if (first.weekdayNumber === 1) return days
-                const result = []
-                let ln = first.weekdayNumber - 1
-                if (ln < 0) ln = 6 - ln - 1
-                while (ln > 0) {
-                  result.unshift(day(fd.subtract(1, 'days').toDate()))
-                  ln -= 1
-                }
-                return result.concat(days)
+              const first = days[0]
+              const fd = date(newvalue.Year, newvalue.MonthID, first.day)
+              const monthstart = fd.day()
+              if (monthstart === 1) return days
+              const result = []
+              let ln = monthstart - 1
+              if (ln < 0) ln = 6 - ln - 1
+              while (ln > 0) {
+                const d = fd.subtract(1, 'days')
+                result.unshift({ day: d.date(), weekday: d.day(), isprev: true, month: d.month() + 1 })
+                ln -= 1
               }
-              const dayscount = daysInMonth(newvalue.Year, newvalue.MonthID)
-              _days = (_days.length > 0 // на предыдущем шаге удалось получить проиводственный календарь за этот месяц?
-                ? _days.map((_d, index) => ({ code: _d, d: index + 1 })) // отмаппим массив нулей, единиц, двоек и четвёрок в массив обьектов
-                // { code: Number (код календарного дня), d: index + 1 (день месяца, человеческий) }
-                // если же не получилось с произовдственным календарём
-                : Array.from(Array(dayscount).keys()).map((_d, index) => ({ d: index + 1 })))
-                .map(d => (day(date(newvalue.Year, newvalue.MonthID, d.d).toDate(), d.code)))
-                // и ещё раз отмаппим, через функцию day, которая вернёт всё, что нам нужно знать об этом дне
-              if (calendar.schedule !== undefined) {
-                const scheduledays = calendar.schedule.map(m => m.day)
-                _days.forEach(day => {
-                  const index = scheduledays.findIndex(d => (+day.day) === d)
-                  if (index !== -1) {
-                    Vue.set(day, 'info', calendar.schedule[index])
-                  }
-                })
-              }
-              if (newvalue.mode === 1) {
-                calendar.dates = prepend(_days)
-              } else {
-                calendar.dates = _days.filter(f => f.info !== undefined)
-              }
+              month.calendar = result.concat(days)
             })
         }
       }
     }
   },
   computed: {
-    isweekmode () {
-      return this.payload.mode === 1
+    resolvedayselected () {
+      const month = this
+      return (day) => {
+        if (month.isdayselected !== undefined && month.isdayselected(day)) return 'selected'
+        return ''
+      }
+    },
+    monthdate () {
+      return new Date(this.payload.Year, this.payload.MonthID - 1, 1)
+    },
+    monthheader () {
+      return `${this.formatter.format(this.monthdate)} ${this.payload.Year}`
+    },
+    scheduleref () {
+      const month = this
+      return month.schedule.map(d => moment(d[month.property], month.format).date())
+    },
+    source () {
+      return this.payload.mode === 0 ? this.calendar : this.weekdays
     },
     weekdaylist () {
-      const calendar = this
-      return (weekday) => calendar.dates.filter(d => d.weekdayNumber === weekday.row.id)
+      const month = this
+      if (month.calendar.length === 0) return () => []
+      return (wd) => {
+        return month.calendar.filter(d => d.weekday === wd.row.id)
+      }
     },
-    isprevmonth () {
-      const calendar = this
-      return (weekday) => weekday.row.month !== (calendar.payload.MonthID - 1)
+    isdayvisible () {
+      const month = this
+      if (month.payload.mode) {
+        return (d) => true
+      } else {
+        return (d) => {
+          if (d.month !== month.payload.MonthID) return false
+          return month.scheduleref.indexOf(d.day) >= 0
+        }
+      }
+    },
+    rootrowclass () {
+      const month = this
+      return (row) => ([{ 'weekday-container col': month.payload.mode === 1 }, row.class])
     }
   },
   methods: {
-    resolverowclass (row) {
-      const cdmonth = this
-      return `cd-weekday-container col ${([0, 6].indexOf(row.weekdayNumber) !== -1 ? 'cd-day--weekend' : '')} ${cdmonth.resolvedayclass(row)}`
+    ondialogclose () {
+      this.selectedweekdays = []
+      this.newtask = {}
+    },
+    templateselect () {
+      console.log('template select')
+      this.runtemplate = true
+    },
+    addday () {
+      console.log('add day')
+    },
+    ontemplatechange (...args) {
+      console.log(args)
+    },
+    weekdayselect (event, weekday) {
+      const index = this.selectedweekdays.indexOf(weekday.row.id)
+      if (index === -1) this.selectedweekdays.push(weekday.row.id)
+      else this.selectedweekdays.splice(index, 1)
     }
   }
 }
 </script>
 
 <style>
-  .cd-weekday--days {
-    padding-inline-start: unset;
-    list-style: none;
+  .cd-month {
+    margin: 1em;
   }
-  .cd-weekdays {
-    padding-inline-start: unset;
-    list-style: none;
-    margin-right: unset;
-    margin-left: unset;
+  .month-header {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 2em;
   }
-  .cd-holiday {
-    color: salmon;
+  .prev-month {
+    opacity: 0.5;
+    pointer-events: none;
   }
   .cd-weekend {
     color: salmon;
   }
-  .cd-day--header {
-    justify-content: space-between;
-    padding-left: 1em;
-    padding-right: 1em;
+  .holiday {
+    color: salmon;
   }
-  .cd-day--number {
-    font-size: 2em;
-    font-weight: bolder;
-  }
-  .cd-day--container {
-    margin-left: 0.5em;
-    margin-top: 0.5em;
-    margin-right: unset;
-    flex-grow: 1;
-  }
-  .cd-day--content {
-    border-top: 1px solid;
-  }
-  .cd-day--info {
-    text-align: right;
-  }
-  .cd-day {
-    border: 1px solid;
-    border-color: #00000023;
-    border-radius: 0.5em;
-  }
-  .cd-weekday--name {
+  .weekday-name {
+    font-size: 1.5em;
+    user-select: none;
     text-align: center;
-    font-weight: 700;
+    font-weight: bold;
   }
-  .cd-day:hover {
-    -webkit-box-shadow: 0px 5px 5px -2px rgba(34, 60, 80, 0.6);
-    -moz-box-shadow: 0px 5px 5px -2px rgba(34, 60, 80, 0.6);
-    box-shadow: 0px 5px 5px -2px rgba(34, 60, 80, 0.6);
+  .weekday-container {
+    text-align: center;
   }
-  .col {
-    padding-left: unset;
-    padding-right: unset;
+  .new-day--template {
+    text-align: center;
+  }
+  i {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+  .month-no-data {
+    padding-top: 2em;
+    padding-bottom: 2em;
+    margin-bottom: 1em;
+    text-align: center;
+    border: 0.01em solid gray;
+  }
+  .template-selector {
+    width: inherit;
+  }
+  .month-item-wrap.selected {
+    background-color: rgba(117, 115, 115, 0.445);
+    font-weight: bold;
+  }
+  .template-weekday-list {
+    font-size: 1rem;
+    font-weight: 200;
+  }
+  .preview-day-number {
+    padding: 3px;
   }
 </style>
