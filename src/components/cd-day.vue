@@ -1,13 +1,13 @@
 <template>
-  <div class="cd-day">
-    <div class="cd-day--header row">
-      <div class="cd-day--number col">{{ day }}</div>
+  <div class="cd-day" :class="{ 'border-0 compact': compact}">
+    <div v-if="!compact" class="cd-day--header row">
+      <div class="cd-day--number col" :class="{ 'compact': compact }">{{ day }}</div>
       <div class="cd-day--info col">
         <div>{{ month }}</div>
         <div>{{ weekday }}</div>
       </div>
     </div>
-    <div class="cd-day--content">
+    <div class="cd-day--content" :class="{ 'border-0': compact }">
       <slot></slot>
     </div>
   </div>
@@ -23,7 +23,8 @@ export default {
   name: 'cd-day',
   mixins: [month],
   props: {
-    info: { type: Object, required: true }
+    info: { type: Object, required: true },
+    compact: { type: Boolean, default: false }
   },
   data (day) {
     return {
@@ -51,6 +52,9 @@ export default {
 </script>
 
 <style>
+  .compact {
+    margin-bottom: unset!important;
+  }
   .cd-day--number {
     font-size: 2em;
     font-weight: bold;
