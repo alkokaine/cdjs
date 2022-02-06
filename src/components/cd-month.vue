@@ -18,12 +18,16 @@
           </div>
           <div class="month-item-wrap" slot-scope="day"
             :class="{ 'prev-month': day.row.isprev, 'holiday' : day.row.code == 1, 'selected': resolvedayselected(day) }">
-            <slot :day="day.row"></slot>
+            <cd-day :payload="payload" :info="day.row" :compact="compact">
+              <slot :day="day.row"></slot>
+            </cd-day>
           </div>
         </cd-list>
       </template>
       <template v-else>
-        <slot :day="content.row"></slot>
+        <cd-day :payload="payload" :info="content.row">
+          <slot :day="content.row"></slot>
+        </cd-day>
       </template>
     </div>
     <template v-if="canadd && !payload.mode">
@@ -37,12 +41,12 @@
     <div class="month-no-data" slot="no-data">
       Нет данных
     </div>
-    <div slot="footer">
+    <div v-if="!compact && createnew" slot="footer">
       <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose">
-        <cd-form :descriptor="templatedescriptor" :payload="newtask" :onpropertychange="ontemplatechange">
+        <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :onpropertychange="ontemplatechange">
           <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
             :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
-            :isweekdayselected="resolveweekdayselected" :selectweekday="newtask.id === 3">
+            :isweekdayselected="resolveweekdayselected" :selectweekday="newtask.id === 3" :compact="true">
             <div class="preview-day-number" slot-scope="scope">
               {{ scope.day.day }}
             </div>
@@ -50,7 +54,7 @@
         </cd-form>
         <div class="commit-template" slot="footer">
           <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="closedialog">Отменить</button>
-          <button type="button" class="btn btn-sm btn-primary">Сохранить</button>
+          <button type="button" class="btn btn-sm btn-primary" v-on:click="run($event, calendar.filter(newtask.daycompare))">Сохранить</button>
         </div>
       </el-dialog>
     </div>
@@ -60,6 +64,7 @@
 <script>
 import CDList from './cd-list.vue'
 import CDForm from './cd-form.vue'
+import CDDay from './cd-day.vue'
 import moment from 'moment'
 import month from '@/common/calendar-mixin'
 import { Dialog } from 'element-ui'
@@ -73,9 +78,15 @@ export default {
   components: {
     'cd-list': CDList,
     'cd-form': CDForm,
+    'cd-day': CDDay,
     'el-dialog': Dialog
   },
   props: {
+    compact: { type: Boolean, default: false },
+    createnew: {
+      type: Function,
+      description: 'Сколько я не думал, не нашёл лучшего варианта, кроме следующего: функция принимает массив дат, выполняет какие-то преобразования и добавляет результат в массив, переданный как свойство компонента cd-month'
+    },
     showheader: { type: Boolean, default: true, description: 'Переключатель видимости месяца-года' },
     canadd: { type: Boolean, default: true, description: 'Можно ли добавлять события в календарь' },
     weekdays: {
@@ -124,6 +135,7 @@ export default {
       description: 'Массив дней недели'
     },
     mode: { type: Number, default: 1 },
+    isdayhidden: { type: Function, default: (day) => (false) },
     isdayselected: { type: Function },
     format: { type: String, default: 'YYYY-MM-DD' },
     schedule: { type: [Function, Array], description: 'Данные, которые мы хотим показать в календаре' },
@@ -136,6 +148,7 @@ export default {
   },
   data (cdm) {
     return {
+      generatorconfig: Object,
       calendar: [],
       runtemplate: false,
       formatter: new Intl.DateTimeFormat('ru-RU', { month: 'long' }),
@@ -154,21 +167,21 @@ export default {
                 console.log(args)
               },
               daycompare (dayscope) {
-                return dayscope.row.isprev === undefined && (dayscope.row.day % 2 === 0)
+                return dayscope.isprev === undefined && (dayscope.day % 2 === 0) && (!cdm.generatorconfig.workdays || dayscope.code !== 1)
               }
             },
             {
               id: 2,
               text: 'Нечётные числа',
               daycompare (dayscope) {
-                return dayscope.row.isprev === undefined && (dayscope.row.day % 2 === 1)
+                return dayscope.isprev === undefined && (dayscope.day % 2 === 1) && (!cdm.generatorconfig.workdays || dayscope.code !== 1)
               }
             },
             {
               id: 3,
               text: 'Выбрать дни недели',
               daycompare (dayscope) {
-                return dayscope.row.isprev === undefined && cdm.selectedweekdays.indexOf(dayscope.row.weekday) !== -1
+                return dayscope.isprev === undefined && cdm.selectedweekdays.indexOf(dayscope.weekday) !== -1 && (!cdm.generatorconfig.workdays || dayscope.code !== 1)
               }
             },
             {
@@ -185,6 +198,14 @@ export default {
           onselect (payload, option) {
             cdm.newtask = option
           }
+        },
+        {
+          input: 'checkbox',
+          datafield: 'workdays',
+          text: 'Только рабочие дни',
+          toogle (payload) {
+            cdm.generatorconfig.workdays = !cdm.generatorconfig.workdays
+          }
         }
       ],
       newtask: {},
@@ -195,10 +216,12 @@ export default {
     payload: {
       deep: true,
       immediate: true,
-      handler (newvalue) {
+      handler (newvalue, oldvalue) {
         const month = this
         let days = []
-        if (newvalue !== undefined && newvalue.Year !== undefined && newvalue.MonthID !== undefined) {
+        if (newvalue !== undefined && (newvalue.Year !== undefined && newvalue.MonthID !== undefined && (
+          oldvalue === undefined || (newvalue.Year !== oldvalue.Year || newvalue.MonthID !== oldvalue.MonthID)
+        ))) {
           month.$http.get(`https://isdayoff.ru/api/getdata?year=${newvalue.Year}&month=${(newvalue.MonthID)}&pre=1&covid=1&sd=0`)
             .then((response) => {
               // приходит строчка из нулей, единиц, двоек и четвёрок, индекс символа указывает на номер дня (начиная с нуля)
@@ -226,13 +249,28 @@ export default {
             })
         }
       }
+    },
+    runtemplate: {
+      handler (newvalue) {
+        if (newvalue === true) {
+          this.generatorconfig = {
+            template_id: null,
+            workdays: false
+          }
+        } else {
+          this.generatorconfig = Object
+        }
+      }
     }
   },
   computed: {
+    templateready () {
+      return typeof this.generatorconfig !== 'function'
+    },
     resolvedayselected () {
       const month = this
       return (day) => {
-        if (month.isdayselected !== undefined && month.isdayselected(day)) return 'selected'
+        if (month.isdayselected !== undefined && month.isdayselected(day.row)) return 'selected'
         return ''
       }
     },
@@ -263,7 +301,9 @@ export default {
       } else {
         return (d) => {
           if (d.month !== month.payload.MonthID) return false
-          return month.scheduleref.indexOf(d.day) >= 0
+          let isdayhidden = false
+          if (month.isdayhidden && typeof month.isdayhidden === 'function') isdayhidden = month.isdayhidden(d)
+          return month.scheduleref.indexOf(d.day) >= 0 && !isdayhidden
         }
       }
     },
@@ -281,7 +321,6 @@ export default {
       this.runtemplate = true
     },
     addday () {
-      console.log('add day')
     },
     ontemplatechange (...args) {
     },
@@ -295,6 +334,10 @@ export default {
     },
     closedialog () {
       this.runtemplate = false
+    },
+    run (event, days) {
+      const payload = this.payload
+      this.createnew(days.map(d => date(payload.Year, payload.MonthID, d.day).toDate()))
     }
   }
 }

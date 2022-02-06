@@ -1,18 +1,15 @@
 <template>
   <cd-setting-container>
     <cd-form :payload="payload" :descriptor="settings" :onpropertychange="onpropertychange"></cd-form>
-    <cd-month v-if="holidays.length" slot="content" :payload="payload" :schedule="holidays">
-      <cd-day slot-scope="day" :day="day.day">
-        <div slot="info">
-          <div>{{ day.day.weekday }}</div>
-          <div>{{ day.day.month_name }}</div>
+    <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayhidden="isdayhidden">
+      <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :onpropertychange="onpropertychange"></cd-form>
+      <cd-list slot-scope="day" listclass="list-unstyled" :collection="details(day.day)" keyfield="id">
+        <div class="row" slot-scope="event">
+          <div class="col-2">{{ format(event.row) }}</div>
+          <div v-if="payload.mode === 0" class="col-8">{{ event.row.name }}</div>
         </div>
-        <cd-list listclass="day-holidays" :collection="details(day.day)" keyfield="day">
-          <el-popover slot-scope="holiday" :content="holiday.row.description" trigger="hover">
-            <span slot="reference">{{ holiday.row.name }}</span>
-          </el-popover>
-        </cd-list>
-      </cd-day>
+        <span slot="no-data">Нет данных</span>
+      </cd-list>
     </cd-month>
   </cd-setting-container>
 </template>
@@ -21,17 +18,15 @@
 import Vue from 'vue'
 import CDSettingContainer from '@/components/cd-setting-container.vue'
 import CDMonth from '@/components/cd-month.vue'
-import CDList from '@/components/cd-list.vue'
-import CDDay from '@/components/cd-day.vue'
 import CDForm from '@/components/cd-form.vue'
+import CDList from '@/components/cd-list.vue'
 export default {
   name: 'cd-doc-month',
   components: {
     'cd-month': CDMonth,
-    'cd-day': CDDay,
-    'cd-list': CDList,
     'cd-setting-container': CDSettingContainer,
-    'cd-form': CDForm
+    'cd-form': CDForm,
+    'cd-list': CDList
   },
   data (docmonth) {
     return {
@@ -45,43 +40,98 @@ export default {
             if (payload.mode === 0) Vue.set(payload, 'mode', 1)
             else Vue.set(payload, 'mode', 0)
           }
+        },
+        {
+          datafield: 'canadd',
+          text: 'Можно ли добавлять события',
+          input: 'checkbox',
+          toogle (payload) {
+            Vue.set(payload, 'canadd', !payload.canadd)
+          }
         }
       ],
       payload: {
         mode: 1,
         Year: 2022,
-        MonthID: 1
-      }
+        MonthID: 2,
+        canadd: true,
+        workdays: false
+      },
+      olympicdescriptor: [
+        {
+          datafield: 'sport_id',
+          text: 'Вид спорта',
+          input: 'select',
+          valuekey: 'sport_id',
+          labelkey: 'nazwa',
+          clearable: true,
+          url: 'http://sebastianszwarc.pl:9000/olypi/sports',
+          resolveresult: (response) => (response.data.sports),
+          method: 'get',
+          onselect (payload, option) {
+            Vue.set(payload, 'sport_id', option.sport_id)
+          }
+        }
+      ],
+      olympicpayload: {
+        sport_id: null
+      },
+      timeformatter: new Intl.DateTimeFormat('ru-RU', { timeStyle: 'medium' })
     }
   },
   watch: {
-    payload: {
+    olympicpayload: {
       immediate: true,
-      deep: true,
-      handler (newvalue) {
-        if (newvalue === undefined) return
+      handler (newvalue, oldvalue) {
         const dn = this
-        dn.$http.get(`https://calendarific.com/api/v2/holidays?&api_key=13fb3847e37114626655e5578ab078f14ed577eb&country=RU&year=${newvalue.Year}&month=${newvalue.MonthID}`).then(
-          (response) => {
-            dn.holidays = response.data.response.holidays.map(h => ({ day: h.date.datetime.day, month: h.date.datetime.month, name: h.name, description: h.description }))
-          }
-        )
+        if (oldvalue === undefined) {
+          dn.$http.get('http://sebastianszwarc.pl:9000/olypi/events').then((response) => {
+            dn.holidays = response.data.events.map(e => {
+              const date = new Date(e.start_time_UTC)
+              Vue.set(e, 'date', date)
+              Vue.set(e, 'day', date.getDate())
+              Vue.set(e, 'month', date.getMonth() + 1)
+              return e
+            })
+          })
+        }
       }
     }
   },
   computed: {
+    format () {
+      const doc = this
+      return (row) => doc.timeformatter.format(row.date)
+    },
     details () {
       const dh = this
       return (day) => {
-        return dh.holidays.filter(f => dh.checkday(f, day))
+        return dh.holidays.filter(f => dh.checkday(f, day) && (dh.olympicpayload.sport_id === null || f.sport_id === dh.olympicpayload.sport_id))
       }
+    },
+    isdayhidden () {
+      const dh = this
+      return (day) => dh.details(day).length === 0
     }
   },
   methods: {
     checkday (exist, check) {
-      return exist.day === (+check.day) && exist.month === (check.month + 1)
+      return exist.day === (+check.day) && exist.month === check.month
     },
     onpropertychange (args) {
+    },
+    createnewevent (dates) {
+      const dm = this
+      dates.forEach(date => {
+        dm.holidays.push({
+          key: date.valueOf(),
+          day: date.getDate(),
+          month: date.getMonth() + 1,
+          date: date,
+          name: 'no-name',
+          description: 'no-description'
+        })
+      })
     }
   }
 }
