@@ -1,6 +1,9 @@
+import Vue from 'vue'
+
 export default {
   name: 'collection',
   props: {
+    config: { type: Object, description: 'Кажется, без нас никуда. Мы -- это настройки запроса. Возможно только Мы справимся с CORS, авторизацией на разных ендпойнтах и вообще чем угодно' },
     /**
      * без неё никуда
      * но шутка в том, что объект параметры-запроса может отличаться для разных
@@ -55,12 +58,6 @@ export default {
      */
     createnew: { type: Function, returns: Object, description: 'Функция, возвращающая объект, который будет добавлен в коллекцию' },
     /**
-     * функция, выполняющаяся при редактировании элемента коллекции,
-     * в том числе нового
-     * обычно открывается диалог, в нём что-то делается, нажимается кнопка и уходит запрос
-     */
-    onedit: { type: Function },
-    /**
      * строчка, которая будет написана на кнопке добавления новой строки
      */
     addnewheader: { type: String, default: 'Добавить новую строку', description: 'Строчка, что будет на кнопке добавления строки' },
@@ -112,7 +109,10 @@ export default {
     loaddata (url, payload) {
       const local = this
       const request = local.$http[local.get.method]
-      request(url, local.resolvepayload(payload))
+      const config = local.config
+      const resolvedpayload = local.resolvepayload(payload)
+      if (resolvedpayload !== undefined && resolvedpayload !== null && Object.isObject(resolvedpayload)) Vue.set(config, 'data', resolvedpayload)
+      request(url, config)
         .then((response) => {
           local.resolveresult(response)
           local.error = false
@@ -120,39 +120,6 @@ export default {
         .catch((reason) => {
           local.error = reason
         })
-    },
-    delete (row) {
-      console.log('Deleting ', this.urls.remove, row)
-    },
-    update (row) {
-      console.log('Updating ', this.urls.update, row)
-    },
-    callcreate () {
-      const local = this
-      const create = new Promise((resolve) => {
-        local.createnew(local.payload, resolve)
-      }).then((newvalue) => {
-        local.onedit(newvalue, (payload) => {
-          local.$http(local.urls.add, payload)
-            .then((response) => {
-              if (Object.prototype.hasOwnProperty.call(response, 'success')) {
-                if (response.success) {
-                  local.collection.push(response.data)
-                } else if (Object.prototype.hasOwnProperty.call(response, 'message')) {
-                  console.error(response.message)
-                } else {
-                  console.error('something goes wrong')
-                }
-              } else {
-                console.info(response)
-              }
-            })
-            .catch((reason) => {
-              console.error(reason)
-            })
-        })
-      })
-      return create
     }
   }
 }

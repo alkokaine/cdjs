@@ -91,6 +91,7 @@ function createSelect (property, propertyholder, payload) {
     labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
     payload: resolvePropertyValue(property, 'resolvepayload', propertyholder), // параметры получения данных,
     values: property.values,
+    config: property.config,
     clearable: property.clearable,
     get: {
       url: property.url,

@@ -14,6 +14,7 @@
       <cd-select :payload="config.select.payload"
         :keyfield="config.select.valuekey"
         :labelkey="config.select.labelkey"
+        :config="config.select.config"
         :value="config.value"
         :get="config.select.get"
         :collection="values"
