@@ -5,7 +5,9 @@
       <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :onpropertychange="onpropertychange"></cd-form>
       <cd-list slot-scope="day" listclass="list-unstyled" :collection="details(day.day)" keyfield="id">
         <div class="row" slot-scope="event">
-          <div class="col-2">{{ format(event.row) }}</div>
+          <el-popover :content="event.row.name" trigger="hover" placement="top" :disabled="payload.mode === 0">
+            <div slot="reference" class="col-2">{{ format(event.row) }}</div>
+          </el-popover>
           <div v-if="payload.mode === 0" class="col-8">{{ event.row.name }}</div>
         </div>
         <span slot="no-data">Нет данных</span>
@@ -65,7 +67,7 @@ export default {
           valuekey: 'sport_id',
           labelkey: 'nazwa',
           clearable: true,
-          url: 'http://sebastianszwarc.pl:9000/olypi/sports',
+          url: '/olympic/olypi/sports',
           resolveresult: (response) => (response.data.sports),
           method: 'get',
           onselect (payload, option) {
@@ -85,7 +87,7 @@ export default {
       handler (newvalue, oldvalue) {
         const dn = this
         if (oldvalue === undefined) {
-          dn.$http.get('http://sebastianszwarc.pl:9000/olypi/events').then((response) => {
+          dn.$http.get('/olympic/olypi/events').then((response) => {
             dn.holidays = response.data.events.map(e => {
               const date = new Date(e.start_time_UTC)
               Vue.set(e, 'date', date)
@@ -104,9 +106,14 @@ export default {
       return (row) => doc.timeformatter.format(row.date)
     },
     details () {
+      const sorter = (a, b) => {
+        const valueofa = a.date.valueOf()
+        const valueofb = b.date.valueOf()
+        return valueofa - valueofb
+      }
       const dh = this
       return (day) => {
-        return dh.holidays.filter(f => dh.checkday(f, day) && (dh.olympicpayload.sport_id === null || f.sport_id === dh.olympicpayload.sport_id))
+        return dh.holidays.filter(f => dh.checkday(f, day) && (dh.olympicpayload.sport_id === null || f.sport_id === dh.olympicpayload.sport_id)).sort(sorter)
       }
     },
     isdayhidden () {

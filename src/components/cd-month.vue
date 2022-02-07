@@ -222,7 +222,7 @@ export default {
         if (newvalue !== undefined && (newvalue.Year !== undefined && newvalue.MonthID !== undefined && (
           oldvalue === undefined || (newvalue.Year !== oldvalue.Year || newvalue.MonthID !== oldvalue.MonthID)
         ))) {
-          month.$http.get(`https://isdayoff.ru/api/getdata?year=${newvalue.Year}&month=${(newvalue.MonthID)}&pre=1&covid=1&sd=0`)
+          month.$http.get(`/dayoff/api/getdata?year=${newvalue.Year}&month=${(newvalue.MonthID)}&pre=1&covid=1&sd=0`)
             .then((response) => {
               // приходит строчка из нулей, единиц, двоек и четвёрок, индекс символа указывает на номер дня (начиная с нуля)
               // а значение -- код дня в производственном календаре
