@@ -1,5 +1,3 @@
-import Vue from 'vue'
-
 export default {
   name: 'collection',
   props: {
@@ -109,10 +107,7 @@ export default {
     loaddata (url, payload) {
       const local = this
       const request = local.$http[local.get.method]
-      const config = local.config
-      const resolvedpayload = local.resolvepayload(payload)
-      if (resolvedpayload !== undefined && resolvedpayload !== null) Vue.set(config, 'data', resolvedpayload)
-      request(url, config)
+      request(url, local.resolvepayload(payload))
         .then((response) => {
           local.resolveresult(response)
           local.error = false
