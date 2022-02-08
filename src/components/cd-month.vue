@@ -1,5 +1,5 @@
 <template>
-  <cd-list class="cd-month" :listitemclicked="ondayselect" :listclass="[ 'list-unstyled', { 'row': mode }]"
+  <cd-list v-loading="isloading" v-if="calendar" class="cd-month" :listitemclicked="ondayselect" :listclass="[ 'list-unstyled', { 'row': mode }]"
     :rowclass="rootrowclass" :collection="source" keyfield="key" :isrowvisible="isdayvisible">
     <div class="month-header" slot="header">
       <slot name="month-header">
@@ -52,7 +52,7 @@
             </div>
           </cd-month>
         </cd-form>
-        <div class="commit-template" slot="footer">
+        <div v-if="islistview" class="commit-template" slot="footer">
           <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="closedialog">Отменить</button>
           <button type="button" class="btn btn-sm btn-primary" v-on:click="run($event, calendar.filter(newtask.daycompare))">Сохранить</button>
         </div>
@@ -62,19 +62,23 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import AsyncComputed from 'vue-async-computed'
+import calendar from '../common/calendar-mixin'
 import CDList from './cd-list.vue'
 import CDForm from './cd-form.vue'
 import CDDay from './cd-day.vue'
 import moment from 'moment'
-import month from '@/common/calendar-mixin'
+
 import { Dialog } from 'element-ui'
 
+Vue.use(AsyncComputed)
 const daysInMonth = (year, month) => (moment(`${year}-${month}`, 'YYYY-MM')).daysInMonth()
 const date = (year, month, day) => (moment(`${year}-${month}-${day}`, 'YYYY-MM-DD'))
 
 export default {
   name: 'cd-month',
-  mixins: [month],
+  mixins: [calendar],
   components: {
     'cd-list': CDList,
     'cd-form': CDForm,
@@ -135,7 +139,7 @@ export default {
       description: 'Массив дней недели'
     },
     mode: { type: Number, default: 1 },
-    isdayhidden: { type: Function, default: (day) => (false) },
+    isdayvisible: { type: Function, default: (day) => (true) },
     isdayselected: { type: Function },
     format: { type: String, default: 'YYYY-MM-DD' },
     schedule: { type: [Function, Array], description: 'Данные, которые мы хотим показать в календаре' },
@@ -149,7 +153,6 @@ export default {
   data (cdm) {
     return {
       generatorconfig: Object,
-      calendar: [],
       runtemplate: false,
       formatter: new Intl.DateTimeFormat('ru-RU', { month: 'long' }),
       templatedescriptor: [
@@ -209,47 +212,11 @@ export default {
         }
       ],
       newtask: {},
-      selectedweekdays: []
+      selectedweekdays: [],
+      isloading: false
     }
   },
   watch: {
-    payload: {
-      deep: true,
-      immediate: true,
-      handler (newvalue, oldvalue) {
-        const month = this
-        let days = []
-        if (newvalue !== undefined && (newvalue.Year !== undefined && newvalue.MonthID !== undefined && (
-          oldvalue === undefined || (newvalue.Year !== oldvalue.Year || newvalue.MonthID !== oldvalue.MonthID)
-        ))) {
-          month.$http.get(`/dayoff/api/getdata?year=${newvalue.Year}&month=${(newvalue.MonthID)}&pre=1&covid=1&sd=0`)
-            .then((response) => {
-              // приходит строчка из нулей, единиц, двоек и четвёрок, индекс символа указывает на номер дня (начиная с нуля)
-              // а значение -- код дня в производственном календаре
-              // для начала переведём строчку в массив нулей, единиц, двоек и четвёрок
-              days = Array.from(response.request.response)
-                .map((m, index) => ({ day: index + 1, code: Number(m), weekday: date(newvalue.Year, newvalue.MonthID, index + 1).day(), month: newvalue.MonthID }))
-            }).catch((error) => {
-              console.error(`[CDJS] ${error}`)
-              days = Array.from(Array(daysInMonth(newvalue.Year, newvalue.MonthID)).keys()).map((_d, index) => ({ day: index + 1 }))
-            }).finally(() => {
-              const first = days[0]
-              const fd = date(newvalue.Year, newvalue.MonthID, first.day)
-              const monthstart = fd.day()
-              if (monthstart === 1) return days
-              const result = []
-              let ln = monthstart - 1
-              if (ln < 0) ln = 6 - ln - 1
-              while (ln > 0) {
-                const d = fd.subtract(1, 'days')
-                result.unshift({ day: d.date(), weekday: d.day(), isprev: true, month: d.month() + 1 })
-                ln -= 1
-              }
-              month.calendar = result.concat(days)
-            })
-        }
-      }
-    },
     runtemplate: {
       handler (newvalue) {
         if (newvalue === true) {
@@ -263,7 +230,48 @@ export default {
       }
     }
   },
+  asyncComputed: {
+    calendar () {
+      const month = this
+      let days = []
+      return new Promise((resolve, reject) => {
+        month.isloading = true
+        month.$http.get(`https://isdayoff.ru/api/getdata?year=${month.payload.Year}&month=${(month.payload.MonthID)}&pre=1&covid=1&sd=0`).then(response => {
+          // приходит строчка из нулей, единиц, двоек и четвёрок, индекс символа указывает на номер дня (начиная с нуля)
+          // а значение -- код дня в производственном календаре
+          // для начала переведём строчку в массив нулей, единиц, двоек и четвёрок
+          days = Array.from(response.request.response)
+            .map((m, index) => ({ date: date(month.payload.Year, month.payload.MonthID, index + 1).toDate(), code: Number(m) }))
+        })
+          .catch((error) => {
+            console.warn(error)
+          })
+          .finally(() => {
+            if (days.length === 0) {
+              Array.from(Array(daysInMonth(month.payload.Year, month.payload.MonthID)).keys()).map((_d, index) => ({ date: date(month.payload.Year, month.payload.MonthID - 1, _d + 1).toDate() })).forEach(d => days.push(d))
+            }
+
+            const monthstart = date(month.payload.Year, month.payload.MonthID, 1)
+            const weekday = monthstart.day()
+            if (weekday === 1) return days
+            const result = []
+            let ln = weekday - 1
+            if (ln < 0) ln = 6 - ln - 1
+            while (ln > 0) {
+              const d = monthstart.subtract(1, 'days')
+              result.unshift({ date: d.toDate(), isprev: true })
+              ln -= 1
+            }
+            month.isloading = false
+            resolve(result.concat(days))
+          })
+      })
+    }
+  },
   computed: {
+    islistview () {
+      return this.mode === 0
+    },
     templateready () {
       return typeof this.generatorconfig !== 'function'
     },
@@ -291,20 +299,7 @@ export default {
       const month = this
       if (month.calendar.length === 0) return () => []
       return (wd) => {
-        return month.calendar.filter(d => d.weekday === wd.row.id)
-      }
-    },
-    isdayvisible () {
-      const month = this
-      if (month.mode) {
-        return (d) => true
-      } else {
-        return (d) => {
-          if (d.month !== month.payload.MonthID) return false
-          let isdayhidden = false
-          if (month.isdayhidden && typeof month.isdayhidden === 'function') isdayhidden = month.isdayhidden(d)
-          return month.scheduleref.indexOf(d.day) >= 0 && !isdayhidden
-        }
+        return month.calendar.filter(d => d.date.getDay() === wd.row.id)
       }
     },
     rootrowclass () {
@@ -405,5 +400,36 @@ export default {
   }
   .commit-template > .btn {
     margin-left: 1em;
+  }
+    .compact {
+    margin-bottom: unset!important;
+  }
+  .cd-day--number {
+    font-size: 2em;
+    font-weight: bold;
+    padding-left: 1em;
+  }
+  .cd-day {
+    border: 1px solid;
+    margin-bottom: 1em;
+  }
+  .cd-day:hover {
+    box-shadow: 0 0.25em 1em rgb(99, 99, 99);
+  }
+  .cd-day--info {
+    width: 20%;
+    line-height: 1em;
+    margin: auto;
+    text-align: right;
+    padding-right: 2em;
+}
+  .cd-day--header {
+    cursor: default;
+    user-select: none;
+  }
+  .cd-day--content {
+    padding: 0.5em;
+    border-top: 1px solid;
+    color: unset;
   }
 </style>
