@@ -38,13 +38,13 @@
 
 <script>
 import Vue from 'vue'
-import CDDocGeneric from '../generic/cd-doc-generic.vue'
-import ComponentInfo from '../generic/cd-doc-component-info.vue'
-import CDGrid from '../components/cd-grid.vue'
-import CDForm from '../components/cd-form.vue'
-import CDTabs from '../components/cd-tabs.vue'
-import CDList from '../components/cd-list.vue'
-import CDPropList from '../generic/cd-prop-list.vue'
+import CDDocGeneric from '@/generic/cd-doc-generic.vue'
+import ComponentInfo from '@/generic/cd-doc-component-info.vue'
+import CDGrid from '@/components/cd-grid.vue'
+import CDForm from '@/components/cd-form.vue'
+import CDTabs from '@/components/cd-tabs.vue'
+import CDList from '@/components/cd-list.vue'
+import CDPropList from '@/generic/cd-prop-list.vue'
 export default {
   name: 'cd-doc-grid',
   components: {

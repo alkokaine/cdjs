@@ -1,4 +1,4 @@
-import inputs from '@/common/inputtype'
+import inputs from '../common/inputtype'
 
 export default [
   {

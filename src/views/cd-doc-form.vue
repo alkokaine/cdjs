@@ -7,9 +7,9 @@
 
 <script>
 
-import CDForm from '../components/cd-form.vue'
-import CDDocGeneric from '../generic/cd-doc-generic.vue'
-import ComponentInfo from '../generic/cd-doc-component-info.vue'
+import CDForm from '@/components/cd-form.vue'
+import CDDocGeneric from '@/generic/cd-doc-generic.vue'
+import ComponentInfo from '@/generic/cd-doc-component-info.vue'
 
 export default {
   components: { 'cd-doc': CDDocGeneric, 'cd-info': ComponentInfo },

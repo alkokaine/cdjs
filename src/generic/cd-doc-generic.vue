@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import CDList from '../components/cd-list.vue'
-import CDPart from '../generic/cd-part-generic.vue'
+import CDList from '@/components/cd-list.vue'
+import CDPart from '@/generic/cd-part-generic.vue'
 export default {
   name: 'cd-doc',
   components: {

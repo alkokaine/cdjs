@@ -22,13 +22,13 @@
 
 <script>
 import Vue from 'vue'
-import CDInfo from '../generic/cd-doc-component-info.vue'
-import CdDocGeneric from '../generic/cd-doc-generic.vue'
+import CDInfo from '@/generic/cd-doc-component-info.vue'
+import CdDocGeneric from '@/generic/cd-doc-generic.vue'
 import inputype from '../common/inputtype'
-import CDForm from '../components/cd-form.vue'
-import CDSelect from '../components/cd-select.vue'
-import CDPropExample from '../generic/cd-prop-example.vue'
-import readyvaluesoptions from '../examples/propertyoptions'
+import CDForm from '@/components/cd-form.vue'
+import CDSelect from '@/components/cd-select.vue'
+import CDPropExample from '@/generic/cd-prop-example.vue'
+import readyvaluesoptions from '@/examples/propertyoptions.js'
 
 const countryParams = {
   limit: 10,

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import CDModal from '../components/cd-modal.vue'
+import CDModal from '@/components/cd-modal.vue'
 export default {
   components: {
     'cd-modal': CDModal

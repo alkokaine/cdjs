@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import CDGrid from '../components/cd-grid.vue'
+import CDGrid from '@/components/cd-grid.vue'
 import utils from '../common/utils'
 export default {
   components: {
