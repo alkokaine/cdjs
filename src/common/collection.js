@@ -111,7 +111,7 @@ export default {
       const request = local.$http[local.get.method]
       const config = local.config
       const resolvedpayload = local.resolvepayload(payload)
-      if (resolvedpayload !== undefined && resolvedpayload !== null && Object.isObject(resolvedpayload)) Vue.set(config, 'data', resolvedpayload)
+      if (resolvedpayload !== undefined && resolvedpayload !== null) Vue.set(config, 'data', resolvedpayload)
       request(url, config)
         .then((response) => {
           local.resolveresult(response)
