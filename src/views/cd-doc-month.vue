@@ -1,7 +1,7 @@
 <template>
   <cd-setting-container>
     <cd-form :payload="payload" :descriptor="settings" :onpropertychange="onpropertychange"></cd-form>
-    <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayhidden="isdayhidden">
+    <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible">
       <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :onpropertychange="onpropertychange"></cd-form>
       <cd-list slot-scope="day" listclass="list-unstyled" :collection="details(day.day)" keyfield="id">
         <div class="row" slot-scope="event">
@@ -89,10 +89,10 @@ export default {
         if (oldvalue === undefined) {
           dn.$http.get('/olympic/olypi/events').then((response) => {
             dn.holidays = response.data.events.map(e => {
-              const date = new Date(e.start_time_UTC)
+              const date = new Date(e.start_time)
               Vue.set(e, 'date', date)
               Vue.set(e, 'day', date.getDate())
-              Vue.set(e, 'month', date.getMonth() + 1)
+              Vue.set(e, 'month', date.getMonth())
               return e
             })
           })
@@ -116,14 +116,14 @@ export default {
         return dh.holidays.filter(f => dh.checkday(f, day) && (dh.olympicpayload.sport_id === null || f.sport_id === dh.olympicpayload.sport_id)).sort(sorter)
       }
     },
-    isdayhidden () {
+    isdayvisible () {
       const dh = this
-      return (day) => dh.details(day).length === 0
+      return (day) => dh.payload.mode === 1 || dh.details(day).length !== 0
     }
   },
   methods: {
     checkday (exist, check) {
-      return exist.day === (+check.day) && exist.month === check.month
+      return exist.day === check.date.getDate() && exist.date.getMonth() === check.date.getMonth()
     },
     onpropertychange (args) {
     },
@@ -133,7 +133,7 @@ export default {
         dm.holidays.push({
           key: date.valueOf(),
           day: date.getDate(),
-          month: date.getMonth() + 1,
+          month: date.getMonth(),
           date: date,
           name: 'no-name',
           description: 'no-description'
