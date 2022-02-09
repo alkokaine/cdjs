@@ -1,5 +1,5 @@
 <template>
-  <cd-list v-loading="isloading" class="cd-month" :listitemclicked="ondayselect" :listclass="[ 'list-unstyled', { 'row': mode }]"
+  <cd-list class="cd-month" :listclass="[ 'list-unstyled', { 'row': mode }]"
     :rowclass="rootrowclass" :collection="source" keyfield="key" :isrowvisible="isdayvisible">
     <div class="month-header" slot="header">
       <slot name="month-header">
@@ -9,7 +9,7 @@
     </div>
     <div class="month-item-wrap" slot-scope="content" :class="{ 'weekday-container': content.row.id }">
       <template v-if="mode">
-        <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled">
+        <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled" :rowclass="resolvedayclass" :listitemclicked="ondayselect">
           <div class="weekday-name" slot="header">
             <div v-if="selectweekday">
               <input type="checkbox" v-on:change="onweekdayselect($event, content)" :checked="isweekdayselected(content)"/>
@@ -42,14 +42,15 @@
       Нет данных
     </div>
     <div v-if="!compact && createnew" slot="footer">
-      <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose">
+      <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose" width="30%">
         <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :onpropertychange="ontemplatechange">
           <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
             :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
-            :isweekdayselected="resolveweekdayselected" :selectweekday="newtask.id === 3" :compact="true">
+            :isweekdayselected="resolveweekdayselected" :selectweekday="newtask.id === 3" :compact="true" :resolvedayclass="dayclass">
+            <span slot="month-header" class="compact">{{ monthheader }}</span>
           </cd-month>
         </cd-form>
-        <div v-if="islistview" class="commit-template" slot="footer">
+        <div class="commit-template" slot="footer">
           <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="closedialog">Отменить</button>
           <button type="button" class="btn btn-sm btn-primary" v-on:click="run($event, calendar.filter(newtask.daycompare))">Сохранить</button>
         </div>
@@ -137,7 +138,7 @@ export default {
     format: { type: String, default: 'YYYY-MM-DD' },
     schedule: { type: [Function, Array], description: 'Данные, которые мы хотим показать в календаре' },
     property: { type: String, description: 'Имя свойства объекта из коллекции schedule, содержащее значение даты события' },
-    resolvedayclass: { type: Function, default: () => (''), description: 'Функция, возвращающая класс для элемента cd-day' },
+    resolvedayclass: { type: [String, Array, Function], default: () => (''), description: 'Функция, возвращающая класс для элемента cd-day' },
     ondayselect: { type: Function, default: (event, args) => {}, description: 'Функция, которая выполняется при клике на день' },
     selectweekday: { type: Boolean, default: false },
     onweekdayselect: { type: Function, default: (event, args) => {}, desciption: 'Функция, которая выполнится, если выбрать колонку с днём недели' },
@@ -159,9 +160,6 @@ export default {
             {
               id: 1,
               text: 'Чётные числа',
-              ondayselect (...args) {
-                console.log(args)
-              },
               daycompare (dayscope) {
                 return dayscope.isprev === undefined && (dayscope.date.getDate() % 2 === 0) && (!cdm.generatorconfig.workdays || dayscope.code !== 1)
               }
@@ -183,11 +181,15 @@ export default {
             {
               id: 4,
               text: 'Выбрать дни вручную',
-              ondayselect (...args) {
-                console.log(args)
+              ondayselect (event, args) {
+                if (args.row.isprev === undefined) {
+                  const index = cdm.selecteddays.indexOf(args.row.date.getDate())
+                  if (index >= 0) cdm.selecteddays.splice(index, 1)
+                  else cdm.selecteddays.push(args.row.date.getDate())
+                }
               },
-              daycompare (...args) {
-                return false
+              daycompare (dayscope) {
+                return cdm.selecteddays.indexOf(dayscope.date.getDate()) !== -1
               }
             }
           ],
@@ -199,6 +201,7 @@ export default {
           input: 'checkbox',
           datafield: 'workdays',
           text: 'Только рабочие дни',
+          disabled: true,
           toogle (payload) {
             cdm.generatorconfig.workdays = !cdm.generatorconfig.workdays
           }
@@ -206,7 +209,7 @@ export default {
       ],
       newtask: {},
       selectedweekdays: [],
-      isloading: false
+      selecteddays: []
     }
   },
   watch: {
@@ -224,9 +227,11 @@ export default {
     }
   },
   computed: {
+    dayclass () {
+      return this.newtask.id === 4 ? 'selectable' : ''
+    },
     calendar () {
       const month = this
-      month.isloading = true
       const days = Array.from(Array(daysInMonth(month.payload.Year, month.payload.MonthID)).keys())
         .map((_d, index) => ({ date: date(month.payload.Year, month.payload.MonthID, _d + 1).toDate() }))
       const monthstart = date(month.payload.Year, month.payload.MonthID, 1)
@@ -240,7 +245,6 @@ export default {
         result.unshift({ date: d.toDate(), isprev: true })
         ln -= 1
       }
-      month.isloading = false
       return result.concat(days)
     },
     // url () {
@@ -286,6 +290,7 @@ export default {
   methods: {
     ondialogclose () {
       this.selectedweekdays = []
+      this.selecteddays = []
       this.newtask = {}
     },
     templateselect () {
@@ -307,8 +312,7 @@ export default {
       this.runtemplate = false
     },
     run (event, days) {
-      const payload = this.payload
-      this.createnew(days.map(d => date(payload.Year, payload.MonthID, d.day).toDate()))
+      this.createnew(days.map(d => d.date))
     }
   }
 }
@@ -407,5 +411,14 @@ export default {
     padding: 0.5em;
     border-top: 1px solid;
     color: unset;
+  }
+  .month-template-preview.compact {
+    font-size: 0.7em;
+  }
+  .compact:hover {
+    box-shadow: none;
+  }
+  .selectable {
+    cursor: pointer;
   }
 </style>
