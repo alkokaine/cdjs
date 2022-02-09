@@ -7,7 +7,7 @@
         <div>{{ weekday }}</div>
       </div>
     </div>
-    <div class="cd-day--content" :class="{ 'border-0': compact }">
+    <div class="cd-day--content" :class="{ 'border-0 compact': compact }">
       <slot>
         <span v-if="compact">{{ day }}</span>
       </slot>
@@ -16,13 +16,11 @@
 </template>
 
 <script>
-import month from '../common/calendar-mixin'
 const weekdayFormatter = new Intl.DateTimeFormat('ru-RU', { weekday: 'short' })
 const monthFormatter = new Intl.DateTimeFormat('ru-RU', { month: 'short' })
 const dayFormatter = new Intl.DateTimeFormat('ru-RU', { day: '2-digit' })
 export default {
   name: 'cd-day',
-  mixins: [month],
   props: {
     info: { type: Object, required: true },
     compact: { type: Boolean, default: false }
