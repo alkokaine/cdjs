@@ -134,6 +134,7 @@ export default {
           key: date.valueOf(),
           day: date.getDate(),
           month: date.getMonth(),
+          sport_id: dm.olympicpayload.sport_id,
           date: date,
           name: 'no-name',
           description: 'no-description'
