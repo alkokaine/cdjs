@@ -8,7 +8,9 @@
       </div>
     </div>
     <div class="cd-day--content" :class="{ 'border-0': compact }">
-      <slot></slot>
+      <slot>
+        <span v-if="compact">{{ day }}</span>
+      </slot>
     </div>
   </div>
 </template>
