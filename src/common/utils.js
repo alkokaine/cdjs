@@ -180,17 +180,18 @@ const flatterer = function (arr, accum) {
 const propertyconfig = function (property, propertyholder, isreadonly, payload = {}) {
   const ph = propertyholder
   const p = property
+  const parent = this
   return {
-    input: createInput.call(this, p, ph, payload),
-    select: p.input === 'select' ? createSelect.call(this, p, ph, payload) : undefined,
-    route: p.route ? createRouterLink.call(this, p, ph, payload) : undefined,
+    input: createInput.call(parent, p, ph, payload),
+    select: p.input === 'select' ? createSelect.call(parent, p, ph, payload) : undefined,
+    route: p.route ? createRouterLink.call(parent, p, ph, payload) : undefined,
     clearable: p.clearable,
     datafield: p.datafield,
     text: p.text,
     value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield],
     onchange (event) {
-      if (property.input === 'checkbox') {
-        property.toogle(propertyholder)
+      if (p.input === 'checkbox') {
+        p.toogle(ph)
       }
     },
     onblur (event) {
@@ -198,7 +199,8 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
     oninput (event) {
     },
     reset (event) {
-      Vue.set(propertyholder, property.datafield, null)
+      Vue.set(ph, p.datafield, null)
+      if (p.reset !== undefined && typeof p.reset === 'function') p.reset(ph, parent)
     }
   }
 }

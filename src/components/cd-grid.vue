@@ -91,7 +91,7 @@
       </table>
     </div>
     <div class="cd-grid--footer">
-      <cd-paging v-if="showPaging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage" :viewRange="pagesvisible"></cd-paging>
+      <cd-paging v-if="paging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage" :viewRange="pagesvisible"></cd-paging>
     </div>
   </div>
 </template>
@@ -119,7 +119,7 @@ export default {
     usefilter: { type: Boolean, default: false, description: 'Использовать ли фильтр (показывать ли форму-редактор аргументов запроса получения данных)' },
     paging: { type: Boolean, default: false, description: 'Использовать ли постраничную загрузку' },
     total: { type: Number, description: 'При постраничной загрузке данных, эта штука возвращается контроллером вместе с коллекцией, означает сколько-всего-элементов-в-коллекции' },
-    pageSize: { type: Number, description: 'При постраничной загрузке данных, размер страницы в элементах' },
+    pageSize: { type: Number, default: 20, description: 'При постраничной загрузке данных, размер страницы в элементах' },
     onpagechange: { type: Function, description: 'Что проиозойдёт при смене страницы', default: function (event, pageargs) {} },
     selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' },
     pagesvisible: { type: Number, default: 5, description: 'Диапазон страниц, видимый без разрывов в компоненте постраничной загрузки' },
@@ -148,9 +148,6 @@ export default {
     },
     propertyconfig: function () {
       return (property, row) => utils.propertyconfig.call(this, property, row, this.iscurrentrow(row), this.payload)
-    },
-    showPaging: function () {
-      return this.paging && (this.pageSize < this.total)
     },
     header: function () {
       return utils.headerrows(this.descriptor, this.payload)
