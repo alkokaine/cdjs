@@ -62,7 +62,12 @@
                 <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
                     :key="prop.datafield + pindex">
                     <slot :row="row" :prop="prop">
-                      <cd-cell :config="propertyconfig(prop, row)"></cd-cell>
+                      <template v-if="prop.icon">
+                        <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
+                      </template>
+                      <template v-else>
+                        <cd-cell :config="propertyconfig(prop, row)"></cd-cell>
+                      </template>
                     </slot>
                 </td>
               </template>
@@ -105,6 +110,7 @@ import utils from '../common/utils'
 import cell from './cd-cell.vue'
 import watchurl from '../common/get-url-watch'
 import paging from './cd-paging.vue'
+import func from 'vue-editor-bridge'
 
 export default {
   mixins: [collection, watchurl, props, methods, selection],
@@ -151,6 +157,12 @@ export default {
     },
     header: function () {
       return utils.headerrows(this.descriptor, this.payload)
+    },
+    resolveicon: function () {
+      return (row, prop) => {
+        if (typeof prop.icon === 'function') return prop.icon(row)
+        return prop.icon
+      }
     }
   },
   name: 'cd-grid',
