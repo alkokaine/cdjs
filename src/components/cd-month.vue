@@ -18,14 +18,14 @@
           </div>
           <div class="month-item-wrap" slot-scope="day"
             :class="{ 'prev-month': day.row.isprev, 'holiday' : day.row.code == 1, 'selected': resolvedayselected(day) }">
-            <cd-day :payload="payload" :info="day.row" :compact="compact">
+            <cd-day :info="day.row" :compact="compact">
               <slot :day="day.row"></slot>
             </cd-day>
           </div>
         </cd-list>
       </template>
       <template v-else>
-        <cd-day :payload="payload" :info="content.row">
+        <cd-day :info="content.row">
           <slot :day="content.row"></slot>
         </cd-day>
       </template>
