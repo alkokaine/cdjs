@@ -110,7 +110,6 @@ import utils from '../common/utils'
 import cell from './cd-cell.vue'
 import watchurl from '../common/get-url-watch'
 import paging from './cd-paging.vue'
-import func from 'vue-editor-bridge'
 
 export default {
   mixins: [collection, watchurl, props, methods, selection],
@@ -159,7 +158,7 @@ export default {
       return utils.headerrows(this.descriptor, this.payload)
     },
     resolveicon: function () {
-      return (row, prop) => {
+      return (prop, row) => {
         if (typeof prop.icon === 'function') return prop.icon(row)
         return prop.icon
       }
@@ -183,6 +182,7 @@ export default {
   .cd-grid--cell {
     display: table-cell;
     padding: 5px;
+    vertical-align: middle;
   }
   .no-data--reload {
     cursor: pointer;
