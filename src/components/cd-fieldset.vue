@@ -1,9 +1,9 @@
 <template>
-  <fieldset class="cd-fieldset border p-2 form-control form-control-sm" :class="{ 'inline': inline }">
+  <fieldset class="cd-fieldset border form-control form-control-sm" :class="{ 'inline': inline }">
     <slot></slot>
     <div class="cd-field" :class="property.class" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
       <template v-if="hasdescriptor(property)">
-        <cd-fieldset
+        <cd-fieldset class="inner"
             :class="property.class"
             :isvisible="isvisible"
             :propertyconfig="propertyconfig"
@@ -57,9 +57,6 @@ export default {
     margin-left: 10px;
     float: none;
   }
-  .cd-field>fieldset.cd-fieldset {
-    margin-top: 10px;
-  }
   .cd-label {
     font-weight: bold;
     font-size: inherit;
@@ -73,9 +70,6 @@ export default {
     display: flex;
     flex-wrap: wrap;
     flex-grow: 1;
-  }
-  .cd-field {
-    padding-top: 0.5em;
   }
   .form-label {
     margin-bottom: unset;
