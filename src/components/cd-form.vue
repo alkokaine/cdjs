@@ -74,12 +74,17 @@ export default {
   }
   .cd-field {
     padding-left: 5px;
-    padding-left: 5px;
   }
   .form-control-sm {
     min-height: calc(0.8em + 0.5rem + 2px);
   }
   .cd-form--content > .cd-fieldset--root {
     border: unset!important;
+  }
+  .cd-field {
+    margin-bottom: 5px;
+  }
+  .cd-field.inner {
+    margin-bottom: unset;
   }
 </style>

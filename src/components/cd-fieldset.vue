@@ -9,12 +9,13 @@
             :propertyconfig="propertyconfig"
             :descriptor="property.descriptor"
             :readonly="readonly"
+            :inner="true"
             :inline="inline">
             <legend v-if="haslegend(property)" class="cd-legend w-auto form-label">{{ property.text }}</legend>
         </cd-fieldset>
       </template>
       <template v-else>
-        <cd-cell :config="propertyconfig(property)" :readonly="readonly(property)">
+        <cd-cell :class="{ 'inner': inner }" :config="propertyconfig(property)" :readonly="readonly(property)">
           <label class="cd-label form-label" :for="property.datafield" slot="label">{{ property.text }}</label>
         </cd-cell>
       </template>
@@ -32,7 +33,8 @@ export default {
   props: {
     propertyconfig: { type: Function },
     readonly: { type: Function },
-    inline: { type: Boolean, default: false }
+    inline: { type: Boolean, default: false },
+    inner: { type: Boolean, default: false }
   },
   components: {
     'cd-cell': cell
