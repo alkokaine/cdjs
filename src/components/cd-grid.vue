@@ -66,7 +66,7 @@
                         <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
                       </template>
                       <template v-else>
-                        <cd-cell :config="propertyconfig(prop, row)"></cd-cell>
+                        <cd-cell :class="resolvecellclass(prop, row)" :config="propertyconfig(prop, row)"></cd-cell>
                       </template>
                     </slot>
                 </td>
@@ -162,6 +162,12 @@ export default {
         if (typeof prop.icon === 'function') return prop.icon(row)
         return prop.icon
       }
+    },
+    resolvecellclass: function () {
+      return (prop, row) => {
+        if (typeof prop.cellclass === 'function') return prop.cellclass(row)
+        return prop.cellclass
+      }
     }
   },
   name: 'cd-grid',
@@ -199,5 +205,7 @@ export default {
     padding-top: 50px;
     padding-bottom: 50px;
   }
-
+  .cd-grid--cell > .cd-cell {
+    display: block;
+  }
 </style>
