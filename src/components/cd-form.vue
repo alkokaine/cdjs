@@ -10,7 +10,8 @@
                 :isvisible="isvisible"
                 :readonly="isreadonly"
                 :inline="inline"
-                :propertyconfig="propertyconfig"></cd-fieldset>
+                :propertyconfig="propertyconfig"
+                :resolvefieldclass="resolvefieldclass"></cd-fieldset>
           </template>
           <template v-else>
               <span>Напишите в внутри тэга cd-form содержимое формы, или используйте свойство descriptor для встроенного рендеринга</span>
@@ -55,6 +56,13 @@ export default {
     },
     propertyconfig () {
       return (property) => utils.propertyconfig.call(this, property, this.payload, this.editmode, undefined)
+    },
+    resolvefieldclass () {
+      const form = this
+      return (prop) => {
+        if (typeof prop.fieldclass === 'function') return prop.fieldclass(form.payload)
+        return prop.fieldclass
+      }
     }
   },
   methods: {
@@ -72,19 +80,6 @@ export default {
   .cd-form {
     text-align: left;
   }
-  .cd-field {
-    padding-left: 5px;
-  }
-  .form-control-sm {
-    min-height: calc(0.8em + 0.5rem + 2px);
-  }
-  .cd-form--content > .cd-fieldset--root {
-    border: unset!important;
-  }
-  .cd-field {
-    margin-bottom: 5px;
-  }
-  .cd-field.inner {
-    margin-bottom: unset;
-  }
+</style>
+<style scoped>
 </style>

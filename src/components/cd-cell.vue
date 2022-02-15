@@ -27,12 +27,13 @@
         <textarea class="form-control form-control-sm" :id="config.datafield"/>
       </template>
       <template v-else-if="config.input">
-        <code v-if="config.input.type === 'code'" class="form-control form-control-sm">
+        <code v-if="config.input.type === 'code'">
           {{ config.value }}
         </code>
         <template v-else>
-          <input class="form-control form-control-sm" v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
+          <input v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
             :value="config.value" :required="config.required" :pattern="config.input.pattern"
+            class="form-control form-control-sm"
             :class="{'is-readonly': readonly, 'form-check-input': config.input.type === 'checkbox' }" :placeholder="config.input.placeholder"
             :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
             :maxlength="config.input.maxlength"

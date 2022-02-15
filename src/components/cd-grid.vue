@@ -60,7 +60,7 @@
                  <!-- проходим в цикле по flatten -->
               <!-- на td вешаем oncellclick(prop, row, $event) -->
                 <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
-                    :key="prop.datafield + pindex">
+                    :key="prop.datafield + pindex" :class="resolvetdclass(prop, row)">
                     <slot :row="row" :prop="prop">
                       <template v-if="prop.icon">
                         <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
@@ -167,6 +167,12 @@ export default {
       return (prop, row) => {
         if (typeof prop.cellclass === 'function') return prop.cellclass(row)
         return prop.cellclass
+      }
+    },
+    resolvetdclass: function () {
+      return (prop, row) => {
+        if (typeof prop.tdclass === 'function') return prop.tdclass(row)
+        return prop.tdclass
       }
     }
   },
