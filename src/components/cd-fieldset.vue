@@ -75,6 +75,9 @@ export default {
     flex-wrap: wrap;
     flex-grow: 1;
   }
+  .cd-field {
+    margin-bottom: 0.5em;
+  }
   .form-label {
     margin-bottom: unset;
     white-space: nowrap;
