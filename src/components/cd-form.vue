@@ -14,7 +14,7 @@
                 :resolvefieldclass="resolvefieldclass"></cd-fieldset>
           </template>
           <template v-else>
-              <span>Напишите в внутри тэга cd-form содержимое формы, или используйте свойство descriptor для встроенного рендеринга</span>
+              <span>Напишите внутри тэга cd-form содержимое формы, или передайте массив дескрипторов свойство в свойство descriptor для встроенного рендеринга</span>
           </template>
         </slot>
       </form>

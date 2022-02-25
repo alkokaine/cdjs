@@ -91,7 +91,7 @@ function createSelect (property, propertyholder, payload) {
     labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
     payload: resolvePropertyValue(property, 'resolvepayload', propertyholder), // параметры получения данных,
     values: property.values,
-    config: property.config,
+    resolvepayload: property.resolvepayload,
     clearable: property.clearable,
     get: {
       url: property.url,
@@ -104,7 +104,7 @@ function createSelect (property, propertyholder, payload) {
     // выполняем onselect
     onselect: (option) => {
       if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
-      if (parent.onpropertychange) parent.onpropertychange(property, option[property.valuekey])
+      if (parent.onpropertychange) parent.onpropertychange(property, option)
     }
   })
   return select
