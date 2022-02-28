@@ -1,7 +1,7 @@
 <template>
   <cd-list :collection="tabs" keyfield="tabkey" listclass="nav nav-tabs mp3" :listrole="keyfield" :listitemclicked="ontabselected">
     <button slot-scope="scope" :ref="tabid(scope.index)" class="nav-link" role="tab" :class="{ 'active': scope.index === current }" :tabindex="scope.index">{{ scope.row[name] }}</button>
-    <div class="tab-pane" slot="footer">
+    <div class="tab-pane m-4" slot="footer">
       <slot></slot>
     </div>
   </cd-list>
