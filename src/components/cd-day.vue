@@ -50,4 +50,9 @@ export default {
   .cd-day--header {
     height: fit-content;
   }
+  .cd-day--number {
+    font-size: 2em;
+    font-weight: bold;
+    width: inherit;
+}
 </style>
