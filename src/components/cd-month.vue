@@ -1,5 +1,5 @@
 <template>
-  <cd-list class="cd-month" :listclass="[ 'list-unstyled', { 'row': mode }]"
+  <cd-list class="cd-month container-sm" :listclass="[ 'list-unstyled', { 'row': mode }]"
     :rowclass="rootrowclass" :collection="source" keyfield="key" :isrowvisible="isdayvisible">
     <div class="month-header" slot="header">
       <slot name="month-header">
@@ -9,7 +9,7 @@
     </div>
     <div class="month-item-wrap" slot-scope="content" :class="{ 'weekday-container': content.row.id }">
       <template v-if="mode">
-        <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled" :rowclass="resolvedayclass" :listitemclicked="ondayselect">
+        <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled col" :rowclass="resolvedayclass" :listitemclicked="ondayselect" :isrowvisible="isdayvisible">
           <div class="weekday-name" slot="header">
             <div v-if="selectweekday">
               <input type="checkbox" v-on:change="onweekdayselect($event, content)" :checked="isweekdayselected(content)"/>
@@ -18,14 +18,14 @@
           </div>
           <div class="month-item-wrap" slot-scope="day"
             :class="{ 'prev-month': day.row.isprev, 'holiday' : day.row.code == 1, 'selected': resolvedayselected(day) }">
-            <cd-day :info="day.row" :compact="compact">
+            <cd-day :info="day.row" :compact="compact" :tile="tile">
               <slot :day="day.row"></slot>
             </cd-day>
           </div>
         </cd-list>
       </template>
       <template v-else>
-        <cd-day :info="content.row">
+        <cd-day :info="content.row" :tile="tile">
           <slot :day="content.row"></slot>
         </cd-day>
       </template>
@@ -46,6 +46,7 @@
         <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :onpropertychange="ontemplatechange">
           <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
             :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
+            :tile="false"
             :isweekdayselected="resolveweekdayselected" :selectweekday="newtask.id === 3" :compact="true" :resolvedayclass="dayclass">
             <span slot="month-header" class="compact">{{ monthheader }}</span>
           </cd-month>
@@ -80,6 +81,7 @@ export default {
     'el-dialog': Dialog
   },
   props: {
+    tile: { type: Boolean, default: true },
     compact: { type: Boolean, default: false },
     createnew: {
       type: Function,
@@ -383,34 +385,6 @@ export default {
   }
     .compact {
     margin-bottom: unset!important;
-  }
-  .cd-day--number {
-    font-size: 2em;
-    font-weight: bold;
-    padding-left: 1em;
-  }
-  .cd-day {
-    border: 1px solid;
-    margin-bottom: 1em;
-  }
-  .cd-day:hover {
-    box-shadow: 0 0.25em 1em rgb(99, 99, 99);
-  }
-  .cd-day--info {
-    width: 20%;
-    line-height: 1em;
-    margin: auto;
-    text-align: right;
-    padding-right: 2em;
-}
-  .cd-day--header {
-    cursor: default;
-    user-select: none;
-  }
-  .cd-day--content {
-    padding: 0.5em;
-    border-top: 1px solid;
-    color: unset;
   }
   .month-template-preview.compact {
     font-size: 0.7em;

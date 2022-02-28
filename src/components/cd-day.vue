@@ -1,13 +1,15 @@
 <template>
-  <div class="cd-day" :class="{ 'border-0 compact': compact}">
-    <div v-if="!compact" class="cd-day--header row">
-      <div class="cd-day--number col" :class="{ 'compact': compact }">{{ day }}</div>
-      <div class="cd-day--info col">
-        <div>{{ month }}</div>
-        <div>{{ weekday }}</div>
+  <div class="cd-day" :class="{ 'border mb-2' : tile && !compact, 'row border-bottom border-start border-end': !tile && !compact }">
+    <div v-if="!compact" class="cd-day--header container-sm row p-0 m-0" :class="{ 'border-1 border-bottom' : tile, 'col-1': !tile }">
+      <div class="cd-day--number col w-auto">
+        {{ day }}
+      </div>
+      <div class="cd-day--info col w-auto">
+        <div class="cd-day--month">{{ month }}</div>
+        <div class="cd-day--weekday">{{ weekday }}</div>
       </div>
     </div>
-    <div class="cd-day--content" :class="{ 'border-0 compact': compact }">
+    <div class="cd-day--content" :class="{ 'col border-start': !tile, 'container-sm': !compact }">
       <slot>
         <span v-if="compact">{{ day }}</span>
       </slot>
@@ -23,7 +25,8 @@ export default {
   name: 'cd-day',
   props: {
     info: { type: Object, required: true },
-    compact: { type: Boolean, default: false }
+    compact: { type: Boolean, default: false },
+    tile: { type: Boolean, default: true }
   },
   data (day) {
     return {
@@ -42,3 +45,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .cd-day--header {
+    height: fit-content;
+  }
+</style>
