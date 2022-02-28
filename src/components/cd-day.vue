@@ -9,7 +9,7 @@
         <div class="cd-day--weekday">{{ weekday }}</div>
       </div>
     </div>
-    <div class="cd-day--content" :class="{ 'col border-start': !tile, 'container-sm': !compact }">
+    <div class="cd-day--content" :class="{ 'col border-start': !tile && !compact, 'container-sm': !compact }">
       <slot>
         <span v-if="compact">{{ day }}</span>
       </slot>
