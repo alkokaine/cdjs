@@ -47,8 +47,10 @@ export default {
       const selected = this.collection.find(option => String(option[this.keyfield]) === event.target.value)
       if (selected !== null && selected !== undefined) {
         this.current = selected[this.keyfield]
-        this.onselect(selected)
+      } else {
+        this.current = event.target.value
       }
+      this.onselect(selected)
     }
   }
 }

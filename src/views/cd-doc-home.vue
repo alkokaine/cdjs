@@ -6,29 +6,29 @@
       <option v-for="(option) in examples" :key="option.id" :value="option.id" :label="option.name">{{ option.name }}</option>
     </select>
     <cd-prop-example v-if="property">
-      <cd-form slot="editor" :descriptor="options" :payload="property.payload" :onpropertychange="onpropertychange(property.payload)"></cd-form>
+      <cd-form slot="editor" :descriptor="options" :payload="property.payload" :onpropertychange="onpropertychange"></cd-form>
       <div slot="preview">
         <code>{{ property.payload }}</code>
         <div v-if="property.params">
           <h3>Давайте издеваться!</h3>
           <div>На форме ниже мы видим значения свойств объекта, который улетит с запросом</div>
-          <cd-form :descriptor="property.paramsdescriptor" :payload="property.params" :onpropertychange="onpropertychange(property.params)"></cd-form>
+          <cd-form :descriptor="property.paramsdescriptor" :payload="property.params" :onpropertychange="onpropertychange"></cd-form>
         </div>
       </div>
-      <cd-form slot="sandbox" :descriptor="[property.payload]" :payload="selectform" :onpropertychange="onpropertychange(selectform)"></cd-form>
+      <cd-form slot="sandbox" :descriptor="[property.payload]" :payload="selectform" :onpropertychange="onpropertychange"></cd-form>
     </cd-prop-example>
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
-import CDInfo from '../generic/cd-doc-component-info.vue'
-import CdDocGeneric from '../generic/cd-doc-generic.vue'
+import CDInfo from '@/generic/cd-doc-component-info.vue'
+import CdDocGeneric from '@/generic/cd-doc-generic.vue'
 import inputype from '../common/inputtype'
-import CDForm from '../components/cd-form.vue'
-import CDSelect from '../components/cd-select.vue'
-import CDPropExample from '../generic/cd-prop-example.vue'
-import readyvaluesoptions from '../examples/propertyoptions'
+import CDForm from '@/components/cd-form.vue'
+import CDSelect from '@/components/cd-select.vue'
+import CDPropExample from '@/generic/cd-prop-example.vue'
+import readyvaluesoptions from '@/examples/propertyoptions.js'
 
 const countryParams = {
   limit: 10,
@@ -206,7 +206,7 @@ params: Function // функция, которая возвращает пара
             resolvepayload: home.resolveCountryPayload,
             isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
             onselect: (payload, option) => {
-              Vue.set(payload, 'countryIds', `${option.code},`)
+              if (option) Vue.set(payload, 'countryIds', `${option.code},`)
             }
           },
           {
@@ -236,14 +236,11 @@ params: Function // функция, которая возвращает пара
     }
   },
   methods: {
+    onpropertychange (...args) {
+      console.log(args)
+    },
     onpropertyselect (event) {
       this.selected = Number(event.target.value)
-    },
-    onpropertychange (payload) {
-      return (property, value) => {
-        Vue.set(payload, property.datafield, value)
-        // todo: after property changed
-      }
     },
     resolveCityPayload (payload) {
       return {

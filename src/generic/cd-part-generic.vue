@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import CDList from '../components/cd-list.vue'
+import CDList from '@/components/cd-list.vue'
 export default {
   name: 'cd-doc-part',
   components: {

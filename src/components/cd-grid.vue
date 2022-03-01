@@ -18,18 +18,21 @@
         </caption>
         <thead v-if="!hideheader" class="cd-grid--header">
           <tr v-for="(row, index) in header" :key="index" class="cd-grid--header-row">
-            <!-- если можно выбирать строки нарисуем колонку с чекбоксом -->
-            <!-- который показывается если index === 0, а rowspan берётся как кол-во строк в header -->
-            <th v-if="selectrows && index === 0"
-              class="cd-grid--header-cell cd-checkbox--cell"
-              :rowspan="header.length">
-              <!-- checked когда всё выбрано, по change выполняем onselectchange -->
-              <input class="cd-checkbox"
-                type="checkbox"
-                @change="onrowselect($event)"
-                :checked="allselected"
-              />
-            </th>
+            <template v-if="index === 0">
+              <!-- если можно выбирать строки нарисуем колонку с чекбоксом -->
+              <!-- который показывается если index === 0, а rowspan берётся как кол-во строк в header -->
+              <th v-if="selectrows"
+                class="cd-grid--header-cell cd-checkbox--cell"
+                :rowspan="header.length">
+                <!-- checked когда всё выбрано, по change выполняем onselectchange -->
+                <input class="cd-checkbox"
+                  type="checkbox"
+                  @change="onrowselect($event)"
+                  :checked="allselected"
+                />
+              </th>
+              <th v-if="servicecol"></th>
+            </template>
             <!-- теперь заголовки столбцов -->
             <!-- проходим в цикле по cols -->
             <!-- ставим colspan и rowspan из свойств col -->
@@ -56,13 +59,19 @@
                       :checked="isrowselected(row)"
                       />
               </td>
+              <td v-if="servicecol"></td>
               <template v-if="columns.length">
                  <!-- проходим в цикле по flatten -->
-              <!-- на td вешаем oncellclick(prop, row, $event) -->
+                <!-- на td вешаем oncellclick(prop, row, $event) -->
                 <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
-                    :key="prop.datafield + pindex">
+                    :key="prop.datafield + pindex" :class="resolvetdclass(prop, row)">
                     <slot :row="row" :prop="prop">
-                      <cd-cell :config="propertyconfig(prop, row)"></cd-cell>
+                      <template v-if="prop.icon">
+                        <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
+                      </template>
+                      <template v-else>
+                        <cd-cell :class="resolvecellclass(prop, row)" :config="propertyconfig(prop, row)"></cd-cell>
+                      </template>
                     </slot>
                 </td>
               </template>
@@ -91,7 +100,7 @@
       </table>
     </div>
     <div class="cd-grid--footer">
-      <cd-paging v-if="showPaging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage" :viewRange="pagesvisible"></cd-paging>
+      <cd-paging v-if="paging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage" :viewRange="pagesvisible"></cd-paging>
     </div>
   </div>
 </template>
@@ -113,13 +122,14 @@ export default {
     'cd-paging': paging
   },
   props: {
+    servicecol: { type: Boolean, default: false, description: 'Служебная колонка' },
     allownew: { type: Boolean, description: 'Можно ли добавлять новые строки в грид' },
     hideheader: { type: Boolean, default: false, description: 'Скрывать ли header грида' },
     filter: { type: Array, default: () => ([]), description: 'Коллекция объектов-дескрипторов свойств объекта payload (о нём было выше)' },
     usefilter: { type: Boolean, default: false, description: 'Использовать ли фильтр (показывать ли форму-редактор аргументов запроса получения данных)' },
     paging: { type: Boolean, default: false, description: 'Использовать ли постраничную загрузку' },
     total: { type: Number, description: 'При постраничной загрузке данных, эта штука возвращается контроллером вместе с коллекцией, означает сколько-всего-элементов-в-коллекции' },
-    pageSize: { type: Number, description: 'При постраничной загрузке данных, размер страницы в элементах' },
+    pageSize: { type: Number, default: 20, description: 'При постраничной загрузке данных, размер страницы в элементах' },
     onpagechange: { type: Function, description: 'Что проиозойдёт при смене страницы', default: function (event, pageargs) {} },
     selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' },
     pagesvisible: { type: Number, default: 5, description: 'Диапазон страниц, видимый без разрывов в компоненте постраничной загрузки' },
@@ -149,11 +159,26 @@ export default {
     propertyconfig: function () {
       return (property, row) => utils.propertyconfig.call(this, property, row, this.iscurrentrow(row), this.payload)
     },
-    showPaging: function () {
-      return this.paging && (this.pageSize < this.total)
-    },
     header: function () {
       return utils.headerrows(this.descriptor, this.payload)
+    },
+    resolveicon: function () {
+      return (prop, row) => {
+        if (typeof prop.icon === 'function') return prop.icon(row)
+        return prop.icon
+      }
+    },
+    resolvecellclass: function () {
+      return (prop, row) => {
+        if (typeof prop.cellclass === 'function') return prop.cellclass(row)
+        return prop.cellclass
+      }
+    },
+    resolvetdclass: function () {
+      return (prop, row) => {
+        if (typeof prop.tdclass === 'function') return prop.tdclass(row)
+        return prop.tdclass
+      }
     }
   },
   name: 'cd-grid',
@@ -174,6 +199,7 @@ export default {
   .cd-grid--cell {
     display: table-cell;
     padding: 5px;
+    vertical-align: middle;
   }
   .no-data--reload {
     cursor: pointer;
@@ -190,5 +216,11 @@ export default {
     padding-top: 50px;
     padding-bottom: 50px;
   }
-
+  .cd-grid--cell > .cd-cell {
+    display: block;
+  }
+  .table > :not(:first-child) {
+    border-color: inherit;
+    border-width: inherit;
+  }
 </style>

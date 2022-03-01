@@ -1,6 +1,7 @@
 export default {
   name: 'collection',
   props: {
+    config: { type: Object, description: 'Кажется, без нас никуда. Мы -- это настройки запроса. Возможно только Мы справимся с CORS, авторизацией на разных ендпойнтах и вообще чем угодно' },
     /**
      * без неё никуда
      * но шутка в том, что объект параметры-запроса может отличаться для разных
@@ -54,12 +55,6 @@ export default {
      * параметрами её будут payload и resolve
      */
     createnew: { type: Function, returns: Object, description: 'Функция, возвращающая объект, который будет добавлен в коллекцию' },
-    /**
-     * функция, выполняющаяся при редактировании элемента коллекции,
-     * в том числе нового
-     * обычно открывается диалог, в нём что-то делается, нажимается кнопка и уходит запрос
-     */
-    onedit: { type: Function },
     /**
      * строчка, которая будет написана на кнопке добавления новой строки
      */
@@ -120,39 +115,6 @@ export default {
         .catch((reason) => {
           local.error = reason
         })
-    },
-    delete (row) {
-      console.log('Deleting ', this.urls.remove, row)
-    },
-    update (row) {
-      console.log('Updating ', this.urls.update, row)
-    },
-    callcreate () {
-      const local = this
-      const create = new Promise((resolve) => {
-        local.createnew(local.payload, resolve)
-      }).then((newvalue) => {
-        local.onedit(newvalue, (payload) => {
-          local.$http(local.urls.add, payload)
-            .then((response) => {
-              if (Object.prototype.hasOwnProperty.call(response, 'success')) {
-                if (response.success) {
-                  local.collection.push(response.data)
-                } else if (Object.prototype.hasOwnProperty.call(response, 'message')) {
-                  console.error(response.message)
-                } else {
-                  console.error('something goes wrong')
-                }
-              } else {
-                console.info(response)
-              }
-            })
-            .catch((reason) => {
-              console.error(reason)
-            })
-        })
-      })
-      return create
     }
   }
 }

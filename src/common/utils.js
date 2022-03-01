@@ -65,7 +65,7 @@ function createInput (property, propertyholder, payload) {
     min: resolvePropertyValue(property, 'min', propertyholder),
     maxlength: resolvePropertyValue(property, 'maxlength', propertyholder),
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
-    checked: resolvePropertyValue(property, 'checked', propertyholder),
+    checked: propertyholder[property.datafield] === 1 || propertyholder[property.datafield] === true,
     placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
     ondebounce (value, event) { parent.onpropertychange(property, value) }
   })
@@ -91,6 +91,7 @@ function createSelect (property, propertyholder, payload) {
     labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
     payload: resolvePropertyValue(property, 'resolvepayload', propertyholder), // параметры получения данных,
     values: property.values,
+    resolvepayload: property.resolvepayload,
     clearable: property.clearable,
     get: {
       url: property.url,
@@ -103,7 +104,7 @@ function createSelect (property, propertyholder, payload) {
     // выполняем onselect
     onselect: (option) => {
       if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
-      if (parent.onpropertychange) parent.onpropertychange(property, option[property.valuekey])
+      if (parent.onpropertychange) parent.onpropertychange(property, option)
     }
   })
   return select
@@ -179,25 +180,27 @@ const flatterer = function (arr, accum) {
 const propertyconfig = function (property, propertyholder, isreadonly, payload = {}) {
   const ph = propertyholder
   const p = property
+  const parent = this
   return {
-    input: createInput.call(this, p, ph, payload),
-    select: p.input === 'select' ? createSelect.call(this, p, ph, payload) : undefined,
-    route: p.route ? createRouterLink.call(this, p, ph, payload) : undefined,
+    input: createInput.call(parent, p, ph, payload),
+    select: p.input === 'select' ? createSelect.call(parent, p, ph, payload) : undefined,
+    route: p.route ? createRouterLink.call(parent, p, ph, payload) : undefined,
     clearable: p.clearable,
     datafield: p.datafield,
     text: p.text,
     value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield],
     onchange (event) {
-
+      if (p.input === 'checkbox') {
+        p.toogle(ph)
+      }
     },
     onblur (event) {
-
     },
     oninput (event) {
-
     },
     reset (event) {
-      Vue.set(propertyholder, property.datafield, null)
+      Vue.set(ph, p.datafield, null)
+      if (p.reset !== undefined && typeof p.reset === 'function') p.reset(ph, parent)
     }
   }
 }

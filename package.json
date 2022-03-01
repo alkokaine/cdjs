@@ -22,6 +22,7 @@
     "bootstrap-icons": "^1.7.1",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
+    "moment": "^2.29.1",
     "vue": "^2.6.11",
     "vue-debounce": "^3.0.1",
     "vue-router": "^3.5.3"
@@ -42,11 +43,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
-    "isomorphic-fetch": "^3.0.0",
     "jest-extended": "^1.2.0",
-    "sass": "^1.26.5",
-    "sass-loader": "^8.0.2",
-    "v-tooltip": "^3.0.0-beta.4",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {

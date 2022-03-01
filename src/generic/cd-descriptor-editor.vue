@@ -16,9 +16,9 @@
 </template>
 
 <script>
-import options from '../examples/propertyoptions'
-import CDList from '../components/cd-list.vue'
-import CDForm from '../components/cd-form.vue'
+import options from '@/examples/propertyoptions.js'
+import CDList from '@/components/cd-list.vue'
+import CDForm from '@/components/cd-form.vue'
 
 export default {
   name: 'cd-descriptor-editor',

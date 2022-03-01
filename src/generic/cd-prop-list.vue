@@ -12,11 +12,11 @@
 
 <script>
 import Vue from 'vue'
-import basedescriptor from '@/examples/base-property-descriptor'
-import inputproperty from '@/examples/input-property-descriptor'
+import basedescriptor from '@/examples/base-property-descriptor.js'
+import inputproperty from '@/examples/input-property-descriptor.js'
 import elpopover from 'element-ui/packages/popover'
-import CDList from '../components/cd-list.vue'
-import CDForm from '../components/cd-form.vue'
+import CDList from '@/components/cd-list.vue'
+import CDForm from '@/components/cd-form.vue'
 
 export default {
   name: 'cd-prop-list',

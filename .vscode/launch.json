@@ -16,6 +16,15 @@
                 "--runInBand",
                 "--watchAll=false"
             ]
+        },
+        {
+            "name": "Chrome",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:8082",
+            "webRoot": "${workspaceRoot}/src",
+            "runtimeArgs": ["--disable-web-security"]
         }
+
     ]
 }

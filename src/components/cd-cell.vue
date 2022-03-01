@@ -14,6 +14,7 @@
       <cd-select :payload="config.select.payload"
         :keyfield="config.select.valuekey"
         :labelkey="config.select.labelkey"
+        :resolvepayload="config.select.resolvepayload"
         :value="config.value"
         :get="config.select.get"
         :collection="values"
@@ -26,20 +27,21 @@
         <textarea class="form-control form-control-sm" :id="config.datafield"/>
       </template>
       <template v-else-if="config.input">
-        <code v-if="config.input.type === 'code'" class="form-control form-control-sm">
-          {{ config.value }}
+        <code v-if="config.input.type === 'code'">
+          {{ value }}
         </code>
         <template v-else>
-          <input class="form-control form-control-sm" v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
-            :value="config.value" :required="config.required" :pattern="config.input.pattern"
-            :class="{'is-readonly': readonly}" :placeholder="config.input.placeholder"
+          <input v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
+            :value="value" :required="config.required" :pattern="config.input.pattern"
+            class="form-control form-control-sm"
+            :class="{'is-readonly': readonly, 'form-check-input': config.input.type === 'checkbox' }" :placeholder="config.input.placeholder"
             :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
             :maxlength="config.input.maxlength"
             :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
         </template>
       </template>
     </template>
-    <button v-if="config.clearable" class="btn bg-transparent cd-clear--button btn-sm" v-on:click.stop="config.reset"><i class="bi bi-x-circle" ></i></button>
+    <button v-if="config.clearable" class="btn bg-transparent cd-clear--button btn-sm" v-on:click.stop="onreset"><i class="bi bi-x-circle" ></i></button>
   </div>
 </template>
 
@@ -62,12 +64,17 @@ export default {
   },
   data (cell) {
     return {
+      value: cell.config.value,
       values: cell.config.select ? (cell.config.select.values || []) : []
     }
   },
   methods: {
     resolveresult (response) {
       this.values = this.config.select.resolveresult(response)
+    },
+    onreset () {
+      this.value = ''
+      this.config.reset()
     }
   }
 }

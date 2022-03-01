@@ -38,13 +38,13 @@
 
 <script>
 import Vue from 'vue'
-import CDDocGeneric from '../generic/cd-doc-generic.vue'
-import ComponentInfo from '../generic/cd-doc-component-info.vue'
-import CDGrid from '../components/cd-grid.vue'
-import CDForm from '../components/cd-form.vue'
-import CDTabs from '../components/cd-tabs.vue'
-import CDList from '../components/cd-list.vue'
-import CDPropList from '../generic/cd-prop-list.vue'
+import CDDocGeneric from '@/generic/cd-doc-generic.vue'
+import ComponentInfo from '@/generic/cd-doc-component-info.vue'
+import CDGrid from '@/components/cd-grid.vue'
+import CDForm from '@/components/cd-form.vue'
+import CDTabs from '@/components/cd-tabs.vue'
+import CDList from '@/components/cd-list.vue'
+import CDPropList from '@/generic/cd-prop-list.vue'
 export default {
   name: 'cd-doc-grid',
   components: {
@@ -109,25 +109,22 @@ export default {
             labelkey: 'name',
             url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
             method: 'get',
-            resolvepayload: {
+            resolvepayload: (payload) => ({
               params: {
                 offset: 0,
                 limit: 10
               }
-            },
+            }),
             resolveresult: (response) => response.data.data,
-            isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
+            isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
             onselect: (payload, option, parent) => {
-              const region = parent.descriptor.find(p => p.datafield === 'region_id')
-              Vue.set(region, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.code}/regions`)
-              if (view.grid.get.url !== 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities') {
-                Vue.nextTick(() => {
-                  Vue.set(view.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
-                })
+              if (option) {
+                const region = parent.descriptor.find(p => p.datafield === 'region_id')
+                Vue.set(region, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.code}/regions`)
+                Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=${option.code}`)
+              } else {
+                Vue.set(view.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
               }
-              Vue.nextTick(() => {
-                Vue.set(payload, 'countryIds', option.code)
-              })
             }
           },
           {
@@ -139,17 +136,15 @@ export default {
             url: '',
             method: 'get',
             resolveresult: (response) => response.data.data,
-            resolvepayload: {
+            resolvepayload: (payload) => ({
               params: {
                 offset: 0,
                 limit: 10
               }
-            },
-            isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
+            }),
+            isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
             onselect (payload, option, descriptor) {
-              setTimeout(() => {
-                Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
-              }, 1100)
+              if (option) Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
             }
           }
         ]
@@ -424,12 +419,15 @@ export default {
       }
     },
     onfilterchange (property, value) {
-      if (property.datafield !== 'region_id') {
-        if (property.datafield === 'countryIds') {
-          Vue.set(this.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
-        }
-        Vue.set(this.payload, property.datafield, value)
+      if (property.datafield === 'countryIds') {
+        Vue.set(this.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
       }
+      // if (property.datafield !== 'region_id') {
+      //   if (property.datafield === 'countryIds') {
+      //     Vue.set(this.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
+      //   }
+      //   Vue.set(this.payload, property.datafield, value)
+      // }
     },
     selectexample (event, args) {
       this.currentindex = args.index
