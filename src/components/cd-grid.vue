@@ -18,18 +18,21 @@
         </caption>
         <thead v-if="!hideheader" class="cd-grid--header">
           <tr v-for="(row, index) in header" :key="index" class="cd-grid--header-row">
-            <!-- если можно выбирать строки нарисуем колонку с чекбоксом -->
-            <!-- который показывается если index === 0, а rowspan берётся как кол-во строк в header -->
-            <th v-if="selectrows && index === 0"
-              class="cd-grid--header-cell cd-checkbox--cell"
-              :rowspan="header.length">
-              <!-- checked когда всё выбрано, по change выполняем onselectchange -->
-              <input class="cd-checkbox"
-                type="checkbox"
-                @change="onrowselect($event)"
-                :checked="allselected"
-              />
-            </th>
+            <template v-if="index === 0">
+              <!-- если можно выбирать строки нарисуем колонку с чекбоксом -->
+              <!-- который показывается если index === 0, а rowspan берётся как кол-во строк в header -->
+              <th v-if="selectrows"
+                class="cd-grid--header-cell cd-checkbox--cell"
+                :rowspan="header.length">
+                <!-- checked когда всё выбрано, по change выполняем onselectchange -->
+                <input class="cd-checkbox"
+                  type="checkbox"
+                  @change="onrowselect($event)"
+                  :checked="allselected"
+                />
+              </th>
+              <th v-if="servicecol"></th>
+            </template>
             <!-- теперь заголовки столбцов -->
             <!-- проходим в цикле по cols -->
             <!-- ставим colspan и rowspan из свойств col -->
@@ -56,9 +59,10 @@
                       :checked="isrowselected(row)"
                       />
               </td>
+              <td v-if="servicecol"></td>
               <template v-if="columns.length">
                  <!-- проходим в цикле по flatten -->
-              <!-- на td вешаем oncellclick(prop, row, $event) -->
+                <!-- на td вешаем oncellclick(prop, row, $event) -->
                 <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
                     :key="prop.datafield + pindex" :class="resolvetdclass(prop, row)">
                     <slot :row="row" :prop="prop">
@@ -118,6 +122,7 @@ export default {
     'cd-paging': paging
   },
   props: {
+    servicecol: { type: Boolean, default: false, description: 'Служебная колонка' },
     allownew: { type: Boolean, description: 'Можно ли добавлять новые строки в грид' },
     hideheader: { type: Boolean, default: false, description: 'Скрывать ли header грида' },
     filter: { type: Array, default: () => ([]), description: 'Коллекция объектов-дескрипторов свойств объекта payload (о нём было выше)' },
@@ -213,5 +218,9 @@ export default {
   }
   .cd-grid--cell > .cd-cell {
     display: block;
+  }
+  .table > :not(:first-child) {
+    border-color: inherit;
+    border-width: inherit;
   }
 </style>

@@ -22,8 +22,8 @@ import axios from 'axios'
 import CDMenu from './components/cd-menu.vue'
 // axios.defaults.baseURL = 'wft-geo-db.p.rapidapi.com'
 // axios.defaults.headers.common['x-rapidapi-host'] = 'wft-geo-db.p.rapidapi.com'
-// axios.defaults.headers.common['x-rapidapi-key'] = '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000'
-// axios.defaults.headers.common.Authorization = 'token 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'
+axios.defaults.headers.common['x-rapidapi-key'] = '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000'
+axios.defaults.headers.common.Authorization = 'token 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'
 Vue.prototype.$http = axios
 
 export default {

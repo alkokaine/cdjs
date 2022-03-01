@@ -322,13 +322,10 @@ export default {
 
 <style>
   .cd-month {
-    margin: 1em;
+
   }
   .month-header {
     text-align: center;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 2em;
   }
   .prev-month {
     opacity: 0.5;
