@@ -1,9 +1,16 @@
 import Vue from 'vue'
-const inputype = ['button', 'checkbox', 'color', 'date',
-  'datetime', 'datetime-local', 'email', 'file', 'month',
-  'number', 'password', 'radio', 'reset', 'tel', 'text',
-  'time', 'week']
 
+function range (start, end, step) {
+  return Array.from({ length: (end - start) / step + 1 }, (_, i) => start + i * step)
+}
+
+/**
+ * функция, удаляющая все свойства объекта object,
+ * которые имеют значение undefined
+ * @param {Object} object объект, за чистоту которого
+ * мы здесь боремся
+ * @returns чистый объект
+ */
 function compress (object) {
   for (const property in object) {
     if (!hasProperty.call(object, property) || object[property] === undefined) {
@@ -20,22 +27,36 @@ function compress (object) {
  * @param {String} propertyname имя разыскиваемого в object свойства
  * @param {Object} payload объект, от которого зависит результат вычисления свойства
  * object[propertyname]
+ * @param {Object} another ещё один объект, от которого зависит результат вычисления свойства
+ * object[propertyname]
  * @returns {any} undefined, если свойства propertyname в объекте object не содержится
  * значение свойства object.propertyname (если это свойство) или результат выполнения функции
  * object.propertyname(payload)
  */
-function resolvePropertyValue (object, propertyname, payload) {
+function resolvePropertyValue (object, propertyname, payload, another = undefined) {
   if (hasProperty.call(object, propertyname)) {
-    if (typeof object[propertyname] === 'function') return object[propertyname](payload)
+    if (typeof object[propertyname] === 'function') return object[propertyname](payload, another)
     return object[propertyname]
   }
   return undefined
 }
-
+function createRouterLink (property, propertyholder, payload) {
+  return resolvePropertyValue(property, 'route', propertyholder)
+}
+/**
+ * функция, возвращающая настройки поля <input>
+ * для свойства property с именем property.datafield
+ * объекта propertyholder,
+ * @param {Object} property дескриптор свойства property.datafield
+ * объекта propertyholder
+ * @param {Object} propertyholder объект, для свойства property.datafield
+ * мы получаем настройки элемента input
+ * @param {Object} payload какой-нибудь внешний объект, от которого может
+ * зависеть поведение элемента input
+ * @returns {Object} настройки элемента <input>
+ */
 function createInput (property, propertyholder, payload) {
-  if (hasProperty.call(property, 'input') && !inputype.includes(property.input)) {
-    console.warn(`[CDJS] Получено значение ${property.input}, ожидалось одно из ${inputype}`)
-  }
+  const parent = this
   return compress({
     type: (property.input || 'text'),
     pattern: resolvePropertyValue(property, 'pattern', propertyholder),
@@ -44,8 +65,9 @@ function createInput (property, propertyholder, payload) {
     min: resolvePropertyValue(property, 'min', propertyholder),
     maxlength: resolvePropertyValue(property, 'maxlength', propertyholder),
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
-    checked: resolvePropertyValue(property, 'checked', propertyholder),
-    placeholder: resolvePropertyValue(property, 'placeholder', propertyholder)
+    checked: propertyholder[property.datafield] === 1 || propertyholder[property.datafield] === true,
+    placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
+    ondebounce (value, event) { parent.onpropertychange(property, value) }
   })
 }
 
@@ -63,22 +85,29 @@ function createInput (property, propertyholder, payload) {
  * элемента формы select
  */
 function createSelect (property, propertyholder, payload) {
-  if (property) {
-    return compress({
-      valuekey: property.valuekey, // свойство ключа коллекции опций
-      labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
-      payload: () => property.params(propertyholder), // параметры получения данных
-      crud: { // объект, нужный для миксина коллекций
-        get: {
-          url: property.url, // урл получения данных
-          method: property.method // метод
-        }
-      },
-      resolveresult: property.resolveresult // функция, возвращающая итоговые данные
-      // для списка опций селекта
-    })
-  }
-  return undefined
+  const parent = this
+  const select = compress({
+    valuekey: property.valuekey, // свойство ключа коллекции опций
+    labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
+    payload: resolvePropertyValue(property, 'resolvepayload', propertyholder), // параметры получения данных,
+    values: property.values,
+    resolvepayload: property.resolvepayload,
+    clearable: property.clearable,
+    get: {
+      url: property.url,
+      method: property.method
+    },
+    resolveresult: property.resolveresult, // функция, возвращающая нужные данные
+    // для списка опций селекта из ответа сервера
+    // определяем, задизаблена ли опция
+    isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
+    // выполняем onselect
+    onselect: (option) => {
+      if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
+      if (parent.onpropertychange) parent.onpropertychange(property, option)
+    }
+  })
+  return select
 }
 
 const hasProperty = Object.prototype.hasOwnProperty
@@ -129,16 +158,51 @@ const flatterer = function (arr, accum) {
   }, accum)
 }
 
-const propertyconfig = function (property, propertyholder, payload = {}) {
+/**
+ * собственно ради чего всё задумывалось
+ * функция, возвращающая настройки клетки таблицы или поля на форме
+ * по объекту property (дескриптору свойства property.datafield
+ * объекта propertyholder)
+ * сюда бы хорошо передать компонент, который выполняет эту функцию,
+ * завести у него свойство типа хранилища и, при получении данных из API,
+ * иметь возможность запихнуть туда полученный датасет, таким образом мы сможем,
+ * гхм, регулировать посылаемые к API запросы, забирая из хранилища уже готовые
+ * данные
+ * впрочем, он может быть и в this
+ * @param {Object} property дескриптор свойства property.datafield
+ * объекта propertyholder
+ * @param {Object} propertyholder объект, свойство property.datafield
+ * которого мы хотим показать
+ * @param {Object} payload какой-нибудь внешний объект, от значений которого
+ * может зависеть настройки, возвращаемые этой фукнцией
+ * @returns {Object} настройки ячейки таблицы или поля на форме
+ */
+const propertyconfig = function (property, propertyholder, isreadonly, payload = {}) {
   const ph = propertyholder
   const p = property
-  return compress({
-    input: createInput(property, propertyholder, payload),
-    select: createSelect(property.select, propertyholder, payload),
-    datafield: property.datafield,
-    text: property.text,
-    value: () => ph[p.datafield]
-  })
+  const parent = this
+  return {
+    input: createInput.call(parent, p, ph, payload),
+    select: p.input === 'select' ? createSelect.call(parent, p, ph, payload) : undefined,
+    route: p.route ? createRouterLink.call(parent, p, ph, payload) : undefined,
+    clearable: p.clearable,
+    datafield: p.datafield,
+    text: p.text,
+    value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield],
+    onchange (event) {
+      if (p.input === 'checkbox') {
+        p.toogle(ph)
+      }
+    },
+    onblur (event) {
+    },
+    oninput (event) {
+    },
+    reset (event) {
+      Vue.set(ph, p.datafield, null)
+      if (p.reset !== undefined && typeof p.reset === 'function') p.reset(ph, parent)
+    }
+  }
 }
 
 /**
@@ -209,11 +273,26 @@ const headerrows = function (descriptor, payload, accum = []) {
   }))
   return accum
 }
+
+const extractarguments = function getArgs (func) {
+  if (func === undefined || func.length === 0) {
+    return []
+  }
+  const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
+  const ARGUMENT_NAMES = /([^\s,]+)/g
+
+  const fnStr = func.toString().replace(STRIP_COMMENTS, '')
+  var result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES)
+  if (result === null) result = []
+  return result
+}
 export default {
+  range,
   ispropertyeditable,
   ispropertyvisible,
   flatterer,
   propertyconfig,
   countchildren,
-  headerrows
+  headerrows,
+  extractarguments
 }

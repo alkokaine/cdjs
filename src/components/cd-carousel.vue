@@ -1,16 +1,15 @@
 <template>
-  <cd-list></cd-list>
+  <cd-list :collection="carousel"></cd-list>
 </template>
 
 <script>
 import CDList from './cd-list.vue'
-
 export default {
-  props: {
-
-  },
   components: {
     'cd-list': CDList
+  },
+  props: {
+    carousel: { type: Array }
   }
 }
 </script>

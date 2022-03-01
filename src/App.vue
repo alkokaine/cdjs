@@ -3,24 +3,15 @@
     <cd-menu class="doc-menu" :iscollapsed="iscollapsed" :menu="menu" :menuitemclicked="menuitemclick">
       <div slot="menu-header" class="cdjs-container" :class="{ 'is-collapsed': iscollapsed }">
         <div v-if="!iscollapsed" class="cdjs-name--block">
-          <span>[{ CDJS }]</span>
+          <router-link to="/">CDJS</router-link>
         </div>
-        <div class="cdjs-name--collapse">
-          <i class='collapse-menu' :class="[iscollapsed ? 'bi bi-list' : 'bi bi-x']" v-on:click="collapse"></i>
+        <div class="cdjs-name--collapse" v-on:click="collapse">
+          <i class='collapse-menu' :class="[iscollapsed ? 'bi bi-list' : 'bi bi-x']"></i>
         </div>
       </div>
     </cd-menu>
     <div class="content-wrapper" :class="{ 'is-collapsed': iscollapsed}">
-      <!-- <cd-grid :descriptor="descriptor"
-        :crud="crud"
-        keyfield="id"
-        :payload="payload"
-        :paging="true"
-        :resolvedata="getcitydata"
-        :total="metadata.totalCount"
-        :page="metadata.currentOffset"
-        :pageSize="payload.limit"></cd-grid> -->
-      <cd-form :descriptor="form" :payload="formpayload"></cd-form>
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -29,21 +20,16 @@
 import Vue from 'vue'
 import axios from 'axios'
 import CDMenu from './components/cd-menu.vue'
-// import CdGrid from './components/cd-grid.vue'
-import CDForm from './components/cd-form.vue'
-
-axios.defaults.baseURL = 'wft-geo-db.p.rapidapi.com'
-axios.defaults.headers.common['x-rapidapi-host'] = 'wft-geo-db.p.rapidapi.com'
+// axios.defaults.baseURL = 'wft-geo-db.p.rapidapi.com'
+// axios.defaults.headers.common['x-rapidapi-host'] = 'wft-geo-db.p.rapidapi.com'
 axios.defaults.headers.common['x-rapidapi-key'] = '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000'
-
+axios.defaults.headers.common.Authorization = 'token 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'
 Vue.prototype.$http = axios
 
 export default {
   name: 'App',
   components: {
-    'cd-menu': CDMenu,
-    // 'cd-grid': CdGrid,
-    'cd-form': CDForm
+    'cd-menu': CDMenu
   },
   data (app) {
     return {
@@ -54,9 +40,7 @@ export default {
       formpayload: {
         namePrefix: ''
       },
-      crud: {
-        get: { url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities', method: 'get' }
-      },
+      get: { url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities', method: 'get' },
       payload: {
         limit: 10,
         minPopulation: null,
@@ -101,15 +85,20 @@ export default {
       ],
       form: [
         {
+          datafield: 'namePrefix',
+          text: 'Поиск'
+        },
+        {
           select: {
             valuekey: 'wikiDataId',
             labelkey: 'name',
             url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
             method: 'get',
             resolveresult: (response) => (response.data.data),
+            isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
             params: (payload) => ({
               limit: 10,
-              namePrefix: payload.name
+              namePrefix: payload.namePrefix
             })
           },
           datafield: 'wikiDataId',
@@ -117,43 +106,64 @@ export default {
         }
       ],
       menu: [
-        { id: 1, icon: 'bi bi-list-ul', text: 'Список' },
-        { id: 2, icon: 'bi bi-menu-button-wide', text: 'Меню' },
+        { id: 1, icon: 'bi bi-list-ul', text: 'Список', url: '/Collection' },
+        { id: 13, icon: '', text: 'Вкладки', url: '/Tabs' },
         {
-          id: 3,
-          icon: 'bi bi-table',
-          text: 'Таблица',
+          id: 2,
+          icon: 'bi bi-menu-button-wide',
+          text: 'Меню',
+          url: '/Menu',
+          drop: true,
           menu: [
             {
               id: 5,
-              text: 'Table1',
+              text: 'восходящее',
+              is_drop: true,
               menu: [
-                { id: 8, text: 'Table1-Point1' },
-                { id: 9, text: 'Table1-Point2' },
-                { id: 10, text: 'Table1-Point3' }
+                {
+                  text: 'восходящее меню 1',
+                  id: 7
+                },
+                {
+                  text: 'восходящее меню 2',
+                  id: 8
+                },
+                {
+                  text: 'восходящее меню 3',
+                  id: 9
+                }
               ]
             },
-            { id: 6, text: 'Table2' },
             {
-              id: 7,
-              text: 'Table3',
+              id: 6,
+              text: 'падающее',
+              is_drop: false,
               menu: [
-                { id: 11, text: 'Table3-Point1' },
                 {
-                  id: 12,
-                  text: 'Table3-Point2',
-                  menu: [
-                    { id: 14, text: 'Table3-Point2-Point1' },
-                    { id: 15, text: 'Table3-Point2-Point2' },
-                    { id: 16, text: 'Table3-Point2-Point3' }
-                  ]
+                  text: 'падающее меню 1',
+                  id: 10
                 },
-                { id: 13, text: 'Table2-Point3' }
+                {
+                  text: 'падающее меню 2',
+                  id: 11
+                },
+                {
+                  text: 'падающее меню 3',
+                  id: 12
+                }
               ]
             }
           ]
         },
-        { id: 4, icon: 'bi bi-input-cursor-text', text: 'Форма' }
+        {
+          id: 3,
+          icon: 'bi bi-table',
+          text: 'Таблица',
+          url: '/Grid'
+        },
+        { id: 4, icon: 'bi bi-input-cursor-text', text: 'Форма', url: '/Form' },
+        { id: 10, text: 'Диалог', url: '/Dialog' },
+        { id: 14, text: 'Календарь', url: '/Calendar' }
       ],
       iscollapsed: window.innerWidth <= 1024,
       totalrows: 0
@@ -169,15 +179,15 @@ export default {
       return data.data
     },
     menuitemclick (event, scope) {
-      if (scope.row.url) console.log(scope)
+      if (scope.row.url && this.$route.path !== scope.row.url) this.$router.push(scope.row.url)
     }
   }
 }
 </script>
 
 <style>
-  /* @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&family=Raleway:wght@300;400&display=swap');*/
-  @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
+  @import '~bootstrap/dist/css/bootstrap.css';
+  @import '~bootstrap-icons/font/bootstrap-icons.css';
   :root {
     --icon-width: 40px;
     --icon-height: 40px;
