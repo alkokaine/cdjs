@@ -1,7 +1,7 @@
 <template>
   <cd-setting-container>
     <cd-form :payload="payload" :descriptor="settings" :onpropertychange="onpropertychange"></cd-form>
-    <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible">
+    <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false">
       <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :onpropertychange="onpropertychange"></cd-form>
       <cd-list slot-scope="day" listclass="list-unstyled" :collection="details(day.day)" keyfield="id">
         <div class="row" slot-scope="event">
