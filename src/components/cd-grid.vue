@@ -102,6 +102,7 @@
     <div class="cd-grid--footer">
       <cd-paging v-if="paging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage" :viewRange="pagesvisible"></cd-paging>
     </div>
+    <slot name="footer"></slot>
   </div>
 </template>
 
