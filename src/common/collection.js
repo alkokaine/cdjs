@@ -22,6 +22,9 @@ export default {
       returns: Array,
       description: 'возвращает ту часть ответа сервера, которую мы собирались поместить в коллекцию'
     },
+    onerror: {
+      type: Function
+    },
     /**
      * собственно, коллекция
      */
@@ -107,14 +110,17 @@ export default {
     loaddata (url, payload) {
       const local = this
       const request = local.$http[local.get.method]
-      request(url, local.resolvepayload(payload))
-        .then((response) => {
-          local.resolveresult(response)
-          local.error = false
-        })
-        .catch((reason) => {
-          local.error = reason
-        })
+      if (request !== undefined && typeof request === 'function') {
+        request(url, local.resolvepayload(payload))
+          .then((response) => {
+            local.resolveresult(response)
+            local.error = false
+          })
+          .catch((reason) => {
+            local.error = reason
+            if (local.onerror !== undefined && typeof local.onerror === 'function') local.onerror(reason)
+          })
+      }
     }
   }
 }
