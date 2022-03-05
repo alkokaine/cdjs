@@ -11,29 +11,42 @@
     </template>
     <template v-else>
     <template v-if="config.select">
-      <cd-select :payload="config.select.payload"
-        :keyfield="config.select.valuekey"
-        :labelkey="config.select.labelkey"
-        :resolvepayload="config.select.resolvepayload"
-        :value="config.value"
-        :get="config.select.get"
-        :collection="values"
-        :isdisabled="config.select.isdisabled"
+      <el-select v-model="value"
+        :multiple="config.select.multiple"
+        :value-key="config.select.valuekey"
         :clearable="config.select.clearable"
-        :resolveresult="resolveresult"
-        :onselect="config.select.onselect"></cd-select>
+        :multiple-limit="config.select.limit"
+        :placeholder="config.placeholder"
+        :filterable="config.select.filterable"
+        :collapse-tags="config.select.collapsetags"
+        :remote-method="config.select.remotemethod"
+        v-on:change="config.select.change(values, $event)"
+        v-on:blur="config.select.blur"
+        v-on:focus="config.select.focus"
+        v-on:remove-tag="config.select.removetag"
+        v-on:visible-change="config.select.visiblechange">
+        <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
+          <el-option slot="no-data" value="nodata" v-if="error">{{ error }}</el-option>
+          <el-option slot-scope="option" :value="option.row[config.select.valuekey]" :label="option.row[config.select.labelkey]">
+            <cd-list class="option-descriptor" v-if="config.select.descriptor" :collection="config.select.descriptor" :readonly="true" keyfield="datafield" listclass="list-unstyled">
+              <span slot-scope="prop">{{ option.row[prop.row.datafield] }}</span>
+            </cd-list>
+          </el-option>
+        </cd-list>
+      </el-select>
       </template>
       <template v-else-if="config.textarea">
         <textarea class="form-control form-control-sm" :id="config.datafield"/>
       </template>
       <template v-else-if="config.input">
-        <code v-if="config.input.type === 'code'">
+        <el-date-picker v-if="config.input.type === 'date'" :value="value"></el-date-picker>
+        <el-checkbox v-else-if="config.input.type === 'checkbox'" v-model="value"></el-checkbox>
+        <code v-else-if="config.input.type === 'code'">
           {{ value }}
         </code>
         <template v-else>
-          <input v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
+          <el-input v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
             :value="value" :required="config.required" :pattern="config.input.pattern"
-            class="form-control form-control-sm"
             :class="{'is-readonly': readonly, 'form-check-input': config.input.type === 'checkbox' }" :placeholder="config.input.placeholder"
             :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
             :maxlength="config.input.maxlength"
@@ -41,13 +54,13 @@
         </template>
       </template>
     </template>
-    <button v-if="config.clearable" class="btn bg-transparent cd-clear--button btn-sm" v-on:click.stop="onreset"><i class="bi bi-x-circle" ></i></button>
   </div>
 </template>
 
 <script>
 import { getDirective } from 'vue-debounce'
-import CDSelect from './cd-select.vue'
+import { DatePicker, Select, Input } from 'element-ui'
+import CDList from './cd-list.vue'
 
 export default {
   name: 'cd-cell',
@@ -55,7 +68,10 @@ export default {
     debounce: getDirective()
   },
   components: {
-    'cd-select': CDSelect
+    'el-select': Select,
+    'el-date-picker': DatePicker,
+    'el-input': Input,
+    'cd-list': CDList
   },
   props: {
     config: { type: Object, required: true },
@@ -65,16 +81,24 @@ export default {
   data (cell) {
     return {
       value: cell.config.value,
-      values: cell.config.select ? (cell.config.select.values || []) : []
+      values: cell.config.select ? (cell.config.select.values || []) : [],
+      error: Object
     }
   },
   methods: {
+    optionpropertyclass (...args) {
+      console.log(args)
+      return 'option-property'
+    },
     resolveresult (response) {
       this.values = this.config.select.resolveresult(response)
     },
     onreset () {
       this.value = ''
       this.config.reset()
+    },
+    onerror (reason) {
+      this.error = reason
     }
   }
 }
@@ -97,4 +121,17 @@ export default {
   .form-control:focus{
     box-shadow: 0 0 0 0.05rem rgb(13 110 253 / 25%)!important;
   }
+  .el-select-dropdown__item {
+    height: unset!important;
+    line-height: unset!important;
+  }
+  .option-descriptor {
+    display: contents;
+  }
+  .cd-select--options {
+    display: contents;
+  }
+</style>
+<style scoped>
+
 </style>

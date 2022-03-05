@@ -71,6 +71,26 @@ function createInput (property, propertyholder, payload) {
   })
 }
 
+function validate (parent, property, propertyholder, newvalue) {
+  const propertyRules = property.rules === undefined
+    ? []
+    : (
+      typeof property.rules === 'function'
+        ? property.rules(propertyholder)
+        : property.rules
+    )
+  const collectErrors = []
+  propertyRules.forEach(function (rule, index) {
+    if (Object.prototype.hasOwnProperty.call(rule, 'validator')) {
+    }
+  }, collectErrors)
+  console.log(collectErrors)
+  return {
+    result: collectErrors.length === 0,
+    errors: collectErrors
+  }
+}
+
 /**
  * функция, возвращающая настройки элемента
  * формы select с опциями, которые достаются по url
@@ -92,7 +112,42 @@ function createSelect (property, propertyholder, payload) {
     payload: resolvePropertyValue(property, 'resolvepayload', propertyholder), // параметры получения данных,
     values: property.values,
     resolvepayload: property.resolvepayload,
+    descriptor: property.slotdescriptor,
+    filterable: property.filterable,
+    multiple: property.multiple,
+    collapsetags: property.collapsetags,
     clearable: property.clearable,
+    change (values, newvalue) {
+      // новое значение
+      Vue.set(propertyholder, property.datafield, newvalue)
+      // результат валидации
+      const validateresult = validate(parent, property, propertyholder, newvalue)
+      if (validateresult.result) {
+        if (property.onselect && typeof property.onselect === 'function') {
+          property.onselect(propertyholder, values.find(v => v[property.valuekey] === newvalue), parent)
+        }
+      } else {
+        Vue.set(select, '$validateinfo', validateresult.errors)
+      }
+    },
+    visiblechange (visiblestate) {
+    },
+    removetag (tagkey) {
+    },
+    clear (...args) {
+    },
+    blur (focusevent) {
+    },
+    focus (focusevent) {
+    },
+    disabled: resolvePropertyValue(property, 'disabled', propertyholder),
+    remote: property.url !== undefined,
+    remotemethod (query) {
+      const request = parent.$http[property.method]
+      request(property.url, resolvePropertyValue(property, 'resolvepayload', propertyholder)).then((response) => {
+        Vue.set(select, 'values', property.resolveresult(response))
+      })
+    },
     get: {
       url: property.url,
       method: property.method
