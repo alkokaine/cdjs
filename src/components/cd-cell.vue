@@ -28,7 +28,7 @@
         <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
           <el-option slot="no-data" value="nodata" v-if="error">{{ error }}</el-option>
           <el-option slot-scope="option" :value="option.row[config.select.valuekey]" :label="option.row[config.select.labelkey]">
-            <cd-list class="option-descriptor" v-if="config.select.descriptor" :collection="config.select.descriptor" :readonly="true" keyfield="datafield" listclass="list-unstyled">
+            <cd-list class="option-descriptor" v-if="config.select.descriptor" :collection="config.select.descriptor" :readonly="true" keyfield="datafield" listclass="list-unstyled" :rowclass="config.select.optionclass">
               <span slot-scope="prop">{{ option.row[prop.row.datafield] }}</span>
             </cd-list>
           </el-option>

@@ -117,6 +117,7 @@ function createSelect (property, propertyholder, payload) {
     multiple: property.multiple,
     collapsetags: property.collapsetags,
     clearable: property.clearable,
+    optionclass: resolvePropertyValue(property, 'optionclass', propertyholder),
     change (values, newvalue) {
       // новое значение
       Vue.set(propertyholder, property.datafield, newvalue)
