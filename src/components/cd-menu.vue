@@ -3,7 +3,6 @@
   <cd-list :listclass="listclass" class="cd-menu--list"
     :onlistleave="onmenuleave"
     :listitementered="onmenuitementer"
-    :listitemclicked="onmenuclicked"
     :listleave="onmenuleave"
     :showitems="showitems"
     :keyfield="itemkey" :inner="inner"
@@ -14,7 +13,7 @@
       <slot name="menu-header"></slot>
     </div>
     <!-- для каждого элемента списка нарисуем такое -->
-    <div slot-scope="scope" class="cd-menu-item--block"
+    <div slot-scope="scope" class="cd-menu-item--block" v-on:click.stop="onmenuclicked($event, scope)"
       :class="{ 'is-collapsed': iscollapsed, 'is-active': isselected(scope), 'inner': inner, 'reversed': !scope.row.is_drop }">
       <!-- блок заголовка: -->
       <div class="cd-menu-item--header" :class="{'is-collapsed': iscollapsed, 'is-active': isselected(scope) }">

@@ -7,7 +7,7 @@
       </li>
       <li v-for="(row, index) in filtered"
         :key="rowkey(row)" class="cd-list--item" :class="rowclassResolved(row)"
-        v-on:click.stop="listitemclicked($event, { row, index })"
+        v-on:click="listitemclicked($event, { row, index })"
         v-on:mouseenter="listitementered($event, { row, index })"
         role="presentation">
         <slot :row="row" :index="index"></slot>
