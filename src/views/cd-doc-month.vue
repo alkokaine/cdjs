@@ -66,13 +66,17 @@ export default {
           input: 'select',
           valuekey: 'sport_id',
           labelkey: 'nazwa',
+          multiple: true,
+          filterable: true,
           clearable: true,
           url: '/olympic/olypi/sports',
           resolveresult: (response) => (response.data.sports),
           method: 'get',
           onselect (payload, option) {
             Vue.set(payload, 'sport_id', option.sport_id)
-          }
+          },
+          rules: (payload) => ([
+          ])
         }
       ],
       olympicpayload: {

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <cd-menu class="doc-menu" :iscollapsed="iscollapsed" :menu="menu" :menuitemclicked="menuitemclick">
+    <cd-menu class="doc-menu" :iscollapsed="iscollapsed" :menu="menu">
       <div slot="menu-header" class="cdjs-container" :class="{ 'is-collapsed': iscollapsed }">
         <div v-if="!iscollapsed" class="cdjs-name--block">
           <router-link to="/">CDJS</router-link>
@@ -112,7 +112,7 @@ export default {
           id: 2,
           icon: 'bi bi-menu-button-wide',
           text: 'Меню',
-          url: '/Menu',
+          // url: '/Menu',
           drop: true,
           menu: [
             {
@@ -229,12 +229,11 @@ export default {
     color: var(--menu-color);
     font-size: var(--font-size);
     height: 100%;
-    width: var(--menu-width);
     position: fixed;
     z-index: 1000;
   }
   .doc-menu.is-collapsed {
-    width: var(--collapsed-menu-width);
+    max-width: var(--collapsed-menu-width);
   }
   .content-wrapper {
     margin-left: var(--menu-width);

@@ -155,6 +155,17 @@ params: Function // функция, которая возвращает пара
           valuekey: 'wikiDataId',
           labelkey: 'name',
           url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+          slotdescriptor: [
+            {
+              datafield: 'code'
+            },
+            {
+              datafield: 'name'
+            },
+            {
+              datafield: 'wikiDataId'
+            }
+          ],
           method: 'get',
           resolveresult: (response) => response.data.data,
           resolvepayload: home.resolveCountryPayload,
@@ -202,6 +213,11 @@ params: Function // функция, которая возвращает пара
             labelkey: 'name',
             url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
             method: 'get',
+            slotdescriptor: [
+              {
+                datafield: 'wikiDataId'
+              }
+            ],
             resolveresult: (response) => response.data.data,
             resolvepayload: home.resolveCountryPayload,
             isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
