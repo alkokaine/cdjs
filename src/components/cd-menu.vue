@@ -1,24 +1,21 @@
 <template>
   <!-- основой для меню является cd-list -->
   <cd-list :listclass="listclass" class="cd-menu--list"
-    :keyfield="itemkey" :inner="inner"
-    :showitems="showitems"
-    :collection="menu"
-    :rowclass="resolverowclass">
+    :keyfield="itemkey" :inner="inner" :showitems="showitems"
+    :collection="menu" :rowclass="resolverowclass">
     <!-- слот заголовка списка обзовём слотом заголовка меню -->
     <div slot="header" class="cd-menu--header">
       <slot name="menu-header"></slot>
     </div>
     <!-- для каждого элемента списка нарисуем такое -->
-    <cd-menu-item slot-scope="scope"
-      :item="scope"
-      :inner="inner"
-      :iscollapsed="iscollapsed"
-      :isactive="scope.index === selected"
-      :onclick="onmenuclicked"
-      :class="[{ 'is-active': scope.index === selected, 'inner': inner }]">
-      <cd-menu v-if="scope.row[property] && scope.index == selected" class="cd-menu--inner" :name="scope.row[itemkey]" :inner="true" :iscollapsed="iscollapsed" :menu="scope.row[property]" :itemkey="itemkey" :icon="icon" :property="property" :text="text">
-      </cd-menu>
+    <cd-menu-item slot-scope="scope" :inner="inner"
+      :iscollapsed="iscollapsed" :isactive="scope.index === selected"
+      :onclick="onmenuclicked(scope)" :class="[{ 'is-active': scope.index === selected, 'inner': inner }]">
+      <i slot="icon" :class="scope.row[icon]"/>
+      <span slot="text">{{ scope.row[text] }}</span>
+      <cd-menu v-if="scope.row[property] && scope.index == selected" class="cd-menu--inner"
+        :name="scope.row[itemkey]" :inner="true" :iscollapsed="iscollapsed" :menu="scope.row[property]"
+        :itemkey="itemkey" :icon="icon" :property="property" :text="text"/>
     </cd-menu-item>
     <div slot="footer">
       <slot name="menu-footer"></slot>
@@ -105,17 +102,18 @@ export default {
         if (index === menu.selected) return 'cd-menu--item is-active'
         else return 'cd-menu--item'
       }
-    }
-  },
-  methods: {
-    onmenuclicked (event, scope) {
+    },
+    onmenuclicked () {
       const menu = this
-      if (menu.selected === scope.index) {
-        menu.selected = -1
-      } else {
-        menu.selected = scope.index
+      return (scope) => (event) => {
+        console.log(event)
+        if (menu.selected === scope.index) {
+          menu.selected = -1
+        } else {
+          menu.selected = scope.index
+        }
+        if (scope.row.url && scope.row.url !== menu.$route.path && (event.sender === 'text' || !menu.iscollapsed)) menu.$router.push(scope.row.url)
       }
-      if (scope.row.url) menu.$router.push(scope.row.url)
     }
   }
 }
@@ -128,67 +126,9 @@ export default {
     background-color: var(--menu-background);
   }
   .cd-menu--inner {
+    background-color: #006195;
   }
-  /* .cd-menu--list > ul {
-    display: block;
-    list-style-type: none;
-    padding-inline-start: 0;
+  .cd-menu--item.is-active {
+    background-color: #07305c;
   }
-  .cd-menu--children {
-    background-color: var(--menu-background);
-  }
-  .cd-menu--children.is-collapsed {
-    position: absolute;
-    left: 100%;
-    overflow: visible!important;
-    background-color: var(--menu-background);
-  }
-  .cd-menu-item--block {
-    transition-property: background-color, color;
-    transition-duration: 1s;
-    transition-timing-function: ease-out;
-  }
-  .cd-menu-item--block:hover {
-    transition-property: background-color, color;
-    transition-duration: 1s;
-    transition-timing-function: ease-out;
-    background-color: rgb(130, 166, 233);
-  }
-  .cd-menu-item--block.is-active {
-    background-color: rgb(130, 166, 233);
-  }
-  .cd-menu-item--icon, .cd-menu-item--text {
-    line-height: var(--menu-item-height);
-  }
-  .cd-menu-item--text {
-    padding-left: var(--menu-padding);
-  }
-  .cd-menu-item--icon {
-    min-height: var(--icon-height);
-    min-width: var(--icon-width);
-    line-height: var(--menu-item-height);
-    padding: var(--icon-padding);
-  }
-  .cd-menu--children.is-collapsed.is-active {
-    display: flex;
-    width: var(--menu-width);
-    flex-direction: column;
-  }
-  .cd-menu--list {
-    width: inherit;
-  }
-  .cd-menu-children--header {
-    background-color: black;
-    cursor: pointer;
-  }
-  .cd-menu-item--block.is-collapsed.is-active {
-    display: flex;
-  }
-  .cd-menu-item--header {
-    cursor: pointer;
-  }
-  .cd-menu-item--block.reversed {
-    display: flex;
-    flex-direction: column-reverse;
-  } */
 </style>

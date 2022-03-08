@@ -1,9 +1,13 @@
 <template>
   <div class="cd-menu-item">
-    <div class="cd-menu-a border-top" :class="[{ 'is-collapsed': iscollapsed, 'is-hover': ishover }]" v-on:click.stop="onclick($event, item)">
-      <div class="cd-menu--icon pb-2 pt-2 w-auto" :class="{ 'm-auto': iscollapsed && !inner, 'ps-1': !iscollapsed }"><i :class="[item.row.icon]"/></div>
+    <div class="cd-menu-a border-top" :class="[{ 'is-collapsed': iscollapsed, 'is-hover': ishover }]">
+      <div v-on:click.stop="onclick({ $event, sender: 'icon'})" class="cd-menu--icon pb-2 pt-2 w-auto" :class="{ 'm-auto': iscollapsed && !inner, 'ps-1': !iscollapsed }">
+        <slot name="icon"></slot>
+      </div>
       <div v-if="inner || !iscollapsed || (ishover || isactive)" class="cd-menu--text pb-2 pt-2" :class="{ 'show-up': !inner && iscollapsed && (ishover || isactive) }">
-        <div class="ps-2" :class="[{ 'is-collapsed': iscollapsed }, $vnode.data.class]">{{ item.row.text }}</div>
+        <div class="ps-2" :class="[{ 'is-collapsed': iscollapsed }, $vnode.data.class]" v-on:click.stop="onclick({ $event, sender: 'text'})">
+          <slot name="text"></slot>
+        </div>
       </div>
     </div>
     <div v-if="$slots.default" class="sub-items" :class="{ 'show-up': iscollapsed && (ishover || isactive), 'inner': inner, 'border-start border-1': !inner && iscollapsed }">
@@ -19,7 +23,6 @@ export default {
     isactive: { type: Boolean, default: false },
     onclick: { type: Function },
     iscollapsed: { type: Boolean },
-    item: { type: Object },
     inner: { type: Boolean, default: false }
   },
   data (mi) {
