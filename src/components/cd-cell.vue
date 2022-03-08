@@ -36,11 +36,8 @@
         </cd-list>
       </el-select>
       </template>
-      <template v-else-if="config.textarea">
-        <textarea class="form-control form-control-sm" :id="config.datafield"/>
-      </template>
       <template v-else-if="config.input">
-        <el-date-picker v-if="config.input.type === 'date'" :value="value" size="mini"></el-date-picker>
+        <el-date-picker v-if="config.input.type === 'date'" :value="config.value" :format="config.input.format"  value-format="timestamp"  size="mini"></el-date-picker>
         <el-checkbox v-else-if="config.input.type === 'checkbox'" v-model="value" size="mini"></el-checkbox>
         <code v-else-if="config.input.type === 'code'">
           {{ value }}

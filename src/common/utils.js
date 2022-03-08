@@ -64,6 +64,7 @@ function createInput (property, propertyholder, payload) {
     autosize: property.input === 'textarea' ? (resolvePropertyValue(property, 'autosize', propertyholder) || {}) : undefined,
     max: resolvePropertyValue(property, 'max', propertyholder),
     min: resolvePropertyValue(property, 'min', propertyholder),
+    displayformat: property.displayformat,
     maxlength: resolvePropertyValue(property, 'maxlength', propertyholder),
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
     checked: propertyholder[property.datafield] === 1 || propertyholder[property.datafield] === true,
@@ -245,7 +246,7 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
     clearable: p.clearable,
     datafield: p.datafield,
     text: p.text,
-    value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield],
+    value: ph[p.datafield],
     onchange (event) {
       if (p.input === 'checkbox') {
         p.toogle(ph)
