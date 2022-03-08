@@ -4,7 +4,7 @@
       <div v-on:click.stop="onclick({ $event, sender: 'icon'})" class="cd-menu--icon pb-2 pt-2 w-auto" :class="{ 'm-auto': iscollapsed && !inner, 'ps-1': !iscollapsed }">
         <slot name="icon"></slot>
       </div>
-      <div v-if="inner || !iscollapsed || (ishover || isactive)" class="cd-menu--text pb-2 pt-2" :class="{ 'show-up': !inner && iscollapsed && (ishover || isactive) }">
+      <div v-if="inner || !iscollapsed || (ishover || isactive)" class="cd-menu--text pb-2 pt-2" :class="{ 'show-up': !inner && iscollapsed && (ishover || isactive), 'w-100': !iscollapsed }">
         <div class="ps-2" :class="[{ 'is-collapsed': iscollapsed }, $vnode.data.class]" v-on:click.stop="onclick({ $event, sender: 'text'})">
           <slot name="text"></slot>
         </div>
