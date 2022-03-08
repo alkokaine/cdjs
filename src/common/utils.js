@@ -61,6 +61,7 @@ function createInput (property, propertyholder, payload) {
     type: (property.input || 'text'),
     pattern: resolvePropertyValue(property, 'pattern', propertyholder),
     name: property.datafield,
+    autosize: property.input === 'textarea' ? (resolvePropertyValue(property, 'autosize', propertyholder) || {}) : undefined,
     max: resolvePropertyValue(property, 'max', propertyholder),
     min: resolvePropertyValue(property, 'min', propertyholder),
     maxlength: resolvePropertyValue(property, 'maxlength', propertyholder),
