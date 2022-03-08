@@ -37,7 +37,7 @@
       </el-select>
       </template>
       <template v-else-if="config.input">
-        <el-date-picker v-if="config.input.type === 'date'" :value="config.value" :format="config.input.format"  value-format="timestamp"  size="mini"></el-date-picker>
+        <el-date-picker v-if="config.input.type === 'date'" v-model="value" :format="config.input.displayformat"  value-format="timestamp"  size="mini" v-on:change="config.onchange" v-on:blur="config.onblur" v-on:focus="config.onfocus"></el-date-picker>
         <el-checkbox v-else-if="config.input.type === 'checkbox'" v-model="value" size="mini"></el-checkbox>
         <code v-else-if="config.input.type === 'code'">
           {{ value }}
