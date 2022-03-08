@@ -17,7 +17,7 @@
       </template>
       <template v-else>
         <cd-cell :class="[resolvefieldclass(property), { 'inner': inner }]" :config="propertyconfig(property)" :readonly="readonly(property)">
-          <label class="cd-label form-label" :for="property.datafield" slot="label">{{ property.text }}</label>
+          <label class="cd-label form-label mb-0" :for="property.datafield" slot="label">{{ property.text }}</label>
         </cd-cell>
       </template>
     </div>
