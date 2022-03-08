@@ -16,6 +16,7 @@
         :value-key="config.select.valuekey"
         :clearable="config.select.clearable"
         :multiple-limit="config.select.limit"
+        size="mini"
         :placeholder="config.placeholder"
         :filterable="config.select.filterable"
         :collapse-tags="config.select.collapsetags"
@@ -39,8 +40,8 @@
         <textarea class="form-control form-control-sm" :id="config.datafield"/>
       </template>
       <template v-else-if="config.input">
-        <el-date-picker v-if="config.input.type === 'date'" :value="value"></el-date-picker>
-        <el-checkbox v-else-if="config.input.type === 'checkbox'" v-model="value"></el-checkbox>
+        <el-date-picker v-if="config.input.type === 'date'" :value="value" size="mini"></el-date-picker>
+        <el-checkbox v-else-if="config.input.type === 'checkbox'" v-model="value" size="mini"></el-checkbox>
         <code v-else-if="config.input.type === 'code'">
           {{ value }}
         </code>
@@ -50,6 +51,7 @@
             :class="{'is-readonly': readonly, 'form-check-input': config.input.type === 'checkbox' }" :placeholder="config.input.placeholder"
             :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
             :maxlength="config.input.maxlength"
+            size="mini"
             :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
         </template>
       </template>
