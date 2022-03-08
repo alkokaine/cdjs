@@ -106,7 +106,6 @@ export default {
     onmenuclicked () {
       const menu = this
       return (scope) => (event) => {
-        console.log(event)
         if (menu.selected === scope.index) {
           menu.selected = -1
         } else {
