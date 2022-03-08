@@ -6,7 +6,7 @@
         <slot name="no-data"></slot>
       </li>
       <li v-for="(row, index) in filtered"
-        :key="rowkey(row)" class="cd-list--item" :class="rowclassResolved(row)"
+        :key="rowkey(row)" class="cd-list--item" :class="rowclassResolved(row, index)"
         v-on:click="listitemclicked($event, { row, index })"
         v-on:mouseenter="listitementered($event, { row, index })"
         role="presentation">
@@ -68,9 +68,9 @@ export default {
     },
     rowclassResolved () {
       const list = this
-      return (row) => {
+      return (row, index) => {
         if (typeof list.rowclass === 'string') return list.rowclass
-        return list.rowclass(row)
+        return list.rowclass(row, index)
       }
     }
   }
