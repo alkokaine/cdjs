@@ -69,7 +69,7 @@ function createInput (property, propertyholder, payload) {
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
     checked: propertyholder[property.datafield] === 1 || propertyholder[property.datafield] === true,
     placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
-    ondebounce (value, event) { parent.onpropertychange(property, value) }
+    ondebounce (value, event) { parent.onpropertychange(propertyholder, property, value) }
   })
 }
 
@@ -162,7 +162,7 @@ function createSelect (property, propertyholder, payload) {
     // выполняем onselect
     onselect: (option) => {
       if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
-      if (parent.onpropertychange) parent.onpropertychange(property, option)
+      if (parent.onpropertychange) parent.onpropertychange(propertyholder, property, option)
     }
   })
   return select
@@ -253,8 +253,16 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
       }
     },
     onblur (event) {
+      console.log(event)
     },
     oninput (event) {
+      if (property.oninput && typeof property.oninput === 'function') {
+        property.oninput(propertyholder, event, payload)
+      }
+      Vue.set(propertyholder, property.datafield, event)
+      parent.onpropertychange(propertyholder, property, event)
+    },
+    onfocus (event) {
     },
     reset (event) {
       Vue.set(ph, p.datafield, null)
