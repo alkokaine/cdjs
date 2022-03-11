@@ -69,29 +69,32 @@ function createInput (property, propertyholder, payload) {
     minlength: resolvePropertyValue(property, 'minlength', propertyholder),
     checked: propertyholder[property.datafield] === 1 || propertyholder[property.datafield] === true,
     placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
-    ondebounce (value, event) { parent.onpropertychange(propertyholder, property, value) }
+    ondebounce (value, event) {
+      Vue.set(propertyholder, property.datafield, value)
+      parent.onpropertychange(propertyholder, property, value)
+    }
   })
 }
 
-function validate (parent, property, propertyholder, newvalue) {
-  const propertyRules = property.rules === undefined
-    ? []
-    : (
-      typeof property.rules === 'function'
-        ? property.rules(propertyholder)
-        : property.rules
-    )
-  const collectErrors = []
-  propertyRules.forEach(function (rule, index) {
-    if (Object.prototype.hasOwnProperty.call(rule, 'validator')) {
-    }
-  }, collectErrors)
-  console.log(collectErrors)
-  return {
-    result: collectErrors.length === 0,
-    errors: collectErrors
-  }
-}
+// function validate (parent, property, propertyholder, newvalue) {
+//   const propertyRules = property.rules === undefined
+//     ? []
+//     : (
+//       typeof property.rules === 'function'
+//         ? property.rules(propertyholder)
+//         : property.rules
+//     )
+//   const collectErrors = []
+//   propertyRules.forEach(function (rule, index) {
+//     if (Object.prototype.hasOwnProperty.call(rule, 'validator')) {
+//     }
+//   }, collectErrors)
+//   console.log(collectErrors)
+//   return {
+//     result: collectErrors.length === 0,
+//     errors: collectErrors
+//   }
+// }
 
 /**
  * функция, возвращающая настройки элемента
@@ -121,27 +124,39 @@ function createSelect (property, propertyholder, payload) {
     clearable: property.clearable,
     optionclass: resolvePropertyValue(property, 'optionclass', propertyholder),
     change (values, newvalue) {
-      // новое значение
-      Vue.set(propertyholder, property.datafield, newvalue)
-      // результат валидации
-      const validateresult = validate(parent, property, propertyholder, newvalue)
-      if (validateresult.result) {
+      if (newvalue !== '') {
+        Vue.set(propertyholder, property.datafield, newvalue)
         if (property.onselect && typeof property.onselect === 'function') {
           property.onselect(propertyholder, values.find(v => v[property.valuekey] === newvalue), parent)
         }
-      } else {
-        Vue.set(select, '$validateinfo', validateresult.errors)
       }
+      // // новое значение
+      // Vue.set(propertyholder, property.datafield, newvalue)
+      // // результат валидации
+      // const validateresult = validate(parent, property, propertyholder, newvalue)
+      // if (!validateresult.result) {
+      //   Vue.set(select, '$validateinfo', validateresult.errors)
+      // }
+      // if (property.onselect && typeof property.onselect === 'function') {
+      //   property.onselect(propertyholder, values.find(v => v[property.valuekey] === newvalue), parent)
+      // }
+      // if (parent.onpropertychange) parent.onpropertychange(propertyholder, property, option)
     },
     visiblechange (visiblestate) {
+      console.log('visible change')
     },
     removetag (tagkey) {
+      console.log('remove tag')
     },
-    clear (...args) {
+    clear () {
+      Vue.set(propertyholder, property.datafield, null)
+      if (property.reset && typeof property.reset === 'function') property.reset(propertyholder, parent)
     },
     blur (focusevent) {
+      console.log('blur')
     },
     focus (focusevent) {
+      console.log('focus')
     },
     disabled: resolvePropertyValue(property, 'disabled', propertyholder),
     remote: property.url !== undefined,
@@ -158,12 +173,11 @@ function createSelect (property, propertyholder, payload) {
     resolveresult: property.resolveresult, // функция, возвращающая нужные данные
     // для списка опций селекта из ответа сервера
     // определяем, задизаблена ли опция
-    isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
+    isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option)
     // выполняем onselect
-    onselect: (option) => {
-      if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
-      if (parent.onpropertychange) parent.onpropertychange(propertyholder, property, option)
-    }
+    // onselect: (option) => {
+    //   if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
+    // }
   })
   return select
 }
@@ -251,16 +265,18 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
       if (p.input === 'checkbox') {
         p.toogle(ph)
       }
+      parent.onpropertychange(propertyholder, property, event)
     },
     onblur (event) {
       console.log(event)
+      if (p.onblur && typeof p.onblur === 'function') {
+        p.onblur(ph, event)
+      }
     },
     oninput (event) {
       if (property.oninput && typeof property.oninput === 'function') {
         property.oninput(propertyholder, event, payload)
       }
-      Vue.set(propertyholder, property.datafield, event)
-      parent.onpropertychange(propertyholder, property, event)
     },
     onfocus (event) {
     },

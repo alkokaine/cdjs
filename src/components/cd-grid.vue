@@ -17,34 +17,29 @@
           <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(get.url, payload)">{{ error }}</div></slot>
         </caption>
         <thead v-if="!hideheader" class="cd-grid--header">
-          <tr v-for="(row, index) in header" :key="index" class="cd-grid--header-row">
-            <template v-if="index === 0">
-              <!-- если можно выбирать строки нарисуем колонку с чекбоксом -->
-              <!-- который показывается если index === 0, а rowspan берётся как кол-во строк в header -->
-              <th v-if="selectrows"
+          <tr class="cd-grid--header-row">
+            <th v-if="selectrows"
                 class="cd-grid--header-cell cd-checkbox--cell"
-                :rowspan="header.length">
+                :rowspan="1">
                 <!-- checked когда всё выбрано, по change выполняем onselectchange -->
                 <input class="cd-checkbox"
                   type="checkbox"
                   @change="onrowselect($event)"
-                  :checked="allselected"
-                />
-              </th>
-              <th v-if="servicecol"></th>
-            </template>
+                  :checked="allselected"/>
+            </th>
+            <th v-if="servicecol"></th>
             <!-- теперь заголовки столбцов -->
             <!-- проходим в цикле по cols -->
             <!-- ставим colspan и rowspan из свойств col -->
             <th class="cd-grid--header-cell"
-              v-for="(col, jindex) in row.cols"
+              v-for="(col, jindex) in columns"
               :key="jindex" :colspan="col.span" :rowspan="col.rowspan" :class="col.headerclass">
                 <div class="cd-grid--header-cell_content">
                   <span>{{ col.text }}</span>
                 </div>
             </th>
             <!-- показывать методы? index === 0? рисуем клетку с rowspan -->
-            <th v-if="showmethods && index === 0" :rowspan="header.length"></th>
+            <th v-if="showmethods" :rowspan="header.length"></th>
           </tr>
         </thead>
         <tbody class="cd-grid--table-content">
@@ -64,7 +59,7 @@
                  <!-- проходим в цикле по flatten -->
                 <!-- на td вешаем oncellclick(prop, row, $event) -->
                 <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
-                    :key="prop.datafield + pindex" :class="resolvetdclass(prop, row)">
+                    :key="propcellkey(prop, rindex, pindex)" :class="resolvetdclass(prop, row)">
                     <slot :row="row" :prop="prop">
                       <template v-if="prop.icon">
                         <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
@@ -81,7 +76,7 @@
               <!-- нарисуем строку с кнопками -->
               <td v-if="showmethods" class="cd-grid--cell method-row">
                   <cd-method-row
-                      :key="methodrowkey(row, index)"
+                      :key="methodrowkey(row, rindex)"
                       :methods="rowmethods(row)"
                       :payload="row"/>
               </td>
@@ -159,6 +154,9 @@ export default {
     },
     propertyconfig: function () {
       return (property, row) => utils.propertyconfig.call(this, property, row, this.iscurrentrow(row), this.payload)
+    },
+    propcellkey: function () {
+      return (prop, ri, pi) => `cell_${ri}_${pi}`
     },
     header: function () {
       return utils.headerrows(this.descriptor, this.payload)
