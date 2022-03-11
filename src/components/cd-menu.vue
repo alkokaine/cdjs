@@ -15,7 +15,7 @@
       <span slot="text">{{ scope.row[text] }}</span>
       <cd-menu v-if="scope.row[property] && scope.index == selected" class="cd-menu--inner"
         :name="scope.row[itemkey]" :inner="true" :iscollapsed="iscollapsed" :menu="scope.row[property]"
-        :itemkey="itemkey" :icon="icon" :property="property" :text="text"/>
+        :itemkey="itemkey" :icon="icon" :property="property" :text="text" :path="path"/>
     </cd-menu-item>
     <div slot="footer">
       <slot name="menu-footer"></slot>
@@ -70,7 +70,8 @@ export default {
     /**
      * расположение элементов меню
     */
-    vertical: { type: Boolean, default: true }
+    vertical: { type: Boolean, default: true },
+    path: { type: String, default: 'url' }
   },
   data (docmenu) {
     return {
@@ -111,7 +112,7 @@ export default {
         } else {
           menu.selected = scope.index
         }
-        if (scope.row.url && scope.row.url !== menu.$route.path && (event.sender === 'text' || !menu.iscollapsed)) menu.$router.push(scope.row.url)
+        if (scope.row[menu.path] && (event.sender === 'text' || !menu.iscollapsed)) menu.$router.push(scope.row[menu.path])
       }
     }
   }
