@@ -265,6 +265,9 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
       if (p.input === 'checkbox') {
         p.toogle(ph)
       }
+      if (p.input === 'datetime' || p.input === 'date') {
+        Vue.set(propertyholder, property, event)
+      }
       parent.onpropertychange(propertyholder, property, event)
     },
     onblur (event) {
