@@ -6,7 +6,9 @@
         <router-link :to="config.route">{{ config.value }}</router-link>
       </template>
       <template v-else>
-        <span>{{ config.value }}</span>
+        <template v-if="config.input.type === 'date'"></template>
+        <template v-else-if="config.input.type === 'datetime'"></template>
+        <template v-else><span>{{ config.value }}</span></template>
       </template>
     </template>
     <template v-else>
@@ -23,6 +25,7 @@
         :remote-method="config.select.remotemethod"
         v-on:change="config.select.change(values, $event)"
         v-on:blur="config.select.blur"
+        v-on:clear="config.select.clear"
         v-on:focus="config.select.focus"
         v-on:remove-tag="config.select.removetag"
         v-on:visible-change="config.select.visiblechange">
