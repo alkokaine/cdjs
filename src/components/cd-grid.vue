@@ -17,7 +17,7 @@
           <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(get.url, payload)">{{ error }}</div></slot>
         </caption>
         <thead v-if="!hideheader" class="cd-grid--header">
-          <tr class="cd-grid--header-row">
+          <tr class="cd-grid--header-row border-bottom">
             <th v-if="selectrows"
                 class="cd-grid--header-cell cd-checkbox--cell"
                 :rowspan="1">
@@ -27,7 +27,7 @@
                   @change="onrowselect($event)"
                   :checked="allselected"/>
             </th>
-            <th v-if="servicecol"></th>
+            <th class="cd-grid--header-cell"></th>
             <!-- теперь заголовки столбцов -->
             <!-- проходим в цикле по cols -->
             <!-- ставим colspan и rowspan из свойств col -->
@@ -39,46 +39,48 @@
                 </div>
             </th>
             <!-- показывать методы? index === 0? рисуем клетку с rowspan -->
-            <th v-if="showmethods" :rowspan="header.length"></th>
+            <th v-if="columns.length === 0" class="cd-grid--header-cell">
+            </th>
+            <th class="cd-grid--header-cell">
+            </th>
           </tr>
         </thead>
         <tbody class="cd-grid--table-content">
           <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
             <tr class="cd-grid--row" v-for="(row, rindex) in collection" :key="rowkey(row)">
-              <!-- можно выбирать строки? -->
               <td v-if="selectrows" class="cd-checkbox--cell">
-                  <input :id="cbkey(row, rindex)" class="cd-checkbox"
-                      type="checkbox"
-                      v-on:change="onrowselect($event, row)"
-                      :checked="isrowselected(row)"
-                      />
+                <input :id="cbkey(row, rindex)" class="cd-checkbox"
+                    type="checkbox"
+                    v-on:change="onrowselect($event, row)"
+                    :checked="isrowselected(row)"/>
               </td>
-              <td v-if="servicecol"></td>
-              <template v-if="columns.length">
-                 <!-- проходим в цикле по flatten -->
-                <!-- на td вешаем oncellclick(prop, row, $event) -->
-                <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
-                    :key="propcellkey(prop, rindex, pindex)" :class="resolvetdclass(prop, row)">
-                    <slot :row="row" :prop="prop">
+              <td class="cd-grid--cell" :ref="propcellkey({}, rindex, 0)">
+                <slot :data="{ row, $rowindex: rindex }" :start="true"></slot>
+              </td>
+              <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
+                    :key="propcellkey(prop, rindex, pindex)"
+                    :class="resolvetdclass(prop, row)"
+                    v-on:click="oncellclick(prop, { $event, row })">
+                    <slot :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
                       <template v-if="prop.icon">
                         <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
+                      </template>
+                      <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
+                        {{ formatDate(row[prop.datafield]) }}
                       </template>
                       <template v-else>
                         <cd-cell :class="resolvecellclass(prop, row)" :config="propertyconfig(prop, row)"></cd-cell>
                       </template>
                     </slot>
-                </td>
-              </template>
-              <template v-else>
-                <td class="cd-grid--cell">{{ row }}</td>
-              </template>
-              <!-- нарисуем строку с кнопками -->
-              <td v-if="showmethods" class="cd-grid--cell method-row">
-                  <cd-method-row
-                      :key="methodrowkey(row, rindex)"
-                      :methods="rowmethods(row)"
-                      :payload="row"/>
+              </td>
+              <td class="cd-grid--cell" v-if="columns.length === 0">
+                <slot :data="{ row, $rowindex: rindex }" :row="true">
+                  {{ row }}
+                </slot>
+              </td>
+              <td class="cd-grid--cell" :ref="propcellkey({}, rindex, 999)">
+                <slot :data="{ row, $rowindex: rindex }" :end="true"></slot>
               </td>
             </tr>
           </template>
@@ -111,6 +113,8 @@ import cell from './cd-cell.vue'
 import watchurl from '../common/get-url-watch'
 import paging from './cd-paging.vue'
 
+const formatter = new Intl.DateTimeFormat('ru-RU')
+
 export default {
   mixins: [collection, watchurl, props, methods, selection],
   components: {
@@ -139,6 +143,12 @@ export default {
       type: Array,
       required: true,
       description: 'Коллекция для отображения в гриде'
+    },
+    formatDate: {
+      type: Function,
+      default: function (date) {
+        return formatter.format(new Date(date))
+      }
     }
   },
   data (grid) {
@@ -189,6 +199,9 @@ export default {
       if (scope.row.pageNum > 0) this.currentpage = scope.row.pageNum
       else if (scope.row.pageNum < 0) this.currentpage += (scope.row.pageNum) * this.pagesvisible
       this.onpagechange(event, scope)
+    },
+    oncellclick (prop, event) {
+      if (prop.oncellclick && typeof prop.oncellclick === 'function') prop.oncellclick(event)
     }
   }
 }
