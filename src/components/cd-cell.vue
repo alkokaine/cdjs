@@ -1,46 +1,37 @@
 <template>
   <div class="cd-cell">
     <slot name="label"></slot>
-    <template v-if="readonly">
-      <template v-if="config.route">
-        <router-link :to="config.route">{{ config.value }}</router-link>
-      </template>
-      <template v-else>
-        <template v-if="config.input.type === 'date'"></template>
-        <template v-else-if="config.input.type === 'datetime'"></template>
-        <template v-else><span>{{ config.value }}</span></template>
-      </template>
-    </template>
-    <template v-else>
-    <template v-if="config.select">
-      <el-select v-model="value"
-        :multiple="config.select.multiple"
-        :value-key="config.select.valuekey"
-        :clearable="config.select.clearable"
-        :multiple-limit="config.select.limit"
-        size="mini"
-        :placeholder="config.placeholder"
-        :filterable="config.select.filterable"
-        :collapse-tags="config.select.collapsetags"
-        :remote-method="config.select.remotemethod"
-        v-on:change="config.select.change(values, $event)"
-        v-on:blur="config.select.blur"
-        v-on:clear="config.select.clear"
-        v-on:focus="config.select.focus"
-        v-on:remove-tag="config.select.removetag"
-        v-on:visible-change="config.select.visiblechange">
-        <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
-          <el-option slot="no-data" value="nodata" v-if="error">{{ error }}</el-option>
-          <el-option slot-scope="option" :value="option.row[config.select.valuekey]" :label="option.row[config.select.labelkey]">
-            <cd-list class="option-descriptor" v-if="config.select.descriptor" :collection="config.select.descriptor" :readonly="true" keyfield="datafield" listclass="list-unstyled" :rowclass="config.select.optionclass">
-              <span slot-scope="prop">{{ option.row[prop.row.datafield] }}</span>
-            </cd-list>
-          </el-option>
-        </cd-list>
-      </el-select>
+    <slot>
+      <template v-if="config.select">
+        <el-select v-model="value"
+          :multiple="config.select.multiple"
+          :value-key="config.select.valuekey"
+          :clearable="config.select.clearable"
+          :multiple-limit="config.select.limit"
+          :disabled="readonly"
+          size="mini"
+          :placeholder="config.placeholder"
+          :filterable="config.select.filterable"
+          :collapse-tags="config.select.collapsetags"
+          :remote-method="config.select.remotemethod"
+          v-on:change="config.select.change(values, $event)"
+          v-on:blur="config.select.blur"
+          v-on:clear="config.select.clear"
+          v-on:focus="config.select.focus"
+          v-on:remove-tag="config.select.removetag"
+          v-on:visible-change="config.select.visiblechange">
+          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
+            <el-option slot="no-data" value="nodata" v-if="error">{{ error }}</el-option>
+            <el-option slot-scope="option" :value="option.row[config.select.valuekey]" :label="option.row[config.select.labelkey]">
+              <cd-list class="option-descriptor" v-if="config.select.descriptor" :collection="config.select.descriptor" :readonly="true" keyfield="datafield" listclass="list-unstyled" :rowclass="config.select.optionclass">
+                <span slot-scope="prop">{{ option.row[prop.row.datafield] }}</span>
+              </cd-list>
+            </el-option>
+          </cd-list>
+        </el-select>
       </template>
       <template v-else-if="config.input">
-        <el-date-picker v-if="config.input.type === 'date'" v-model="value" :format="config.input.displayformat"  value-format="timestamp"  size="mini" v-on:change="config.onchange" v-on:blur="config.onblur" v-on:focus="config.onfocus"></el-date-picker>
+        <el-date-picker v-if="config.input.type === 'date'" v-model="value" :format="config.input.displayformat" :readonly="readonly" :editable="!readonly" value-format="timestamp"  size="mini" v-on:change="config.onchange" v-on:blur="config.onblur" v-on:focus="config.onfocus"></el-date-picker>
         <el-checkbox v-else-if="config.input.type === 'checkbox'" v-model="value" size="mini"></el-checkbox>
         <code v-else-if="config.input.type === 'code'">
           {{ value }}
@@ -55,7 +46,7 @@
             :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
         </template>
       </template>
-    </template>
+    </slot>
   </div>
 </template>
 
