@@ -20,7 +20,7 @@
           v-on:focus="config.select.focus"
           v-on:remove-tag="config.select.removetag"
           v-on:visible-change="config.select.visiblechange">
-          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
+          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :payload="config.select.payload" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
             <el-option slot="no-data" value="nodata" v-if="error">{{ error }}</el-option>
             <el-option slot-scope="option" :value="option.row[config.select.valuekey]" :label="option.row[config.select.labelkey]">
               <cd-list class="option-descriptor" v-if="config.select.descriptor" :collection="config.select.descriptor" :readonly="true" keyfield="datafield" listclass="list-unstyled" :rowclass="config.select.optionclass">
@@ -51,19 +51,15 @@
 </template>
 
 <script>
-import { getDirective } from 'vue-debounce'
-import { DatePicker, Select, Input } from 'element-ui'
-import CDList from './cd-list.vue'
 
+import CDList from './cd-list.vue'
+const { getDirective } = require('vue-debounce')
 export default {
   name: 'cd-cell',
   directives: {
     debounce: getDirective()
   },
   components: {
-    'el-select': Select,
-    'el-date-picker': DatePicker,
-    'el-input': Input,
     'cd-list': CDList
   },
   props: {
