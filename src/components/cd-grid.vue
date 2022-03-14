@@ -70,7 +70,7 @@
                         {{ formatDate(row[prop.datafield]) }}
                       </template>
                       <template v-else>
-                        <cd-cell :class="resolvecellclass(prop, row)" :config="propertyconfig(prop, row)"></cd-cell>
+                        {{ row[prop.datafield] }}
                       </template>
                     </slot>
               </td>
@@ -109,7 +109,6 @@ import selection from '../common/selection'
 import props from '../common/property-decorator'
 import methods from '../common/methods'
 import utils from '../common/utils'
-import cell from './cd-cell.vue'
 import watchurl from '../common/get-url-watch'
 import paging from './cd-paging.vue'
 
@@ -118,7 +117,6 @@ const formatter = new Intl.DateTimeFormat('ru-RU')
 export default {
   mixins: [collection, watchurl, props, methods, selection],
   components: {
-    'cd-cell': cell,
     'cd-paging': paging
   },
   props: {
