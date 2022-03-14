@@ -9,6 +9,7 @@
               <cd-fieldset class="cd-fieldset--root border-0" :class="rootclass" :descriptor="descriptor"
                 :isvisible="isvisible"
                 :readonly="isreadonly"
+                :editmode="editmode"
                 :inline="inline"
                 :propertyconfig="propertyconfig"
                 :resolvefieldclass="resolvefieldclass"></cd-fieldset>
