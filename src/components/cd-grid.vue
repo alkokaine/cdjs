@@ -66,6 +66,12 @@
                       <template v-if="prop.icon">
                         <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
                       </template>
+                      <template v-else-if="prop.route">
+                        <router-link :to="prop.route(row)">
+                          <template v-if="prop.format">{{ prop.format(row) }}</template>
+                          <template v-else>{{ row[prop.datafield] }}</template>
+                        </router-link>
+                      </template>
                       <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
                         {{ formatDate(row[prop.datafield]) }}
                       </template>
