@@ -143,20 +143,20 @@ function createSelect (property, propertyholder, payload) {
       // if (parent.onpropertychange) parent.onpropertychange(propertyholder, property, option)
     },
     visiblechange (visiblestate) {
-      console.log('visible change')
+      // console.log('visible change')
     },
     removetag (tagkey) {
-      console.log('remove tag')
+      // console.log('remove tag')
     },
     clear () {
       Vue.set(propertyholder, property.datafield, null)
       if (property.reset && typeof property.reset === 'function') property.reset(propertyholder, parent)
     },
     blur (focusevent) {
-      console.log('blur')
+      // console.log('blur')
     },
     focus (focusevent) {
-      console.log('focus')
+      // console.log('focus')
     },
     disabled: resolvePropertyValue(property, 'disabled', propertyholder),
     remote: property.url !== undefined,
@@ -271,7 +271,7 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
       parent.onpropertychange(propertyholder, property, event)
     },
     onblur (event) {
-      console.log(event)
+      // console.log(event)
       if (p.onblur && typeof p.onblur === 'function') {
         p.onblur(ph, event)
       }

@@ -4,7 +4,7 @@ export default {
     descriptor: {
       type: Array,
       default (payload) {
-        console.log(payload)
+        // console.log(payload)
         return []
       },
       description: 'Массив объектов-дескрипторов свойств, с которыми будет иметь дело декоратору'
@@ -12,7 +12,7 @@ export default {
     isvisible: {
       type: Function,
       default (property) {
-        console.log(Object.prototype.hasOwnProperty.call(property, 'hidden'))
+        // console.log(Object.prototype.hasOwnProperty.call(property, 'hidden'))
         return true
       },
       returns: Boolean,
@@ -21,7 +21,7 @@ export default {
     iseditable: {
       type: Function,
       default (property) {
-        console.log(Object.prototype.hasOwnProperty.call(property, 'canedit'))
+        // console.log(Object.prototype.hasOwnProperty.call(property, 'canedit'))
         return true
       },
       returns: Boolean,

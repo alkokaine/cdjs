@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     optionpropertyclass (...args) {
-      console.log(args)
+      // console.log(args)
       return 'option-property'
     },
     resolveresult (response) {
