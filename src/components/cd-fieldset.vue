@@ -4,6 +4,7 @@
     <div class="cd-field" :class="[{ 'inner' : inner}, property.class]" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
       <template v-if="hasdescriptor(property)">
         <cd-fieldset class="inner"
+            :editmode="editmode"
             :class="property.class"
             :isvisible="isvisible"
             :propertyconfig="propertyconfig"
@@ -16,7 +17,7 @@
         </cd-fieldset>
       </template>
       <template v-else>
-        <cd-cell :class="[resolvefieldclass(property), { 'inner': inner }]" :config="propertyconfig(property)" :readonly="readonly(property)">
+        <cd-cell :class="[resolvefieldclass(property), { 'inner': inner }]" :config="propertyconfig(property)" :readonly="!editmode || readonly(property)">
           <label class="cd-label form-label mb-0" :for="property.datafield" slot="label">{{ property.text }}</label>
         </cd-cell>
       </template>
@@ -34,6 +35,7 @@ export default {
   props: {
     propertyconfig: { type: Function },
     resolvefieldclass: { type: Function },
+    editmode: { type: Boolean, default: true },
     readonly: { type: Function },
     inline: { type: Boolean, default: false },
     inner: { type: Boolean, default: false }
