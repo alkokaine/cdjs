@@ -54,15 +54,6 @@ export default {
     // crud: { type: [Object, Function], description: '!!!!! кандидат на пересмотр !!!!! Пусть это будет объект с четырьма свойствами: get, update, delete, add { method: String, url: String }, для получения коллекции, добавления, удаления и редактирования объектов коллекци. В свойстве method будем указывать метод http запроса (post, get...) в свойстве url адрес метода ' },
     get: { type: Object, description: 'Объект, содержащий урл и заголовок метода' },
     /**
-     * функция, возвращающая новый объект коллекции
-     * параметрами её будут payload и resolve
-     */
-    createnew: { type: Function, returns: Object, description: 'Функция, возвращающая объект, который будет добавлен в коллекцию' },
-    /**
-     * строчка, которая будет написана на кнопке добавления новой строки
-     */
-    addnewheader: { type: String, default: 'Добавить новую строку', description: 'Строчка, что будет на кнопке добавления строки' },
-    /**
      * нужна ли постраничная загрузка
      */
     paging: { type: Boolean, default: false, description: 'Нужна ли постраничная загрузка' }
@@ -89,13 +80,6 @@ export default {
     }
   },
   computed: {
-    // вообще всё не так
-    // возможна ли вообще здесь crud как функция от payload, параметров загрузки данных
-    // поскольку payload известен там же, где и определение crud
-    // urls () {
-    //   if (typeof this.crud === 'function') return this.crud(this.payload)
-    //   return this.crud
-    // },
     rowkey () {
       const local = this
       return (row) => row[local.keyfield]
