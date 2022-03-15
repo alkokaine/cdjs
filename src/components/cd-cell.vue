@@ -20,7 +20,7 @@
           v-on:focus="config.select.focus"
           v-on:remove-tag="config.select.removetag"
           v-on:visible-change="config.select.visiblechange">
-          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :payload="config.select.payload" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
+          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :payload="config.select.payload" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
             <el-option slot="no-data" value="nodata" v-if="error">{{ error }}</el-option>
             <el-option slot-scope="option" :value="option.row[config.select.valuekey]" :label="option.row[config.select.labelkey]">
               <cd-list class="option-descriptor" v-if="config.select.descriptor" :collection="config.select.descriptor" :readonly="true" keyfield="datafield" listclass="list-unstyled" :rowclass="config.select.optionclass">
