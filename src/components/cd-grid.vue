@@ -3,89 +3,78 @@
     <div class="grid-tuner">
       <slot name="grid-tuner"></slot>
     </div>
-    <div class="cd-grid-buttons--row">
-      <button v-if="allownew" class="cd-grid--createnew" v-on:click="callcreate">
-        <span>
-          {{ addnewheader }}
-        </span>
-      </button>
-      <slot name="cd-grid-buttons"></slot>
+    <div class="grid-buttons--pane">
+      <slot name="grid-buttons"></slot>
     </div>
-    <div class="cd-grid--content">
-      <table class="table cd-grid--table table-responsive table-sm">
+    <div class="table-responsive">
+      <table class="table table-sm border-bottom" :class="[{ 'table-striped' : striped, 'table-hover': highlightOnHover }, borderclass ]">
         <caption>
           <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(get.url, payload)">{{ error }}</div></slot>
         </caption>
-        <thead v-if="!hideheader" class="cd-grid--header">
-          <tr class="cd-grid--header-row border-bottom">
-            <th v-if="selectrows"
-                class="cd-grid--header-cell cd-checkbox--cell"
-                :rowspan="1">
-                <!-- checked когда всё выбрано, по change выполняем onselectchange -->
-                <input class="cd-checkbox"
-                  type="checkbox"
-                  @change="onrowselect($event)"
-                  :checked="allselected"/>
+        <thead v-if="!hideheader" class="cd-grid--head table-light border-top" :class="headerclass">
+          <tr class="ms-0 me-0">
+            <th class="col cd-checkbox--cell">
+              <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event)" :checked="allselected"/>
             </th>
-            <th class="cd-grid--header-cell"></th>
-            <!-- теперь заголовки столбцов -->
-            <!-- проходим в цикле по cols -->
-            <!-- ставим colspan и rowspan из свойств col -->
-            <th class="cd-grid--header-cell"
-              v-for="(col, jindex) in columns"
-              :key="jindex" :colspan="col.span" :rowspan="col.rowspan" :class="col.headerclass">
-                <div class="cd-grid--header-cell_content">
-                  <span>{{ col.text }}</span>
-                </div>
-            </th>
-            <!-- показывать методы? index === 0? рисуем клетку с rowspan -->
-            <th v-if="columns.length === 0" class="cd-grid--header-cell">
-            </th>
-            <th class="cd-grid--header-cell">
-            </th>
+            <th scope="col">...</th>
+            <template v-if="columns.length">
+              <th scope="col"
+                v-for="(col, jindex) in columns"
+                :key="jindex" :class="col.headerclass">
+                  <div>
+                    <p class="mb-0">{{ col.text }}</p>
+                  </div>
+              </th>
+            </template>
+            <template v-else>
+              <th scope="col" class="w-100"></th>
+            </template>
+            <th scope="col"></th>
           </tr>
         </thead>
-        <tbody class="cd-grid--table-content">
+        <tbody>
           <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
-            <tr class="cd-grid--row" v-for="(row, rindex) in collection" :key="rowkey(row)">
-              <td v-if="selectrows" class="cd-checkbox--cell">
-                <input :id="cbkey(row, rindex)" class="cd-checkbox"
-                    type="checkbox"
-                    v-on:change="onrowselect($event, row)"
-                    :checked="isrowselected(row)"/>
+            <tr v-for="(row, rindex) in collection" :key="rowkey(row)" class="ms-0 me-0">
+              <td class="col cd-checkbox--cell">
+                <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event, row)" :checked="isrowselected(row)"/>
               </td>
-              <td class="cd-grid--cell" :ref="propcellkey({}, rindex, 0)">
+              <td :ref="propcellkey({}, rindex, 0)">
                 <slot :data="{ row, $rowindex: rindex }" :start="true"></slot>
               </td>
-              <td class="cd-grid--cell" v-for="(prop, pindex) in columns"
+              <td v-for="(prop, pindex) in columns"
                     :key="propcellkey(prop, rindex, pindex)"
-                    :class="resolvetdclass(prop, row)"
+                    :class="[resolvetdclass(prop, row), { 'text-center' : prop.input === 'checkbox'}]"
                     v-on:click="oncellclick(prop, { $event, row })">
                     <slot :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
-                      <template v-if="prop.icon">
-                        <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
-                      </template>
-                      <template v-else-if="prop.route">
-                        <router-link :to="prop.route(row)">
-                          <template v-if="prop.format">{{ prop.format(row) }}</template>
-                          <template v-else>{{ row[prop.datafield] }}</template>
-                        </router-link>
-                      </template>
-                      <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
-                        {{ formatDate(row[prop.datafield]) }}
-                      </template>
-                      <template v-else>
-                        {{ row[prop.datafield] }}
-                      </template>
+                      <div class="w-auto">
+                        <template v-if="prop.icon">
+                          <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
+                        </template>
+                        <template v-else-if="prop.route">
+                          <router-link :to="prop.route(row)">
+                            <template v-if="prop.format">{{ prop.format(row) }}</template>
+                            <template v-else>{{ row[prop.datafield] }}</template>
+                          </router-link>
+                        </template>
+                        <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
+                          {{ formatDate(row[prop.datafield]) }}
+                        </template>
+                        <template v-else-if="prop.input === 'checkbox'">
+                          <input class="form-check-input pe-none" type="checkbox" :checked="row[prop.datafield]"/>
+                        </template>
+                        <template v-else>
+                          {{ row[prop.datafield] }}
+                        </template>
+                      </div>
                     </slot>
               </td>
-              <td class="cd-grid--cell" v-if="columns.length === 0">
+              <td v-if="columns.length === 0">
                 <slot :data="{ row, $rowindex: rindex }" :row="true">
                   {{ row }}
                 </slot>
               </td>
-              <td class="cd-grid--cell" :ref="propcellkey({}, rindex, 999)">
+              <td :ref="propcellkey({}, rindex, 999)">
                 <slot :data="{ row, $rowindex: rindex }" :end="true"></slot>
               </td>
             </tr>
@@ -100,10 +89,18 @@
             </tr>
           </template>
         </tbody>
+        <tfoot class="container-sm border-top-0">
+          <slot name="table-footer"></slot>
+          <el-pagination class="p-2 m-auto" v-on:current-change="onpagechange({ page: $event, pageSize })"
+                           :current-page="$route.query.Page"
+                           :page-size="pageSize"
+                           layout="prev, pager, next"
+                           :hide-on-single-page="true"
+                           :total="total"
+                           background
+                           size="small"></el-pagination>
+        </tfoot>
       </table>
-    </div>
-    <div class="cd-grid--footer">
-      <cd-paging v-if="paging" :onpagechange="gridpagechange" :total="total" :pageSize="pageSize" :page="currentpage" :viewRange="pagesvisible"></cd-paging>
     </div>
     <slot name="footer"></slot>
   </div>
@@ -116,21 +113,26 @@ import props from '../common/property-decorator'
 import methods from '../common/methods'
 import utils from '../common/utils'
 import watchurl from '../common/get-url-watch'
-import paging from './cd-paging.vue'
 
 const formatter = new Intl.DateTimeFormat('ru-RU')
 
+const resolveborder = (borders) => {
+  switch (borders) {
+    case 'all': return 'table-bordered'
+    case 'rows': return ''
+    case 'cols': return ''
+    case 'none': return 'table-borderless'
+  }
+}
+
 export default {
   mixins: [collection, watchurl, props, methods, selection],
-  components: {
-    'cd-paging': paging
-  },
   props: {
-    servicecol: { type: Boolean, default: false, description: 'Служебная колонка' },
-    allownew: { type: Boolean, description: 'Можно ли добавлять новые строки в грид' },
+    headerclass: { type: String, description: 'Класс для элемента thead таблицы' },
+    borders: { type: String, validator: (value) => (['all', 'rows', 'cols', 'none'].indexOf(value) !== -1), default: 'rows' },
+    striped: { type: Boolean, default: false, description: 'zebra-striping' },
+    highlightOnHover: { type: Boolean, default: false, description: 'для подсветки строк при hover' },
     hideheader: { type: Boolean, default: false, description: 'Скрывать ли header грида' },
-    filter: { type: Array, default: () => ([]), description: 'Коллекция объектов-дескрипторов свойств объекта payload (о нём было выше)' },
-    usefilter: { type: Boolean, default: false, description: 'Использовать ли фильтр (показывать ли форму-редактор аргументов запроса получения данных)' },
     paging: { type: Boolean, default: false, description: 'Использовать ли постраничную загрузку' },
     total: { type: Number, description: 'При постраничной загрузке данных, эта штука возвращается контроллером вместе с коллекцией, означает сколько-всего-элементов-в-коллекции' },
     pageSize: { type: Number, default: 20, description: 'При постраничной загрузке данных, размер страницы в элементах' },
@@ -159,7 +161,8 @@ export default {
     return {
       // header: utils.headerrows(grid.descriptor, grid.payload),
       currentrow: {},
-      currentpage: 1
+      currentpage: 1,
+      borderclass: resolveborder(grid.borders)
     }
   },
   computed: {
@@ -199,11 +202,6 @@ export default {
     iscurrentrow (row) {
       return row[this.keyfield] === this.currentrow[this.keyfield] && this.currentrow[this.keyfield] !== undefined
     },
-    gridpagechange (event, scope) {
-      if (scope.row.pageNum > 0) this.currentpage = scope.row.pageNum
-      else if (scope.row.pageNum < 0) this.currentpage += (scope.row.pageNum) * this.pagesvisible
-      this.onpagechange(event, scope)
-    },
     oncellclick (prop, event) {
       if (prop.oncellclick && typeof prop.oncellclick === 'function') prop.oncellclick(event)
     }
@@ -212,31 +210,24 @@ export default {
 </script>
 
 <style>
-  .cd-grid--cell {
-    display: table-cell;
-    padding: 5px;
-    vertical-align: middle;
-  }
-  .no-data--reload {
-    cursor: pointer;
-    width: 300px;
-  }
-  .cd-grid {
-    margin: auto;
-  }
-  .cd-grid--table {
-    margin: auto;
+  .table {
+    table-layout: auto;
   }
   td.cd-grid--no-data {
     text-align: center;
     padding-top: 50px;
     padding-bottom: 50px;
   }
-  .cd-grid--cell > .cd-cell {
-    display: block;
+  ul.el-pager {
+    padding: unset;
   }
-  .table > :not(:first-child) {
-    border-color: inherit;
-    border-width: inherit;
+  .cd-grid--checkbox {
+    position: relative;
+    width: 20px;
+    padding: unset;
   }
+  tbody>tr>:nth-child(1){
+    background-color: lightgrey;
+    height: 100%;
+}
 </style>
