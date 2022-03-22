@@ -23,9 +23,8 @@
           <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :payload="config.select.payload" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
             <el-option slot="no-data" value="nodata" v-if="error">{{ error }}</el-option>
             <el-option slot-scope="option" :value="option.row[config.select.valuekey]" :label="option.row[config.select.labelkey]">
-              <cd-list class="option-descriptor" v-if="config.select.descriptor" :collection="config.select.descriptor" :readonly="true" keyfield="datafield" listclass="list-unstyled" :rowclass="config.select.optionclass">
-                <span slot-scope="prop">{{ option.row[prop.row.datafield] }}</span>
-              </cd-list>
+              <cd-props v-if="config.select.descriptor" :descriptor="config.select.descriptor" :payload="option.row"/>
+              <span v-else>{{ option.row[config.select.labelkey] }}</span>
             </el-option>
           </cd-list>
         </el-select>
@@ -51,8 +50,8 @@
 </template>
 
 <script>
-
 import CDList from './cd-list.vue'
+import CDProps from './cd-props.vue'
 const { getDirective } = require('vue-debounce')
 export default {
   name: 'cd-cell',
@@ -60,7 +59,8 @@ export default {
     debounce: getDirective()
   },
   components: {
-    'cd-list': CDList
+    'cd-list': CDList,
+    'cd-props': CDProps
   },
   props: {
     config: { type: Object, required: true },
