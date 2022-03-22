@@ -11,14 +11,14 @@ function range (start, end, step) {
  * мы здесь боремся
  * @returns чистый объект
  */
-function compress (object) {
-  for (const property in object) {
-    if (!hasProperty.call(object, property) || object[property] === undefined) {
-      delete object[property]
-    }
-  }
-  return object
-}
+// function compress (object) {
+//   for (const property in object) {
+//     if (!hasProperty.call(object, property) || object[property] === undefined) {
+//       delete object[property]
+//     }
+//   }
+//   return object
+// }
 
 /**
  *
@@ -57,7 +57,7 @@ function createRouterLink (property, propertyholder, payload) {
  */
 function createInput (property, propertyholder, payload) {
   const parent = this
-  return compress({
+  return {
     type: (property.input || 'text'),
     pattern: resolvePropertyValue(property, 'pattern', propertyholder),
     name: property.datafield,
@@ -73,7 +73,7 @@ function createInput (property, propertyholder, payload) {
       Vue.set(propertyholder, property.datafield, value)
       parent.onpropertychange(propertyholder, property, value)
     }
-  })
+  }
 }
 
 // function validate (parent, property, propertyholder, newvalue) {
@@ -111,7 +111,7 @@ function createInput (property, propertyholder, payload) {
  */
 function createSelect (property, propertyholder, payload) {
   const parent = this
-  const select = compress({
+  const select = {
     valuekey: property.valuekey, // свойство ключа коллекции опций
     labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
     payload: resolvePropertyValue(property, 'resolvepayload', propertyholder), // параметры получения данных,
@@ -178,7 +178,7 @@ function createSelect (property, propertyholder, payload) {
     // onselect: (option) => {
     //   if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
     // }
-  })
+  }
   return select
 }
 
