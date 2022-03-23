@@ -6,7 +6,7 @@
     <div class="grid-buttons--pane">
       <slot name="grid-buttons"></slot>
     </div>
-    <div class="table-responsive">
+    <div class="cd-grid--table">
       <table class="table table-sm border-bottom" :class="[{ 'table-striped' : striped, 'table-hover': highlightOnHover }, borderclass ]">
         <caption>
           <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(get.url, payload)">{{ error }}</div></slot>
@@ -21,13 +21,11 @@
               <th scope="col"
                 v-for="(col, jindex) in columns"
                 :key="jindex" :class="col.headerclass">
-                  <div>
-                    <p class="mb-0">{{ col.text }}</p>
-                  </div>
+                  <p class="mb-0">{{ col.text }}</p>
               </th>
             </template>
             <template v-else>
-              <th scope="col" class="w-100"></th>
+              <th scope="col"></th>
             </template>
             <th scope="col"></th>
           </tr>
@@ -89,9 +87,9 @@
             </tr>
           </template>
         </tbody>
-        <tfoot class="container-sm border-top-0">
-          <slot name="table-footer"></slot>
-          <el-pagination class="p-2 m-auto" v-on:current-change="onpagechange({ page: $event, pagesize: payload.PageSize })"
+        <tfoot class="border-top-0"></tfoot>
+      </table>
+      <el-pagination v-if="paging" class="p-2 m-auto" v-on:current-change="onpagechange({ page: $event, pagesize: payload.PageSize })"
                            :current-page="payload.Page"
                            :page-size="payload.PageSize"
                            layout="prev, pager, next"
@@ -99,10 +97,8 @@
                            :total="total"
                            background
                            size="small"></el-pagination>
-        </tfoot>
-      </table>
+        <slot name="table-footer"></slot>
     </div>
-    <slot name="footer"></slot>
   </div>
 </template>
 
@@ -128,6 +124,7 @@ const resolveborder = (borders) => {
 export default {
   mixins: [collection, watchurl, props, methods, selection],
   props: {
+    gridsettings: { type: String, description: 'Попробуем css grid' },
     headerclass: { type: String, description: 'Класс для элемента thead таблицы' },
     borders: { type: String, validator: (value) => (['all', 'rows', 'cols', 'none'].indexOf(value) !== -1), default: 'rows' },
     striped: { type: Boolean, default: false, description: 'zebra-striping' },
@@ -219,11 +216,6 @@ export default {
     padding-bottom: 50px;
   }
   ul.el-pager {
-    padding: unset;
-  }
-  .cd-grid--checkbox {
-    position: relative;
-    width: 20px;
     padding: unset;
   }
 </style>
