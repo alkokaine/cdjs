@@ -1,6 +1,6 @@
 {
   "name": "cdjs",
-  "version": "0.0.8-1",
+  "version": "0.0.8-3",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -44,6 +44,8 @@
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
     "jest-extended": "^1.2.0",
+    "sass": "^1.49.9",
+    "sass-loader": "^10.0",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
