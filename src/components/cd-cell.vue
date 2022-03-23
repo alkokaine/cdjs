@@ -9,6 +9,7 @@
           :clearable="config.select.clearable"
           :multiple-limit="config.select.limit"
           :disabled="readonly"
+          :class="config.class"
           size="mini"
           :placeholder="config.placeholder"
           :filterable="config.select.filterable"
@@ -20,7 +21,7 @@
           v-on:focus="config.select.focus"
           v-on:remove-tag="config.select.removetag"
           v-on:visible-change="config.select.visiblechange">
-          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :collection="values" :get="config.select.get" :resolveresult="resolveresult" :payload="config.select.payload" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
+          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :collection="values" :get="config.select" :resolveresult="resolveresult" :payload="config.select.payload" :keyfield="config.select.valuekey" :resolvepayload="config.select.resolvepayload" :onerror="onerror">
             <el-option slot="no-data" value="nodata" v-if="error">{{ error }}</el-option>
             <el-option slot-scope="option" :value="option.row[config.select.valuekey]" :label="option.row[config.select.labelkey]">
               <cd-props v-if="config.select.descriptor" :descriptor="config.select.descriptor" :payload="option.row"/>
@@ -30,15 +31,15 @@
         </el-select>
       </template>
       <template v-else-if="config.input">
-        <el-date-picker v-if="config.input.type === 'date'" v-model="value" :format="config.input.displayformat" :readonly="readonly" :editable="!readonly" value-format="timestamp"  size="mini" v-on:change="config.onchange" v-on:blur="config.onblur" v-on:focus="config.onfocus"></el-date-picker>
-        <el-checkbox v-else-if="config.input.type === 'checkbox'" v-model="value" size="mini"></el-checkbox>
+        <el-date-picker v-if="config.input.type === 'date'" :class="config.class" v-model="value" :format="config.input.displayformat" :readonly="readonly" :editable="!readonly" value-format="timestamp"  size="mini" v-on:change="config.onchange" v-on:blur="config.onblur" v-on:focus="config.onfocus"></el-date-picker>
+        <el-checkbox v-else-if="config.input.type === 'checkbox'" :class="config.class" v-model="value" size="mini"></el-checkbox>
         <code v-else-if="config.input.type === 'code'">
           {{ value }}
         </code>
         <template v-else>
-          <el-input v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
+          <el-input  v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
             v-model="value" :required="config.required" :pattern="config.input.pattern"
-            :class="{'is-readonly': readonly, 'form-check-input': config.input.type === 'checkbox' }" :placeholder="config.input.placeholder"
+            :class="[{'is-readonly': readonly, 'form-check-input': config.input.type === 'checkbox' }, config.class]" :placeholder="config.input.placeholder"
             :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
             :maxlength="config.input.maxlength"
             size="mini"
@@ -71,7 +72,8 @@ export default {
     return {
       value: cell.config.value,
       values: cell.config.select ? (cell.config.select.values || []) : [],
-      error: Object
+      error: Object,
+      get: {}
     }
   },
   methods: {
@@ -81,13 +83,15 @@ export default {
     },
     resolveresult (response) {
       this.values = this.config.select.resolveresult(response)
+      this.error = Object
     },
     onreset () {
-      this.value = ''
       this.config.reset()
     },
     onerror (reason) {
       this.error = reason
+      this.values = []
+      this.value = ''
     }
   }
 }

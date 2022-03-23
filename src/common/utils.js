@@ -166,10 +166,8 @@ function createSelect (property, propertyholder, payload) {
         Vue.set(select, 'values', property.resolveresult(response))
       })
     },
-    get: {
-      url: property.url,
-      method: property.method
-    },
+    url: property.url,
+    method: property.method,
     resolveresult: property.resolveresult, // функция, возвращающая нужные данные
     // для списка опций селекта из ответа сервера
     // определяем, задизаблена ли опция
@@ -259,6 +257,7 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
     route: p.route ? createRouterLink.call(parent, p, ph, payload) : undefined,
     clearable: p.clearable,
     datafield: p.datafield,
+    class: p.class,
     text: p.text,
     value: ph[p.datafield],
     onchange (event) {
