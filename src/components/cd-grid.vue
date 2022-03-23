@@ -13,10 +13,10 @@
         </caption>
         <thead v-if="!hideheader" class="cd-grid--head table-light border-top" :class="headerclass">
           <tr class="ms-0 me-0">
-            <th class="col cd-checkbox--cell">
+            <th v-if="selectrows" class="cd-checkbox--cell">
               <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event)" :checked="allselected"/>
             </th>
-            <th scope="col">...</th>
+            <th scope="col"></th>
             <template v-if="columns.length">
               <th scope="col"
                 v-for="(col, jindex) in columns"
@@ -36,7 +36,7 @@
           <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
             <tr v-for="(row, rindex) in collection" :key="rowkey(row)" class="ms-0 me-0">
-              <td class="col cd-checkbox--cell">
+              <td v-if="selectrows" class="cd-checkbox--cell">
                 <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event, row)" :checked="isrowselected(row)"/>
               </td>
               <td :ref="propcellkey({}, rindex, 0)">
@@ -91,9 +91,9 @@
         </tbody>
         <tfoot class="container-sm border-top-0">
           <slot name="table-footer"></slot>
-          <el-pagination class="p-2 m-auto" v-on:current-change="onpagechange({ page: $event, pageSize })"
-                           :current-page="$route.query.Page"
-                           :page-size="pageSize"
+          <el-pagination class="p-2 m-auto" v-on:current-change="onpagechange({ page: $event, pagesize: payload.PageSize })"
+                           :current-page="payload.Page"
+                           :page-size="payload.PageSize"
                            layout="prev, pager, next"
                            :hide-on-single-page="true"
                            :total="total"
@@ -226,8 +226,4 @@ export default {
     width: 20px;
     padding: unset;
   }
-  tbody>tr>:nth-child(1){
-    background-color: lightgrey;
-    height: 100%;
-}
 </style>

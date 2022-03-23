@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>{{ component.name }}</h3>
-    <cd-grid keyfield="propertyname" :collection="data" :descriptor="descriptor" :allownew="false"></cd-grid>
+    <cd-grid keyfield="propertyname" :collection="data" :descriptor="descriptor"></cd-grid>
   </div>
 </template>
 
