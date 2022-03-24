@@ -288,8 +288,6 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
     }
   }
 }
-
-
 /**
  * функция вычисляет colspan для колонки при определении таблицы
  * @param {Array} properties массив свойств, содержащихся в свойства descriptor
