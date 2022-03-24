@@ -61,8 +61,15 @@ export default {
           ],
           info: [
             {
+              id: 'home-0-0',
+              header: '0?',
+              description: [
+                ''
+              ]
+            },
+            {
               id: 'home-1-1',
-              header: 'Начнём',
+              header: '...',
               description: [
                 'Поведение через определение. За этими простыми словами скрывается не менее простая идея'
               ],
@@ -253,7 +260,7 @@ params: Function // функция, которая возвращает пара
   },
   methods: {
     onpropertychange (...args) {
-      console.log(args)
+      // console.log(args)
     },
     onpropertyselect (event) {
       this.selected = Number(event.target.value)

@@ -3,35 +3,53 @@
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
     <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
-      <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
-      <cd-grid v-if="grid" class="example-grid" ref="example" :keyfield="grid.keyfield"
-        :get="grid.get"
-        :payload="payload"
-        :descriptor="grid.descriptor"
-        :resolveresult="grid.resolveresult"
-        :resolvepayload="grid.resolvepayload"
-        :collection="collection"
-        :total="total"
-        :paging="grid.paging"
-        :pageSize="10"
-        :onpagechange="onpagechange">
-        <div slot="grid-tuner">
-          <div v-if="currentindex === 2">
-            <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
-              <div slot="header">
-                <div v-for="(text, index) in tutorial[step].text" :key="index">{{ text }}</div>
-                <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-prop-list>
-              </div>
-              <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
-            </cd-list>
+      <div>
+        <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
+        <cd-grid v-if="grid" class="example-grid" ref="example" :keyfield="grid.keyfield"
+          :get="grid.get"
+          :payload="payload"
+          :descriptor="grid.descriptor"
+          :resolveresult="grid.resolveresult"
+          :resolvepayload="grid.resolvepayload"
+          :collection="collection"
+          :selectrows="true"
+          :total="total"
+          :paging="grid.paging"
+          :pageSize="10"
+          :onpagechange="onpagechange">
+          <div slot="grid-tuner">
+            <div v-if="currentindex === 2">
+              <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
+                <div slot="header">
+                  <div v-for="(text, index) in tutorial[step].text" :key="index">{{ text }}</div>
+                  <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-prop-list>
+                </div>
+                <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
+              </cd-list>
+            </div>
+            <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter"
+              :payload="payload"
+              :inline="true"
+              :onpropertychange="onfilterchange">
+            </cd-form>
           </div>
-          <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter"
-            :payload="payload"
-            :inline="true"
-            :onpropertychange="onfilterchange">
-          </cd-form>
-        </div>
-      </cd-grid>
+          <template slot-scope="scope">
+            <template v-if="!scope.property">
+              <template>
+                <template v-if="scope.start">
+                  <span></span>
+                </template>
+                <template v-else-if="scope.end">
+                  <span></span>
+                </template>
+                <template v-else-if="scope.data.row">
+                  {{ scope.data.row }}
+                </template>
+              </template>
+            </template>
+          </template>
+        </cd-grid>
+      </div>
     </cd-tabs>
   </div>
 </template>
@@ -401,7 +419,7 @@ export default {
     }
   },
   methods: {
-    onsettingchanged (property, value) {
+    onsettingchanged (propertyholder, property, value) {
       console.log(property, value)
     },
     generateproperties () {
@@ -418,7 +436,7 @@ export default {
         params: payload
       }
     },
-    onfilterchange (property, value) {
+    onfilterchange (propertyholder, property, value) {
       if (property.datafield === 'countryIds') {
         Vue.set(this.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
       }
@@ -439,8 +457,8 @@ export default {
       Vue.set(this, 'total', response.data.metadata.totalCount)
       Vue.set(this, 'collection', response.data.data)
     },
-    onpagechange (event, pageargs) {
-      Vue.set(this.payload, 'offset', pageargs.row.offset)
+    onpagechange (newpage) {
+      Vue.set(this.payload, 'offset', (newpage.page - 1) * newpage.pageSize)
     },
     onremoveproperty (property) {
       this.hasremoved = true

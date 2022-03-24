@@ -2,7 +2,7 @@
   <div>
     <cd-doc :content="content"></cd-doc>
     <cd-info property="props" :component="form"></cd-info>
-    <cd-form :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange"></cd-form>
+    <cd-form :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange" :editmode="false"></cd-form>
   </div>
 </template>
 
@@ -37,7 +37,7 @@ export default {
   },
   methods: {
     onpropertychange (...args) {
-      console.log(args)
+      // console.log(args)
     }
   }
 }

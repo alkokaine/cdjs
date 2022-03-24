@@ -129,7 +129,8 @@ export default {
     checkday (exist, check) {
       return exist.day === check.date.getDate() && exist.date.getMonth() === check.date.getMonth()
     },
-    onpropertychange (args) {
+    onpropertychange (...args) {
+      // console.log(...args)
     },
     createnewevent (dates) {
       const dm = this
