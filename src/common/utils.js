@@ -265,7 +265,7 @@ const propertyconfig = function (property, propertyholder, isreadonly, payload =
         p.toogle(ph)
       }
       if (p.input === 'datetime' || p.input === 'date') {
-        Vue.set(propertyholder, property, event)
+        Vue.set(ph, p.datafield, new Date(event))
       }
       parent.onpropertychange(propertyholder, property, event)
     },
