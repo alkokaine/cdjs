@@ -370,6 +370,7 @@ const extractarguments = function getArgs (func) {
   return result
 }
 export default {
+  resolvePropertyValue,
   range,
   ispropertyeditable,
   ispropertyvisible,
