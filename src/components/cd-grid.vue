@@ -44,7 +44,8 @@
                     :key="propcellkey(prop, rindex, pindex)" class="cd-grid--cell"
                     :class="[resolvetdclass(prop, row), { 'text-center' : prop.input === 'checkbox'}]"
                     v-on:click="oncellclick(prop, { $event, row })">
-                    <el-popover class="cd-grid--tooltip" :disabled="hasnopopover(prop)" :popper-class="resolvepopperclass(prop, row)"
+                    <el-popover class="cd-grid--tooltip"
+                                :disabled="hasnopopover(prop) || isdisabledpopover(prop, row)" :popper-class="resolvepopperclass(prop, row)"
                                 :trigger="resolvepopovertrigger(prop, row)"
                                 v-on:hide="onpopoverhide($event, { prop, row })"
                                 v-on:show="onpopovershow($event, { prop, row })"
@@ -180,6 +181,10 @@ export default {
     }
   },
   computed: {
+    isdisabledpopover () {
+      const grid = this
+      return (property, row) => (grid.resolvepopoverproperty(property, 'isdisabled', row))
+    },
     resolvepopover () {
       return (property, row) => (utils.resolvePropertyValue(property, 'popover', row) || {})
     },
