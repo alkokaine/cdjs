@@ -41,31 +41,49 @@
                 <slot :data="{ row, $rowindex: rindex }" :start="true"></slot>
               </td>
               <td v-for="(prop, pindex) in columns"
-                    :key="propcellkey(prop, rindex, pindex)"
+                    :key="propcellkey(prop, rindex, pindex)" class="cd-grid--cell"
                     :class="[resolvetdclass(prop, row), { 'text-center' : prop.input === 'checkbox'}]"
                     v-on:click="oncellclick(prop, { $event, row })">
-                    <slot :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
-                      <div class="w-auto">
-                        <template v-if="prop.icon">
-                          <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
-                        </template>
-                        <template v-else-if="prop.route">
-                          <router-link :to="prop.route(row)">
-                            <template v-if="prop.format">{{ prop.format(row) }}</template>
-                            <template v-else>{{ row[prop.datafield] }}</template>
-                          </router-link>
-                        </template>
-                        <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
-                          {{ formatDate(row[prop.datafield]) }}
-                        </template>
-                        <template v-else-if="prop.input === 'checkbox'">
-                          <input class="form-check-input pe-none" type="checkbox" :checked="row[prop.datafield]"/>
-                        </template>
-                        <template v-else>
-                          {{ row[prop.datafield] }}
-                        </template>
-                      </div>
-                    </slot>
+                    <el-popover class="cd-grid--tooltip" :disabled="hasnopopover(prop)" :popper-class="resolvepopperclass(prop, row)"
+                                :trigger="resolvepopovertrigger(prop, row)"
+                                v-on:hide="onpopoverhide($event, { prop, row })"
+                                v-on:show="onpopovershow($event, { prop, row })"
+                                v-on:after-leave="onpopoverleave($event, { prop, row })"
+                                v-on:after-enter="onpopoverenter($event, { prop, row })"
+                                :width="resolvepopoverwidth(prop, row)"
+                                :popper-options="resolvepopoveroptions(prop, row)"
+                                :title="resolvepopovertitle(prop, row)"
+                                :content="resolvepopovercontent(prop, row)">
+                      <template v-if="prop.popover">
+                        <slot :ispopover="true" :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
+                          <span class="cd-popover--default">укажите содержимое подсказки для свойства {{ prop.datafield }}</span>
+                        </slot>
+                      </template>
+                      <template slot="reference">
+                        <slot :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
+                          <div class="w-auto">
+                            <template v-if="prop.icon">
+                              <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
+                            </template>
+                            <template v-else-if="prop.route">
+                              <router-link :to="prop.route(row)">
+                                <template v-if="prop.format">{{ prop.format(row) }}</template>
+                                <template v-else>{{ row[prop.datafield] }}</template>
+                              </router-link>
+                            </template>
+                            <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
+                              {{ formatDate(row[prop.datafield]) }}
+                            </template>
+                            <template v-else-if="prop.input === 'checkbox'">
+                              <input class="form-check-input pe-none" type="checkbox" :checked="row[prop.datafield]"/>
+                            </template>
+                            <template v-else>
+                              {{ row[prop.datafield] }}
+                            </template>
+                          </div>
+                        </slot>
+                      </template>
+                    </el-popover>
               </td>
               <td v-if="columns.length === 0">
                 <slot :data="{ row, $rowindex: rindex }" :row="true">
@@ -156,13 +174,48 @@ export default {
   },
   data (grid) {
     return {
-      // header: utils.headerrows(grid.descriptor, grid.payload),
       currentrow: {},
       currentpage: 1,
       borderclass: resolveborder(grid.borders)
     }
   },
   computed: {
+    resolvepopover () {
+      return (property, row) => (utils.resolvePropertyValue(property, 'popover', row) || {})
+    },
+    resolvepopperclass () {
+      const grid = this
+      return (prop, row) => (`${(grid.resolvepopoverproperty(prop, 'class', row) || 'cd-popover--content')}`)
+    },
+    resolvepopoveroptions: function () {
+      const grid = this
+      return (prop, row) => (grid.resolvepopoverproperty(prop, 'options', row) || {
+        placement: 'auto-start'
+      })
+    },
+    resolvepopovertrigger: function () {
+      const grid = this
+      return (prop, row) => (grid.resolvepopoverproperty(prop, 'trigger', row) || 'hover')
+    },
+    // resolvepopoverplacement: function () {
+    //   const grid = this
+    //   return (prop, row) => (grid.resolvepopoverproperty(prop, 'placement', row) || 'bottom-end')
+    // },
+    resolvepopovertitle: function () {
+      const grid = this
+      return (prop, row) => (grid.resolvepopoverproperty(prop, 'title', row))
+    },
+    resolvepopovercontent: function () {
+      const grid = this
+      return (prop, row) => (grid.resolvepopoverproperty(prop, 'content', row))
+    },
+    resolvepopoverwidth: function () {
+      const grid = this
+      return (prop, row) => (grid.resolvepopoverproperty(prop, 'title', row))
+    },
+    hasnopopover () {
+      return (prop) => prop.popover === undefined
+    },
     columns: function () {
       return utils.flatterer(this.descriptor, []).filter((p) => utils.ispropertyvisible(p, this.payload, {}))
     },
@@ -176,21 +229,19 @@ export default {
       return utils.headerrows(this.descriptor, this.payload)
     },
     resolveicon: function () {
-      return (prop, row) => {
-        if (typeof prop.icon === 'function') return prop.icon(row)
-        return prop.icon
-      }
+      return (prop, row) => utils.resolvePropertyValue(prop, 'icon', row)
     },
     resolvecellclass: function () {
-      return (prop, row) => {
-        if (typeof prop.cellclass === 'function') return prop.cellclass(row)
-        return prop.cellclass
-      }
+      return (prop, row) => utils.resolvePropertyValue(prop, 'cellclass', row)
     },
     resolvetdclass: function () {
-      return (prop, row) => {
-        if (typeof prop.tdclass === 'function') return prop.tdclass(row)
-        return prop.tdclass
+      return (prop, row) => utils.resolvePropertyValue(prop, 'tdclass', row)
+    },
+    resolvepopoverproperty () {
+      const grid = this
+      return (property, propname, row) => {
+        const popover = grid.resolvepopover(property, row)
+        return utils.resolvePropertyValue(popover, propname, row)
       }
     }
   },
@@ -201,6 +252,22 @@ export default {
     },
     oncellclick (prop, event) {
       if (prop.oncellclick && typeof prop.oncellclick === 'function') prop.oncellclick(event)
+    },
+    onpopoverhide (event, args) {
+      const onhide = args.prop.onhide
+      if (onhide && typeof onhide === 'function') onhide(args.row, event)
+    },
+    onpopovershow (event, args) {
+      const onshow = args.prop.onshow
+      if (onshow && typeof onshow === 'function') onshow(args.row, event)
+    },
+    onpopoverleave (event, args) {
+      const onleave = args.prop.onleave
+      if (onleave && typeof onleave === 'function') onleave(args.row, event)
+    },
+    onpopoverenter (event, args) {
+      const onenter = args.prop.onenter
+      if (onenter && typeof onenter === 'function') onenter(args.row, event)
     }
   }
 }
