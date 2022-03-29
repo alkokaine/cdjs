@@ -57,7 +57,7 @@
                                 :content="resolvepopovercontent(prop, row)">
                       <template v-if="prop.popover">
                         <slot :ispopover="true" :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
-                          <span class="cd-popover--default">укажите содержимое подсказки для свойства {{ prop.datafield }}</span>
+                          <div class="cd-popover--default">укажите содержимое подсказки для свойства {{ prop.datafield }} или используйте слот, где ispopover == true  </div>
                         </slot>
                       </template>
                       <template slot="reference">
@@ -202,10 +202,6 @@ export default {
       const grid = this
       return (prop, row) => (grid.resolvepopoverproperty(prop, 'trigger', row) || 'hover')
     },
-    // resolvepopoverplacement: function () {
-    //   const grid = this
-    //   return (prop, row) => (grid.resolvepopoverproperty(prop, 'placement', row) || 'bottom-end')
-    // },
     resolvepopovertitle: function () {
       const grid = this
       return (prop, row) => (grid.resolvepopoverproperty(prop, 'title', row))
@@ -289,5 +285,8 @@ export default {
   }
   ul.el-pager {
     padding: unset;
+  }
+  .cd-popover--content {
+    width: 20%;
   }
 </style>
