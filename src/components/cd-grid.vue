@@ -287,6 +287,7 @@ export default {
     padding: unset;
   }
   .cd-popover--content {
-    width: 20%;
+    min-width: max-content;
+    max-width: min-content;
   }
 </style>
