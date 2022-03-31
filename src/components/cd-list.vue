@@ -36,7 +36,7 @@ export default {
     /**
      * строка или функция, возвращающая css-класс для строки коллекции
      */
-    rowclass: { type: [String, Function], default: '', description: 'Строка или функция, возвращающая строку с классом для элемента списка, ' },
+    rowclass: { type: [String, Array, Function], default: '', description: 'Строка или функция, возвращающая строку с классом для элемента списка, ' },
     listitemclicked: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится по клику на элементе списка' },
     listitementered: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при входе мыши на элемент списка' },
     listitemleaved: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при выходе из элемента списка' },
@@ -69,7 +69,7 @@ export default {
     rowclassResolved () {
       const list = this
       return (row, index) => {
-        if (typeof list.rowclass === 'string') return list.rowclass
+        if (typeof list.rowclass === 'string' || Array.isArray(list.rowclass)) return list.rowclass
         return list.rowclass(row, index)
       }
     }
