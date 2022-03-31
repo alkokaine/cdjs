@@ -1,7 +1,7 @@
 <template>
   <div class="cd-cell">
     <slot name="label"></slot>
-    <slot>
+    <!-- <slot>
       <template v-if="config.select">
         <el-select v-model="value"
           :multiple="config.select.multiple"
@@ -46,6 +46,26 @@
             :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
         </template>
       </template>
+    </slot> -->
+    <slot>
+      <template v-if="editortype.isselect">
+        <el-select v-model="cellvalue" :value-key="property.valuekey" :clearable="property.clearable" :placeholder="property.placeholder" :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini">
+          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :get="property">
+            <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
+              <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
+              <span v-else>{{ option.row[property.labelkey] }}</span>
+            </el-option>
+          </cd-list>
+        </el-select>
+      </template>
+      <template v-else-if="editortype.isautocomplete"></template>
+      <template v-else-if="editortype.isdate"></template>
+      <template v-else-if="editortype.isdaatetime"></template>
+      <template v-else-if="editortype.isnumber"></template>
+      <template v-else-if="editortype.ischeckbox"></template>
+      <template v-else-if="editortype.isfile"></template>
+      <template v-else-if="editortype.istextarea"></template>
+      <template v-else-if="editortype.isslider"></template>
     </slot>
   </div>
 </template>
@@ -64,14 +84,24 @@ export default {
     'cd-props': CDProps
   },
   props: {
-    config: { type: Object, required: true },
-    showlabel: { type: Boolean, default: false },
+    value: { type: [String, Number, Object, Array] },
+    property: { type: Object, required: true },
     readonly: { type: Boolean, default: true }
   },
   data (cell) {
     return {
-      value: cell.config.value,
-      values: cell.config.select ? (cell.config.select.values || []) : [],
+      cellvalue: cell.value,
+      editortype: {
+        isselect: cell.property.input === 'select',
+        isautocomplete: cell.property.input === 'autocomplete',
+        isdate: cell.property.input === 'date',
+        isdatetime: cell.property.input === 'datetime',
+        isnumber: cell.property.input === 'number',
+        ischeckbox: cell.property.input === 'checkbox',
+        isfile: cell.property.input === 'file',
+        istextarea: cell.property.input === 'textarea'
+      },
+      values: [], // cell.config.select ? (cell.config.select.values || []) : [],
       error: Object,
       get: {}
     }

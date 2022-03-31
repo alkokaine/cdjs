@@ -1,7 +1,7 @@
 <template>
-  <fieldset class="cd-fieldset" :class="{ 'inline': inline }">
+  <fieldset class="cd-fieldset">
     <slot></slot>
-    <div class="cd-field" :class="[{ 'inner' : inner}, property.class]" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
+    <!-- <div class="cd-field" :class="[{ 'inner' : inner}, property.class]" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
       <template v-if="hasdescriptor(property)">
         <cd-fieldset class="inner"
             :editmode="editmode"
@@ -13,7 +13,7 @@
             :resolvefieldclass="resolvefieldclass"
             :inner="true"
             :inline="inline">
-            <legend v-if="haslegend(property)" class="cd-legend w-auto form-label">{{ property.text }}</legend>
+            <legend class="cd-legend w-auto form-label">{{ property.text }}</legend>
         </cd-fieldset>
       </template>
       <template v-else>
@@ -21,14 +21,27 @@
           <label class="cd-label form-label mb-0" :for="property.datafield" slot="label">{{ property.text }}</label>
         </cd-cell>
       </template>
-    </div>
+    </div> -->
+    <cd-list listclass="list-unstyled cd-field" keyfield="datafield" :rowclass="['cd-field', { 'inner': inner }]" :isrowvisible="isvisible" :collection="descriptor">
+      <div class="cd-fieldset--header" slot="header"><slot name="legend"></slot></div>
+      <template slot-scope="property">
+        <cd-fieldset v-if="property.descriptor" :descriptor="property.descriptor" :isvisible="isvisible" :resolvevalue="resolvevalue">
+          <legend v-if="haslegend(property.row)" slot="legend">{{ property.row.text }}</legend>
+        </cd-fieldset>
+        <slot v-else>
+          <cd-cell :value="resolvevalue(property.row)" :property="property.row">
+            <label slot="label" class="cd-label form-label mb-0" :for="property.row.datafield">{{ property.row.text }}</label>
+          </cd-cell>
+        </slot>
+      </template>
+    </cd-list>
   </fieldset>
 </template>
 
 <script>
 import props from '../common/property-decorator'
 import cell from './cd-cell.vue'
-
+import list from './cd-list.vue'
 export default {
   name: 'cd-fieldset',
   mixins: [props],
@@ -37,11 +50,12 @@ export default {
     resolvefieldclass: { type: Function },
     editmode: { type: Boolean, default: true },
     readonly: { type: Function },
-    inline: { type: Boolean, default: false },
-    inner: { type: Boolean, default: false }
+    inner: { type: Boolean, default: false },
+    resolvevalue: { type: Function, required: true }
   },
   components: {
-    'cd-cell': cell
+    'cd-cell': cell,
+    'cd-list': list
   },
   computed: {
     hasdescriptor () {
