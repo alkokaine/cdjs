@@ -6,11 +6,10 @@
       <form class="cd-form--content" :class="formclass" v-on:submit.prevent="validateform">
         <slot>
           <template v-if="descriptor.length">
-              <cd-fieldset class="cd-fieldset--root border-0" :class="rootclass" :descriptor="descriptor"
+              <cd-fieldset class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :class="rootclass" :descriptor="descriptor"
                 :isvisible="isvisible"
                 :readonly="isreadonly"
                 :editmode="editmode"
-                :inline="inline"
                 :propertyconfig="propertyconfig"
                 :resolvefieldclass="resolvefieldclass"></cd-fieldset>
           </template>
@@ -36,7 +35,6 @@ export default {
   props: {
     formclass: { type: String, default: '' },
     rootclass: { type: String, default: '' },
-    inline: { type: Boolean, default: false, description: 'fieldset рисуется с display: flex, flex-wrap, flex-grow' },
     onpropertychange: { type: Function, required: true, description: 'Функция, которая выполнится при изменении свойства объекта payload' },
     payload: { type: Object, required: true, description: 'Объект, который размещается на форме' },
     descriptor: {
@@ -49,6 +47,10 @@ export default {
     editmode: { type: Boolean, default: true }
   },
   computed: {
+    resolvevalue () {
+      const form = this
+      return (property) => (form.payload || {})[property.datafield]
+    },
     isvisible () {
       return (property) => utils.ispropertyvisible(property, null, this.payload)
     },
