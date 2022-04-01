@@ -2,7 +2,7 @@
   <div>
     <cd-doc :content="content"></cd-doc>
     <cd-info property="props" :component="form"></cd-info>
-    <cd-form :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange" :editmode="false"></cd-form>
+    <cd-form :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange"></cd-form>
   </div>
 </template>
 
@@ -25,6 +25,61 @@ export default {
           datafield: 'date',
           text: 'дата',
           input: 'date'
+        },
+        {
+          datafield: 'number',
+          text: 'number',
+          input: 'number'
+        },
+        {
+          datafield: 'textarea',
+          text: 'textarea',
+          input: 'textarea'
+        },
+        {
+          datafield: 'slider',
+          text: 'slider',
+          input: 'slider',
+          min: 0,
+          max: 100,
+          range: false,
+          showinput: true,
+          showcontrols: false
+        },
+        {
+          datafield: 'checkbox',
+          text: 'checkbox',
+          input: 'checkbox'
+        },
+        {
+          datafield: 'switch',
+          text: 'switch',
+          input: 'switch'
+        },
+        {
+          text: 'Legend',
+          descriptor: [
+            {
+              datafield: 'slider1',
+              text: 'slider',
+              input: 'slider',
+              min: 0,
+              max: 100,
+              range: false,
+              showinput: true,
+              showcontrols: false
+            },
+            {
+              datafield: 'checkbox1',
+              text: 'checkbox',
+              input: 'checkbox'
+            },
+            {
+              datafield: 'switch1',
+              text: 'switch',
+              input: 'switch'
+            }
+          ]
         }
       ],
       content: [
