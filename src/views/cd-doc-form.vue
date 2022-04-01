@@ -3,6 +3,7 @@
     <cd-doc :content="content"></cd-doc>
     <cd-info property="props" :component="form"></cd-info>
     <cd-form :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange"></cd-form>
+    {{ test }}
   </div>
 </template>
 
@@ -24,7 +25,12 @@ export default {
         {
           datafield: 'date',
           text: 'дата',
-          input: 'date'
+          input: 'date',
+          onchange (payload, event) {
+            console.log(this)
+            console.log(payload)
+            console.log(event)
+          }
         },
         {
           datafield: 'number',
@@ -43,7 +49,7 @@ export default {
           min: 0,
           max: 100,
           range: false,
-          showinput: true,
+          showinput: false,
           showcontrols: false
         },
         {
@@ -60,13 +66,58 @@ export default {
           text: 'Legend',
           descriptor: [
             {
+              datafield: 'address',
+              text: 'address',
+              input: 'autocomplete',
+              method: 'post',
+              labelkey: 'unrestricted_value',
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Token 08ca729eaf9a69c5d90fd9bde48adb7d8131a60a'
+              },
+              data: (query) => ({
+                query: query,
+                count: 20
+              }),
+              focustrigger: false,
+              clearable: true,
+              url: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address',
+              resolveresult: (response) => (response.data.suggestions)
+            },
+            {
+              datafield: 'simpleselect',
+              text: 'select',
+              input: 'select',
+              values: [
+                {
+                  key: 1,
+                  label: 'label 1'
+                },
+                {
+                  key: 2,
+                  label: 'label 2'
+                },
+                {
+                  key: 3,
+                  label: 'label 3'
+                },
+                {
+                  key: 4,
+                  label: 'label 4'
+                }
+              ],
+              labelkey: 'label',
+              valuekey: 'key'
+            },
+            {
               datafield: 'slider1',
               text: 'slider',
               input: 'slider',
               min: 0,
               max: 100,
               range: false,
-              showinput: true,
+              showinput: false,
               showcontrols: false
             },
             {

@@ -10,6 +10,12 @@
                 :isvisible="isvisible"
                 :readonly="isreadonly"
                 :editmode="editmode"
+                :onchange="onchange"
+                :onclear="onclear"
+                :onfocus="onfocus"
+                :oninput="oninput"
+                :onblur="onblur"
+                :onselect="onselect"
                 :propertyconfig="propertyconfig"
                 :resolvefieldclass="resolvefieldclass"></cd-fieldset>
           </template>
@@ -24,6 +30,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import utils from '../common/utils'
 import fieldset from './cd-fieldset.vue'
 
@@ -51,6 +58,10 @@ export default {
       const form = this
       return (property) => (form.payload || {})[property.datafield]
     },
+    descriptorproperty () {
+      const form = this
+      return (property) => (name) => utils.resolvePropertyValue(property, name, form.payload)
+    },
     isvisible () {
       return (property) => utils.ispropertyvisible(property, null, this.payload)
     },
@@ -70,6 +81,34 @@ export default {
   },
   methods: {
     validateform (...args) {
+    },
+    onchange ({ $event, property }, callback) {
+      if ($event === null || $event.type !== 'change') {
+        Vue.set(this.payload, property.datafield, $event)
+      } else {
+        Vue.set(this.payload, property.datafield, $event.target.value)
+      }
+      if (callback) callback.call(property, this.payload, $event)
+    },
+    onblur ({ $event, property }, callback) {
+      console.log($event)
+      console.log(property)
+      if (callback) callback.call(property, this.payload, $event)
+    },
+    oninput ({ $event, property }, callback) {
+      if (callback) callback.call(property, this.payload, $event)
+    },
+    onclear ({ $event, property }, callback) {
+      console.log($event)
+      console.log(property)
+      if (callback) callback.call(property, this.payload, $event)
+    },
+    onfocus ({ $event, property }, callback) {
+      if (callback) callback.call(property, this.payload, $event)
+    },
+    onselect ({ $event, property }, callback) {
+      Vue.set(this.payload, property.datafield, $event[property.labelkey])
+      if (callback) callback.call(property, this.payload, $event)
     }
   },
   data: function (form) {
