@@ -1,5 +1,5 @@
 <template>
-  <fieldset class="cd-fieldset">
+  <fieldset class="cd-fieldset d-block">
     <slot></slot>
     <!-- <div class="cd-field" :class="[{ 'inner' : inner}, property.class]" v-for="(property,index) in visibleproperties" :key="propertykey(property,index)">
       <template v-if="hasdescriptor(property)">
@@ -22,14 +22,14 @@
         </cd-cell>
       </template>
     </div> -->
-    <cd-list listclass="list-unstyled cd-field" keyfield="datafield" :rowclass="['cd-field', { 'inner': inner }]" :isrowvisible="isvisible" :collection="descriptor">
-      <div class="cd-fieldset--header" slot="header"><slot name="legend"></slot></div>
+    <cd-list listclass="list-unstyled cd-fieldset--inner" keyfield="datafield" :rowclass="['cd-field', { 'inner': inner }]" :isrowvisible="isvisible" :collection="descriptor">
+      <div class="d-block cd-fieldset--header w-auto" slot="header"><slot name="legend"></slot></div>
       <template slot-scope="property">
-        <cd-fieldset v-if="property.descriptor" :descriptor="property.descriptor" :isvisible="isvisible" :resolvevalue="resolvevalue">
+        <cd-fieldset v-if="property.row.descriptor" :descriptor="property.row.descriptor" :isvisible="isvisible" :resolvevalue="resolvevalue" :isdisabled="isdisabled" :parent="property.row">
           <legend v-if="haslegend(property.row)" slot="legend">{{ property.row.text }}</legend>
         </cd-fieldset>
         <slot v-else>
-          <cd-cell :value="resolvevalue(property.row)" :property="property.row">
+          <cd-cell class="cd-field" :value="resolvevalue(property.row)" :property="property.row" :disabled="isdisabled(property.row)" :class="property.class">
             <label slot="label" class="cd-label form-label mb-0" :for="property.row.datafield">{{ property.row.text }}</label>
           </cd-cell>
         </slot>
@@ -46,12 +46,10 @@ export default {
   name: 'cd-fieldset',
   mixins: [props],
   props: {
-    propertyconfig: { type: Function },
-    resolvefieldclass: { type: Function },
-    editmode: { type: Boolean, default: true },
-    readonly: { type: Function },
+    parent: { type: Object },
     inner: { type: Boolean, default: false },
-    resolvevalue: { type: Function, required: true }
+    resolvevalue: { type: Function, required: true },
+    isdisabled: { type: Function, default: (property) => (false) }
   },
   components: {
     'cd-cell': cell,
@@ -97,6 +95,10 @@ export default {
     margin-bottom: unset;
     white-space: nowrap;
   }
+  .cd-fieldset--inner {
+    padding-inline-start: 0;
+    margin-inline-start: 0;
+  }
 </style>
 <style scoped>
   .cd-fieldset.row> *:first-child {
@@ -118,4 +120,7 @@ export default {
     margin-left: unset;
     margin-right: unset;
 }
+  legend {
+    float: none;
+  }
 </style>

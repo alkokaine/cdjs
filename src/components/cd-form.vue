@@ -10,6 +10,7 @@
                 :isvisible="isvisible"
                 :readonly="isreadonly"
                 :editmode="editmode"
+                :onpropertychange="onpropertychange"
                 :propertyconfig="propertyconfig"
                 :resolvefieldclass="resolvefieldclass"></cd-fieldset>
           </template>
@@ -24,6 +25,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import utils from '../common/utils'
 import fieldset from './cd-fieldset.vue'
 
@@ -70,6 +72,12 @@ export default {
   },
   methods: {
     validateform (...args) {
+    },
+    propertychange (property, event) {
+      Promise.resolve(() => {
+        Vue.set(this.payload, property.datafield, event)
+        return { property, event }
+      }).then()
     }
   },
   data: function (form) {

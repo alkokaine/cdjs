@@ -1,5 +1,5 @@
 <template>
-  <div class="cd-cell">
+  <div class="cd-cell ms-2 me-2" :class="{ 'd-block': editortype.istextarea, 'is-readonly': readonly }">
     <slot name="label"></slot>
     <!-- <slot>
       <template v-if="config.select">
@@ -49,8 +49,13 @@
     </slot> -->
     <slot>
       <template v-if="editortype.isselect">
-        <el-select v-model="cellvalue" :value-key="property.valuekey" :clearable="property.clearable" :placeholder="property.placeholder" :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini">
-          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :get="property">
+        <el-select class="w-100" :disabled="disabled" v-model="cellvalue" :value-key="property.valuekey" :clearable="property.clearable" :placeholder="property.placeholder"
+          :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini"
+          v-on:change="onchange({ $event, property }, property.onchange)" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
+          v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)" v-on:clear="onclear({ $event, property }, property.onclear)"
+          v-on:blur="onblur({ $event, property }, property.onblur)" v-on:focus="onfocus({ $event, property }, property.onfocus)">
+          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item"
+            :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :get="property">
             <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
               <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
               <span v-else>{{ option.row[property.labelkey] }}</span>
@@ -58,14 +63,66 @@
           </cd-list>
         </el-select>
       </template>
-      <template v-else-if="editortype.isautocomplete"></template>
-      <template v-else-if="editortype.isdate"></template>
-      <template v-else-if="editortype.isdaatetime"></template>
-      <template v-else-if="editortype.isnumber"></template>
-      <template v-else-if="editortype.ischeckbox"></template>
+      <template v-else-if="editortype.isautocomplete">
+        <el-autocomplete class="w-100" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable" v-model="cellvalue" :debounce="500"
+          :value-key="property.valuekey" :placement="property.placement" :fetch-suggestions="fetchsuggestions" size="mini"
+          :trigger-on-focus="property.focustrigger" :name="property.datafield" v-on:select="onselect({ $event, property }, property.onselect)"
+          v-on:change="onchage({ $event, property }, property.onchage)" v-on:focus="onfocus({ $event, property }, property.onfocus)" v-on:blur="onblur({ $event, property }, property.onblur)" v-on:input="oninput({ $event, property }, property.oninput)">
+          <el-option slot-scope="option">
+              <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
+              <span v-else>{{ option.row[property.labelkey] }}</span>
+          </el-option>
+        </el-autocomplete>
+      </template>
+      <template v-else-if="editortype.isdate">
+        <el-date-picker class="w-100" :disabled="disabled" size="mini" v-model="cellvalue" :placeholder="property.placeholder" :clearable="property.clearable"
+          :format="property.displayformat" value-format="timestamp"
+          :editable="property.editable" :align="property.align" :name="property.datafield" :picker-options="pickeroptions"
+          v-on:change="onchange({ $event, property },  property.onchange)"
+          v-on:blur="onblur({ $event, property }, property.onblur)"
+          v-on:focus="onfocus({ $event, property }, property.onfocus)"
+          v-on:input="oninput({ $event, property }, property.oninput)">
+        </el-date-picker>
+      </template>
+      <template v-else-if="editortype.isdatetime"></template>
+      <div v-else-if="editortype.isnumber" class="el-input--mini w-100">
+        <input :disabled="disabled" class="el-input__inner" type="number" v-model="cellvalue"
+          :clearable="property.clearable"
+          v-on:input="oninput({ $event, property }, property.oninput)"
+          v-on:focus="onfocus({ $event, property }, property.onfocus)"
+          v-on:change="onchange({ $event, property }, property.onchage)"
+          v-on:blur="onblur({ $event, property }, property.onblur)"/>
+      </div>
+      <template v-else-if="editortype.ischeckbox">
+        <el-checkbox class="cd-checkbox" size="mini" v-model="cellvalue" :disabled="disabled"></el-checkbox>
+      </template>
       <template v-else-if="editortype.isfile"></template>
-      <template v-else-if="editortype.istextarea"></template>
-      <template v-else-if="editortype.isslider"></template>
+      <template v-else-if="editortype.istextarea">
+        <el-input type="textarea" v-model="cellvalue"
+          v-on:blur="onblur({ $event, property}, property.onblur)"
+          v-on:change="onchange({ $event, property}, property.onchange)"
+          v-on:input="oninput({ $event, property }, property.oninput)"
+          v-on:focus="onfocus({ $event, property }, property.onfocus)"></el-input>
+      </template>
+      <template v-else-if="editortype.isslider">
+        <el-slider class="cd-slider ms-2" v-model="cellvalue" :show-stops="property.showstops" :step="property.step"
+          :show-input="property.showinput" :range="property.range" :min="property.min"
+          :max="property.max" :vertical="property.vertical" :marks="property.marks"
+          :show-input-controls="property.showcontrols" input-size="mini" :show-tooltip="property.showtooltip"
+          :format-tooltip="property.ftooltip" :height="property.height" :debounce="property.debounce"
+          v-on:change="onchange({ $event, property }, property.onchange)"
+          v-on:input="oninput({ $event, property }, property.oninput)"></el-slider>
+      </template>
+      <template v-else-if="editortype.isswitch">
+        <el-switch v-model="cellvalue" v-on:change="onchange({ $event, property }, property.onchage)"></el-switch>
+      </template>
+      <template v-else-if="!isarray">
+        <el-input v-model="cellvalue" size="mini" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable"
+          v-on:change="onchange({ $event, property }, property.onchange)"
+          v-on:input="oninput({ $event, property }, property.oninput)"
+          v-on:focus="onfocus({ $event, property }, property.onfocus)"
+          v-on:blur="onblur({ $event, property }, property.onblur)"></el-input>
+      </template>
     </slot>
   </div>
 </template>
@@ -84,12 +141,14 @@ export default {
     'cd-props': CDProps
   },
   props: {
-    value: { type: [String, Number, Object, Array] },
+    disabled: { type: Boolean, default: false },
+    value: { type: [String, Number, Object, Array, Date, Boolean] },
     property: { type: Object, required: true },
     readonly: { type: Boolean, default: true }
   },
   data (cell) {
     return {
+      isarray: Array.isArray(cell.value),
       cellvalue: cell.value,
       editortype: {
         isselect: cell.property.input === 'select',
@@ -99,11 +158,13 @@ export default {
         isnumber: cell.property.input === 'number',
         ischeckbox: cell.property.input === 'checkbox',
         isfile: cell.property.input === 'file',
-        istextarea: cell.property.input === 'textarea'
+        istextarea: cell.property.input === 'textarea',
+        isslider: cell.property.input === 'slider',
+        isswitch: cell.property.input === 'switch'
       },
-      values: [], // cell.config.select ? (cell.config.select.values || []) : [],
-      error: Object,
-      get: {}
+      pickeroptions: cell.property.options,
+      values: (cell.property.values || []),
+      error: Object
     }
   },
   methods: {
@@ -112,7 +173,7 @@ export default {
       return 'option-property'
     },
     resolveresult (response) {
-      this.values = this.config.select.resolveresult(response)
+      this.values = this.property.resolveresult(response)
       this.error = Object
     },
     onreset () {
@@ -122,6 +183,32 @@ export default {
       this.error = reason
       this.values = []
       this.value = ''
+    },
+    onchange (event, callback) {
+      
+      if (callback) callback.call(event.property, event.$event)
+
+    },
+    onvisiblechange (event, callback) {
+      if (callback) callback.call(event.property, event.$event)
+    },
+    onremovetag (event, callback) {
+      if (callback) callback.call(event.property, event.$event)
+    },
+    onclear (event, callback) {
+      if (callback) callback.call(event.property, event.$event)
+    },
+    onblur (event, callback) {
+      if (callback) callback.call(event.property, event.$event)
+    },
+    onfocus (event, callback) {
+      if (callback) callback.call(event.property, event.$event)
+    },
+    oninput (event, callback) {
+      if (callback) callback.call(event.property, event.$event)
+    },
+    fetchsuggestions (query, callback) {
+
     }
   }
 }
@@ -154,7 +241,19 @@ export default {
   .cd-select--options {
     display: contents;
   }
+  .cd-slider {
+    width: 100%;
+  }
 </style>
 <style scoped>
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
 </style>
