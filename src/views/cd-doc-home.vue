@@ -1,5 +1,6 @@
 <template>
   <div>
+    A
     <cd-doc :content="content"></cd-doc>
     <cd-info v-for="(info, index) in select" :key="index" :component="info" property="props"></cd-info>
     <select v-model="selected" v-on:change="onpropertyselect">
