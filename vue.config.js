@@ -17,6 +17,13 @@ module.exports = {
         },
         '/city': {
           target: 'https://wft-geo-db.p.rapidapi.com/v1/geo'
+        },
+        '/address': {
+          target: 'https://suggestions.dadata.ru',
+          changeOrigin: true,
+          pathRewrite: {
+            '/address': ''
+          }
         }
       },
       headers: { 'Access-Control-Allow-Origin': 'http://192.168.106.62:8082' }
