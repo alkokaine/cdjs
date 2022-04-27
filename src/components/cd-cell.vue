@@ -5,7 +5,7 @@
       <template v-if="editortype.isselect">
         <el-select class="w-100" :disabled="disabled" v-model="cellvalue" :value-key="property.valuekey" :clearable="property.clearable" :placeholder="property.placeholder"
           :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini"
-          v-on:change="onchange({ $event, property }, property.onchange)" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
+          v-on:change="onchange({ $event: option($event), property }, property.onchange)" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
           v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)" v-on:clear="onclear({ $event, property }, property.onclear)"
           v-on:blur="onblur({ $event, property }, property.onblur)" v-on:focus="onfocus({ $event, property }, property.onfocus)">
           <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item"
@@ -41,8 +41,8 @@
         </el-date-picker>
       </template>
       <template v-else-if="editortype.isdatetime"></template>
-      <div v-else-if="editortype.isnumber" class="el-input--mini w-100">
-        <input :disabled="disabled" class="el-input__inner" type="number" v-model="cellvalue"
+      <div v-else-if="editortype.isnumber" class="el-input el-input--mini w-100" :class="[{ 'is-disabled': disabled }]">
+        <input :disabled="disabled" class="el-input el-input__inner" :class="[{ 'is-disabled': disabled }]" type="number" v-model="cellvalue"
           :clearable="property.clearable"
           v-on:input="oninput({ $event, property }, property.oninput)"
           v-on:focus="onfocus({ $event, property }, property.onfocus)"
@@ -50,13 +50,13 @@
           v-on:blur="onblur({ $event, property }, property.onblur)"/>
       </div>
       <template v-else-if="editortype.ischeckbox">
-        <el-checkbox class="cd-checkbox" size="mini" v-model="cellvalue" :disabled="disabled" v-on:change="onchange({ $event, property}, property.onchange)"></el-checkbox>
+        <el-checkbox class="cd-checkbox" size="mini" v-model="cellvalue" :disabled="disabled" v-on:change="onchange({ $event, property }, property.onchange)" :checked="ischecked"></el-checkbox>
       </template>
       <template v-else-if="editortype.isfile">
         <el-upload class="cd-upload" :action="property.url" :headers="property.headers" :multiple="property.multiple"></el-upload>
       </template>
       <template v-else-if="editortype.istextarea">
-        <el-input type="textarea" v-model="cellvalue"
+        <el-input type="textarea" v-model="cellvalue" :disabled="disabled"
           v-on:blur="onblur({ $event, property}, property.onblur)"
           v-on:change="onchange({ $event, property}, property.onchange)"
           v-on:input="oninput({ $event, property }, property.oninput)"
@@ -64,16 +64,12 @@
           v-on:clear="onclear({ $event, property }, property.onclear)"></el-input>
       </template>
       <template v-else-if="editortype.isslider">
-        <el-slider class="cd-slider ms-2" v-model="cellvalue" :show-stops="property.showstops" :step="property.step"
-          :show-input="property.showinput" :range="property.range" :min="property.min"
-          :max="property.max" :vertical="property.vertical" :marks="property.marks"
-          :show-input-controls="property.showcontrols" input-size="mini" :show-tooltip="property.showtooltip"
-          :format-tooltip="property.ftooltip" :height="property.height" :debounce="property.debounce"
+        <input type="range" class="form-range" :min="property.min" :max="property.max" :step="property.step" v-model="cellvalue" :disabled="disabled"
           v-on:change="onchange({ $event, property }, property.onchange)"
-          v-on:input="oninput({ $event, property }, property.oninput)"></el-slider>
+          v-on:input="oninput({ $event, property }, property.oninput)"/>
       </template>
       <template v-else-if="editortype.isswitch">
-        <el-switch v-model="cellvalue" v-on:change="onchange({ $event, property }, property.onchange)"></el-switch>
+        <el-switch v-model="cellvalue" v-on:change="onchange({ $event, property }, property.onchange)" :disabled="disabled"></el-switch>
       </template>
       <template v-else-if="!isarray">
         <el-input v-model="cellvalue" size="mini" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable"
@@ -87,6 +83,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import CDList from './cd-list.vue'
 import CDProps from './cd-props.vue'
 const { getDirective } = require('vue-debounce')
@@ -101,21 +98,22 @@ export default {
   },
   props: {
     disabled: { type: Boolean, default: false },
-    value: { type: [String, Number, Object, Array, Date, Boolean] },
     property: { type: Object, required: true },
     readonly: { type: Boolean, default: true },
+    value: { type: [String, Number, Object, Array, Date, Boolean] },
     onchange: { type: Function },
     oninput: { type: Function },
     onblur: { type: Function },
     onfocus: { type: Function },
     onclear: { type: Function },
-    onselect: { type: Function }
+    onselect: { type: Function },
+    revert: { type: Boolean }
   },
   data (cell) {
-    const property = cell.property.row
+    const property = cell.property
     return {
       isarray: Array.isArray(cell.value),
-      cellvalue: cell.value,
+      cellvalue: cell.resolvevalue(property, cell.value),
       editortype: {
         isselect: property.input === 'select',
         isautocomplete: property.input === 'autocomplete',
@@ -133,7 +131,28 @@ export default {
       error: Object
     }
   },
+  watch: {
+    revert: {
+      handler (newvalue) {
+        const cell = this
+        if (newvalue === true) {
+          Vue.set(cell, 'cellvalue', (cell.resolvevalue(cell.property, cell.value)))
+        }
+      }
+    }
+  },
   methods: {
+    resolvevalue (property, value) {
+      if (property.input === 'slider') {
+        return (value || 0)
+      } else {
+        return (value || null)
+      }
+    },
+    option (event) {
+      const cell = this
+      return this.values.find(o => o[cell.property.valuekey] === event)
+    },
     optionpropertyclass (...args) {
       // console.log(args)
       return 'option-property'
@@ -141,9 +160,6 @@ export default {
     resolveresult (response) {
       this.values = this.property.resolveresult(response)
       this.error = Object
-    },
-    onreset () {
-      this.config.reset()
     },
     onerror (reason) {
       this.error = reason
@@ -168,6 +184,11 @@ export default {
       }).catch((reason) => {
         console.log(reason)
       })
+    }
+  },
+  computed: {
+    ischecked () {
+      return this.value === true
     }
   }
 }
