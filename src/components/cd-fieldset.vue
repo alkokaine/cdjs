@@ -1,23 +1,25 @@
 <template>
-  <fieldset class="cd-fieldset d-block">
-    <slot></slot>
-    <cd-list listclass="list-unstyled cd-fieldset--inner" keyfield="datafield" :rowclass="['cd-field', { 'inner': inner }]" :isrowvisible="isvisible" :collection="descriptor">
-      <div class="d-block cd-fieldset--header w-auto" slot="header"><slot name="legend"></slot></div>
-      <template slot-scope="{ row }">
-        <template v-if="row.descriptor">
-          <cd-fieldset :descriptor="row.descriptor" :isvisible="isvisible" :isdisabled="isdisabled" :parent="row" :resolvevalue="resolvevalue">
-            <legend v-if="haslegend(row)" slot="legend">{{ row.text }}</legend>
-            <template slot-scope="{ property }">
-              <slot :property="property" :parent="row"/>
-            </template>
-          </cd-fieldset>
+  <fieldset class="cd-fieldset d-block w-auto">
+      <slot></slot>
+      <cd-list :listclass="['list-unstyled cd-fieldset--inner', innerclass, { 'ms-2 me-2': inner }]" keyfield="datafield" :rowclass="['cd-field--wrap', { 'ps-2 pe-2 inner': inner }]" :isrowvisible="isvisible" :collection="descriptor">
+        <div class="d-block cd-fieldset--header w-auto" slot="header"><slot name="legend"></slot></div>
+        <template slot-scope="{ row }">
+          <template v-if="row.descriptor">
+            <cd-fieldset :descriptor="row.descriptor" :isvisible="isvisible" :isdisabled="isdisabled" :parent="row" :resolvevalue="resolvevalue" :innerclass="row.class">
+              <legend v-if="haslegend(row)" slot="legend" class="cd-legend">
+                <span class="w-auto ms-4 cd-legend--text ps-2 pe-2">{{ row.text }}</span>
+              </legend>
+              <template slot-scope="{ property }">
+                <slot :property="property" :parent="row"/>
+              </template>
+            </cd-fieldset>
+          </template>
+          <template v-else>
+            <slot :property="row" :parent="parent"></slot>
+          </template>
         </template>
-        <template v-else>
-          <slot :property="row" :parent="parent"></slot>
-        </template>
-      </template>
-    </cd-list>
-  </fieldset>
+      </cd-list>
+    </fieldset>
 </template>
 
 <script>
@@ -31,7 +33,8 @@ export default {
     inner: { type: Boolean, default: false },
     resolvevalue: { type: Function, required: true },
     isdisabled: { type: Function, default: (property) => (false) },
-    isvalid: { type: Function, default: (property) => (false) }
+    isvalid: { type: Function, default: (property) => (false) },
+    innerclass: { type: [String, Array] }
   },
   components: {
     'cd-list': list
@@ -41,67 +44,20 @@ export default {
       return (property) => Object.prototype.hasOwnProperty.call(property, 'descriptor') && Array.isArray(property.descriptor) && property.descriptor.length
     },
     haslegend () {
-      return (property) => Object.prototype.hasOwnProperty.call(property, 'text')
+      return (property) => (property === undefined || Object.prototype.hasOwnProperty.call(property, 'text'))
     }
   }
 }
 </script>
 
 <style>
-  .cd-legend {
-    background-color: lightgray;
-    display: block;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-left: 10px;
-    float: none;
-  }
-  .cd-label {
-    font-weight: bold;
-    margin-bottom: unset;
-  }
-  .cd-label::after {
-    content: ":";
-    margin-right: 5px;
-  }
-  .cd-fieldset.inline {
-    display: flex;
-    flex-wrap: wrap;
-    flex-grow: 1;
-  }
-  .cd-field {
-    margin-bottom: 0.5em;
-  }
-  .form-label {
-    margin-bottom: unset;
-    white-space: nowrap;
-  }
-  .cd-fieldset--inner {
-    padding-inline-start: 0;
-    margin-inline-start: 0;
-  }
+
 </style>
 <style scoped>
-  .cd-fieldset.row> *:first-child {
-    padding-left: unset;
-  }
-  .cd-fieldset.row> *:last-child {
-    padding-right: unset;
-  }
-  .cd-field.row {
-    margin-right: unset;
-    margin-left: unset;
-  }
-  .cd-field.row > * {
-    flex-shrink: 0;
-    width: 100%;
-    max-width: 100%;
-    padding-right: unset;
-    padding-left: unset;
-    margin-left: unset;
-    margin-right: unset;
-}
   legend {
     float: none;
+  }
+  .cd-legend--text {
+    background-color: darkgray;
   }
 </style>
