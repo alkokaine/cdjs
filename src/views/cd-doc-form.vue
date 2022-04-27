@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="cd-doc-form m-auto">
     <cd-doc :content="content"></cd-doc>
     <cd-info property="props" :component="form"></cd-info>
     <el-checkbox v-model="editmode">AAA</el-checkbox> {{ editmode }}
-    <cd-form :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange" :editmode="editmode" :showcontrols="true" :switchmode="oncancel"></cd-form>
+    <cd-form class="m-auto" :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange" :editmode="editmode" :showcontrols="true" :switchmode="oncancel"></cd-form>
     {{ test }}
   </div>
 </template>
@@ -25,125 +25,322 @@ export default {
       },
       descriptor: [
         {
-          datafield: 'date',
-          text: 'дата',
-          input: 'date',
-          onchange (payload, event) {
-            console.log(this)
-            console.log(payload)
-            console.log(event)
-          }
-        },
-        {
-          datafield: 'number',
-          text: 'number',
-          input: 'number'
-        },
-        {
-          datafield: 'textarea',
-          text: 'textarea',
-          input: 'textarea'
-        },
-        {
-          datafield: 'slider',
-          text: 'slider',
-          input: 'slider',
-          min: 0,
-          max: 100,
-          range: false,
-          showinput: false,
-          showcontrols: false
-        },
-        {
-          datafield: 'checkbox',
-          text: 'checkbox',
-          input: 'checkbox'
-        },
-        {
-          datafield: 'switch',
-          text: 'switch',
-          input: 'switch'
-        },
-        {
-          text: 'Legend',
+          text: 'Общее',
           descriptor: [
             {
-              datafield: 'datafield2',
-              text: 'datafield2'
+              datafield: 'Name',
+              text: 'Полное название'
             },
             {
-              text: 'AAA',
               descriptor: [
                 {
-                  datafield: 'datafield1',
-                  text: 'datafield1'
-                }
-              ]
-            },
-            {
-              datafield: 'address',
-              text: 'address',
-              input: 'autocomplete',
-              method: 'post',
-              labelkey: 'unrestricted_value',
-              headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                Authorization: 'Token 08ca729eaf9a69c5d90fd9bde48adb7d8131a60a'
-              },
-              data: (query) => ({
-                query: query,
-                count: 20
-              }),
-              focustrigger: false,
-              clearable: true,
-              url: '/address/suggestions/api/4_1/rs/suggest/address',
-              resolveresult: (response) => (response.data.suggestions)
-            },
-            {
-              datafield: 'simpleselect',
-              text: 'select',
-              input: 'select',
-              values: [
-                {
-                  key: 1,
-                  label: 'label 1'
-                },
-                {
-                  key: 2,
-                  label: 'label 2'
-                },
-                {
-                  key: 3,
-                  label: 'label 3'
-                },
-                {
-                  key: 4,
-                  label: 'label 4'
+                  datafield: 'ShortName',
+                  text: 'Сокращенное название'
+                }, {
+                  datafield: 'UltraShortName',
+                  text: 'Краткое название'
                 }
               ],
-              labelkey: 'label',
-              valuekey: 'key'
+              class: 'row row-cols-2'
             },
             {
-              datafield: 'slider1',
-              text: 'slider',
-              input: 'slider',
-              min: 0,
-              max: 100,
-              range: false,
-              showinput: false,
-              showcontrols: false
+              descriptor: [
+                {
+                  datafield: 'Is24Group',
+                  text: 'Is24Group'
+                },
+                {
+                  datafield: 'IsBudget',
+                  text: 'IsBudget'
+                  // Invalid prop: type check failed for prop "value".
+                },
+                {
+                  datafield: 'IsDepartment',
+                  text: 'IsDepartment'
+                }
+              ],
+              class: 'row row-cols-3'
+            },
+
+            {
+              descriptor: [
+                {
+                  datafield: 'IsFew',
+                  text: 'Малочисленная'
+                },
+                {
+                  datafield: 'WorkDaysCount',
+                  text: 'WorkDaysCount'
+                },
+                {
+                  datafield: 'ObjectID',
+                  text: 'ObjectID'
+                },
+                {
+                  datafield: 'slider',
+                  text: 'slider',
+                  input: 'slider'
+                }
+              ],
+              class: 'row row-cols-4'
+            },
+
+            {
+              descriptor: [
+                {
+                  datafield: 'ObjectStatusID',
+                  text: 'ObjectStatusID'
+                },
+                {
+                  datafield: 'ObjectTypeID',
+                  text: 'ObjectTypeID'
+                },
+                {
+                  datafield: 'MainObjectID',
+                  text: 'MainObjectID'
+                }
+              ],
+              class: 'row row-cols-3'
+            },
+
+            {
+              descriptor: [
+                {
+                  datafield: 'Code',
+                  text: 'Code'
+                },
+                {
+                  datafield: 'EndDate',
+                  text: 'EndDate'
+                },
+                {
+                  datafield: 'OrderNumber',
+                  text: 'OrderNumber'
+                }
+              ],
+              class: 'row row-cols-3'
             },
             {
-              datafield: 'checkbox1',
-              text: 'checkbox',
-              input: 'checkbox'
+              datafield: 'ParentObjectID',
+              text: 'ParentObjectID'
+            }
+          ]
+        },
+        {
+          text: 'Адрес и контактные данные',
+          descriptor: [
+            {
+              descriptor: [
+                {
+                  datafield: 'PostIndex',
+                  text: 'Почтовый индекс'
+                },
+                {
+                  datafield: 'City',
+                  text: 'Город'
+                }
+              ],
+              class: 'row row-cols-2'
             },
             {
-              datafield: 'switch1',
-              text: 'switch',
-              input: 'switch'
+              descriptor: [
+                {
+                  datafield: 'Region',
+                  text: 'Район'
+                },
+                {
+                  datafield: 'Street',
+                  text: 'Улица'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'HouseNumber',
+                  text: 'Дом'
+                },
+                {
+                  datafield: 'HouseBlock',
+                  text: 'Корпус'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'PhoneNumber',
+                  text: 'Телефон'
+                },
+                {
+                  datafield: 'EMail',
+                  text: 'E-mail'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'FaxNumber',
+                  text: 'Факс'
+                },
+
+                {
+                  datafield: 'WWW',
+                  text: 'Сайт'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              datafield: 'CityID',
+              text: 'CityID'
+            }
+          ]
+        },
+        {
+          text: 'Реквизиты',
+          descriptor: [
+            {
+              descriptor: [{
+                datafield: 'INN',
+                text: 'ИНН'
+              },
+              {
+                datafield: 'OKPO',
+                text: 'ОКПО'
+              }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+
+                {
+                  datafield: 'KPP',
+                  text: 'КПП'
+                },
+                {
+                  datafield: 'OKVED',
+                  text: 'ОКВЭД'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'BankName',
+                  text: 'Банк'
+                },
+                {
+                  datafield: 'CorrAccount',
+                  text: 'Корр/счет'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'BIC',
+                  text: 'БИК'
+                },
+                {
+                  datafield: 'CorrBank',
+                  text: 'Корр.банк'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              datafield: 'CurrentAccount',
+              text: 'Р/Счет'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'PersonalAccount',
+                  text: 'Лицевой счет'
+                },
+                {
+                  datafield: 'PersonalAccount2',
+                  text: 'Лицевой счет2'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              datafield: 'MunAccount',
+              text: 'MunAccount'
+            },
+            {
+              datafield: 'UFK',
+              text: 'UFK'
+            }
+          ]
+        },
+        {
+          text: 'Руководитель',
+          descriptor: [
+            {
+              datafield: 'HeadPosition',
+              text: 'Должность'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'HeadFIO',
+                  text: 'ФИО'
+                },
+                {
+                  datafield: 'IsIO',
+                  text: 'Исполняющий обязаности'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'HeadPhoneNumber',
+                  text: 'Телефон'
+                },
+                {
+                  datafield: 'HeadEMail',
+                  text: 'E-mail'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'HeadReason',
+                  text: 'HeadReason'
+                },
+                {
+                  datafield: 'HeadSignature',
+                  text: 'Подпись для документов'
+                }
+              ],
+              class: 'row row-cols-2'
+            },
+            {
+              descriptor: [
+                {
+                  datafield: 'PostAddress',
+                  text: 'PostAddress'
+                },
+                {
+                  datafield: 'LawAddress',
+                  text: 'LawAddress'
+                }
+              ],
+              class: 'row row-cols-2'
             }
           ]
         }
@@ -168,5 +365,7 @@ export default {
 </script>
 
 <style>
-
+  .cd-doc-form {
+    width: 95%;
+  }
 </style>
