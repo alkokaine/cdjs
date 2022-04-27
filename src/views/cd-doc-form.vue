@@ -2,7 +2,8 @@
   <div>
     <cd-doc :content="content"></cd-doc>
     <cd-info property="props" :component="form"></cd-info>
-    <cd-form :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange"></cd-form>
+    <el-checkbox v-model="editmode">AAA</el-checkbox> {{ editmode }}
+    <cd-form :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange" :editmode="editmode" :showcontrols="true" :switchmode="oncancel"></cd-form>
     {{ test }}
   </div>
 </template>
@@ -17,6 +18,7 @@ export default {
   components: { 'cd-doc': CDDocGeneric, 'cd-info': ComponentInfo, 'cd-form': CDForm },
   data (doc) {
     return {
+      editmode: false,
       form: CDForm,
       test: {
         date: new Date(Date.now())
@@ -66,6 +68,19 @@ export default {
           text: 'Legend',
           descriptor: [
             {
+              datafield: 'datafield2',
+              text: 'datafield2'
+            },
+            {
+              text: 'AAA',
+              descriptor: [
+                {
+                  datafield: 'datafield1',
+                  text: 'datafield1'
+                }
+              ]
+            },
+            {
               datafield: 'address',
               text: 'address',
               input: 'autocomplete',
@@ -82,7 +97,7 @@ export default {
               }),
               focustrigger: false,
               clearable: true,
-              url: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address',
+              url: '/address/suggestions/api/4_1/rs/suggest/address',
               resolveresult: (response) => (response.data.suggestions)
             },
             {
@@ -144,6 +159,9 @@ export default {
   methods: {
     onpropertychange (...args) {
       // console.log(args)
+    },
+    oncancel (event) {
+      this.editmode = false
     }
   }
 }
