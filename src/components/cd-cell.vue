@@ -1,5 +1,5 @@
 <template>
-  <div class="cd-cell ms-2 me-2" :class="{ 'd-block': editortype.istextarea, 'is-readonly': readonly }">
+  <div class="cd-cell" :class="{ 'd-block': editortype.istextarea, 'is-readonly': readonly }">
     <slot name="label"></slot>
     <slot>
       <template v-if="editortype.isselect">
@@ -200,6 +200,10 @@ export default {
     align-items: center;
     flex-grow: 1;
   }
+  .cd-field {
+    margin-bottom: 0.5em;
+  }
+  /*
   .cd-clear--button {
     margin-left: -40px;
   }
@@ -223,7 +227,7 @@ export default {
   }
   .cd-slider {
     width: 100%;
-  }
+  } */
 </style>
 <style scoped>
   input::-webkit-outer-spin-button,
@@ -235,5 +239,8 @@ export default {
   /* Firefox */
   input[type=number] {
     -moz-appearance: textfield;
+  }
+  .cd-slider {
+    width: 100%;
   }
 </style>
