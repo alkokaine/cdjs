@@ -3,7 +3,13 @@
     <cd-doc :content="content"></cd-doc>
     <cd-info property="props" :component="form"></cd-info>
     <el-checkbox v-model="editmode">AAA</el-checkbox> {{ editmode }}
-    <cd-form class="m-auto" :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange" :editmode="editmode" :showcontrols="true" :switchmode="oncancel"></cd-form>
+    <cd-form class="m-auto" :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange" :editmode="editmode" :showcontrols="true" :switchmode="oncancel">
+      <template slot-scope="{ property }">
+        <template v-if="property.datafield === 'test'">
+          AAAAAA
+        </template>
+      </template>
+    </cd-form>
     {{ test }}
   </div>
 </template>
@@ -41,9 +47,13 @@ export default {
                     }, {
                       datafield: 'UltraShortName',
                       text: 'Краткое название'
+                    },
+                    {
+                      datafield: 'test',
+                      text: 'test'
                     }
                   ],
-                  class: 'row row-cols-2'
+                  class: 'row row-cols-3'
                 },
                 {
                   descriptor: [
