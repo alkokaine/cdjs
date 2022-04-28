@@ -2,28 +2,21 @@
   <div class="cd-form">
     <slot name="header"></slot>
      <form class="cd-form--content" :class="formclass" v-on:submit.prevent="validateform">
-      <slot>
-        <template v-if="descriptor.length">
-            <cd-fieldset class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :class="rootclass" :descriptor="descriptor"
-              :isvisible="isvisible"
-              :readonly="isreadonly"
-              :editmode="editmode"
-              :resolvefieldclass="resolvefieldclass">
-              <template slot-scope="{ property }">
-                <cd-cell v-if="property" class="cd-field" :property="property"
+      <cd-fieldset class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :class="rootclass" :descriptor="descriptor" :isvisible="isvisible" :readonly="isreadonly">
+          <template slot-scope="{ property, parent }">
+            <template v-if="property">
+              <slot :property="property" :parent="parent">
+                <cd-cell class="cd-field" :property="property"
                   :class="property.class" :onchange="onchange" :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus"
                   :onselect="onselect" :disabled="!editmode" :value="formobject[property.datafield]" :revert="revert">
                   <el-popover slot="label" :disabled="true">
                     <label slot="reference" class="cd-label form-label mb-0" :for="property.datafield">{{ property.text }}</label>
                   </el-popover>
                 </cd-cell>
-              </template>
-            </cd-fieldset>
-        </template>
-        <template v-else>
-            <span>Напишите внутри тэга cd-form содержимое формы, или передайте массив дескрипторов свойство в свойство descriptor для встроенного рендеринга</span>
-        </template>
-      </slot>
+              </slot>
+            </template>
+          </template>
+        </cd-fieldset>
       <div v-if="showcontrols && editmode" class="cd-form--buttons">
         <button class="btn btn-primary btn-sm ms-2 cd-reset-button" v-on:click="applychanges($event, payload, formobject)">{{ resettext }}</button>
         <button class="btn btn-primary btn-sm ms-2 cd-submit-button" v-on:click="applychanges($event, formobject, payload)" v-bind:disabled="!haschange">{{ submittext }}</button>
