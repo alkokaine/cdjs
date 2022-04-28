@@ -13,7 +13,7 @@
                 <cd-cell v-if="property" class="cd-field" :property="property"
                   :class="property.class" :onchange="onchange" :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus"
                   :onselect="onselect" :disabled="!editmode" :value="formobject[property.datafield]" :revert="revert">
-                  <el-popover slot="label" :disabled="property.isvalid">
+                  <el-popover slot="label" :disabled="true">
                     <label slot="reference" class="cd-label form-label mb-0" :for="property.datafield">{{ property.text }}</label>
                   </el-popover>
                 </cd-cell>
