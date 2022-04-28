@@ -203,6 +203,11 @@ export default {
   .cd-field {
     margin-bottom: 0.5em;
   }
+  .el-input.is-disabled .el-input__inner {
+    background-color: var(--bs-body-bg)!important;
+    color: var(--bs-body-color)!important;
+    cursor: default!important;;
+  }
   /*
   .cd-clear--button {
     margin-left: -40px;
