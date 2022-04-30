@@ -77,6 +77,47 @@ export default {
           },
           rules: (payload) => ([
           ])
+        },
+        {
+          datafield: 'object_id',
+          text: 'object_id',
+          input: 'select',
+          valuekey: 'ObjectID',
+          labelkey: 'UltraShortName',
+          headers: {
+            Accept: '*/*',
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1MTk5ODQzMSwiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.26Rmkx8XTSjqzag91XdKJUyk73NmDsA4E6-ee7GbbAg'
+          },
+          url: '/local/api/objects/short',
+          method: 'post',
+          resolveresult: (response) => (response.data.Data),
+          resolvepayload: (payload) => ({
+            ObjectIDs: [],
+            ObjectTypeID: null,
+            ObjectGroupID: null,
+            SearchString: ''
+          })
+        },
+        {
+          datafield: 'address',
+          text: 'address',
+          input: 'autocomplete',
+          method: 'post',
+          labelkey: 'unrestricted_value',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: '*/*',
+            Authorization: 'Token 08ca729eaf9a69c5d90fd9bde48adb7d8131a60a'
+          },
+          data: (query) => ({
+            query: query,
+            count: 20
+          }),
+          focustrigger: false,
+          clearable: true,
+          url: '/address/suggestions/api/4_1/rs/suggest/address',
+          resolveresult: (response) => (response.data.suggestions)
         }
       ],
       olympicpayload: {
