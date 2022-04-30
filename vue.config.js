@@ -24,6 +24,12 @@ module.exports = {
           pathRewrite: {
             '/address': ''
           }
+        },
+        '/local': {
+          target: 'https://localhost:5001/',
+          pathRewrite: {
+            '/local': ''
+          }
         }
       },
       headers: { 'Access-Control-Allow-Origin': 'http://192.168.106.62:8082' }
