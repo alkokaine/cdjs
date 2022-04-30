@@ -43,7 +43,14 @@ export default {
     submittext: { type: String, default: 'Отправить' },
     formclass: { type: String, default: '' },
     rootclass: { type: String, default: '' },
-    onpropertychange: { type: Function, required: true, description: 'Функция, которая выполнится при изменении свойства объекта payload' },
+    onpropertychange: {
+      type: Function,
+      default: function (property, value) {
+        const form = this
+        Vue.set(form.formobject, property.datafield, value)
+      },
+      description: 'Функция, которая выполнится при изменении свойства объекта payload'
+    },
     payload: { type: Object, required: true, description: 'Объект, который размещается на форме' },
     descriptor: {
       type: Array,
@@ -86,13 +93,21 @@ export default {
     validateform (...args) {
     },
     onchange ({ $event, property }, callback) {
+      let newvalue = {}
+      let reload = true
       if (property.input === 'select') {
-        Vue.set(this.formobject, property.datafield, $event[property.valuekey])
-      } else if (typeof $event === 'boolean' || $event === null || $event.type !== 'change') {
-        Vue.set(this.formobject, property.datafield, $event)
+        if ($event.type === 'error') {
+          reload = false
+          $event.reload()
+        } else {
+          newvalue = (($event || {})[property.valuekey]) || null
+        }
+      } else if (typeof $event === 'boolean' || $event === null | $event.type !== 'change') {
+        newvalue = $event
       } else {
-        Vue.set(this.formobject, property.datafield, $event.target.value)
+        newvalue = $event.target.value
       }
+      if (reload) this.onpropertychange(property, newvalue)
       if (callback) callback.call(property, this.formobject, $event)
     },
     onblur ({ $event, property }, callback) {
