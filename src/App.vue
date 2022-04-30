@@ -18,8 +18,7 @@
 
 <script>
 import CDMenu from './components/cd-menu.vue'
-import { Message } from 'element-ui'
-console.log(Message)
+
 export default {
   name: 'App',
   components: {
