@@ -126,6 +126,7 @@ export default {
             valuekey: 'code',
             labelkey: 'name',
             url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
             method: 'get',
             resolvepayload: (payload) => ({
               params: {
@@ -160,6 +161,7 @@ export default {
                 limit: 10
               }
             }),
+            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
             isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
             onselect (payload, option, descriptor) {
               if (option) Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
@@ -175,7 +177,8 @@ export default {
         const simplegrid = {
           get: {
             method: 'get',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
+            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
+            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' }
           },
           descriptor: examples.citydescriptor,
           keyfield: 'Id',
@@ -196,7 +199,8 @@ export default {
         const grid = {
           get: {
             method: 'get',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
+            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
+            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' }
           },
           usefilter: true,
           filter: examples.cityfilter,

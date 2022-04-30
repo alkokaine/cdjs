@@ -162,6 +162,11 @@ params: Function // функция, которая возвращает пара
           valuekey: 'wikiDataId',
           labelkey: 'name',
           url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000',
+            'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
+          },
           slotdescriptor: [
             {
               datafield: 'code'
@@ -196,6 +201,7 @@ params: Function // функция, которая возвращает пара
           datafield: 'id',
           text: 'Город',
           url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
+          headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
           method: 'get',
           input: 'select',
           labelkey: 'city',
@@ -219,6 +225,7 @@ params: Function // функция, которая возвращает пара
             valuekey: 'wikiDataId',
             labelkey: 'name',
             url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
             method: 'get',
             slotdescriptor: [
               {
