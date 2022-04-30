@@ -17,15 +17,9 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
 import CDMenu from './components/cd-menu.vue'
-// axios.defaults.baseURL = 'wft-geo-db.p.rapidapi.com'
-// axios.defaults.headers.common['x-rapidapi-host'] = 'wft-geo-db.p.rapidapi.com'
-
-axios.defaults.headers.common.Authorization = 'Token 08ca729eaf9a69c5d90fd9bde48adb7d8131a60a'
-Vue.prototype.$http = axios
-
+import { Message } from 'element-ui'
+console.log(Message)
 export default {
   name: 'App',
   components: {
@@ -33,78 +27,6 @@ export default {
   },
   data (app) {
     return {
-      metadata: {
-        currentOffset: 0,
-        totalCount: 0
-      },
-      formpayload: {
-        namePrefix: ''
-      },
-      get: { url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities', method: 'get' },
-      payload: {
-        limit: 10,
-        minPopulation: null,
-        namePrefix: null,
-        distanceUnit: null,
-        offset: 0,
-        excludedCountryIds: null
-      },
-      descriptor: [
-        {
-          datafield: 'id',
-          text: 'id'
-        },
-        {
-          datafield: 'type',
-          text: 'Type'
-        },
-        {
-          datafield: 'city',
-          text: 'City'
-        },
-        {
-          datafield: 'country',
-          text: 'Country'
-        },
-        {
-          datafield: 'countryCode',
-          text: 'Country Code'
-        },
-        {
-          datafield: 'region',
-          text: 'Region'
-        },
-        {
-          datafield: 'latitude',
-          text: 'Lat'
-        },
-        {
-          datafield: 'longitude',
-          text: 'Lon'
-        }
-      ],
-      form: [
-        {
-          datafield: 'namePrefix',
-          text: 'Поиск'
-        },
-        {
-          select: {
-            valuekey: 'wikiDataId',
-            labelkey: 'name',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
-            method: 'get',
-            resolveresult: (response) => (response.data.data),
-            isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
-            params: (payload) => ({
-              limit: 10,
-              namePrefix: payload.namePrefix
-            })
-          },
-          datafield: 'wikiDataId',
-          text: 'Country'
-        }
-      ],
       menu: [
         { id: 1, icon: 'bi bi-list-ul', text: 'Список', url: '/Collection' },
         { id: 13, icon: '', text: 'Вкладки', url: '/Tabs' },
