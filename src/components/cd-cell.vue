@@ -4,17 +4,20 @@
     <slot>
       <template v-if="editortype.isselect">
         <el-select class="w-100" :disabled="disabled" v-model="cellvalue" :value-key="property.valuekey" :clearable="property.clearable" :placeholder="property.placeholder"
-          :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini"
+          :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini" :remote="true" :remote-method="retrieveoptions"
           v-on:change="onchange({ $event: option($event), property }, property.onchange)" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
           v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)" v-on:clear="onclear({ $event, property }, property.onclear)"
           v-on:blur="onblur({ $event, property }, property.onblur)" v-on:focus="onfocus({ $event, property }, property.onfocus)">
-          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item"
-            :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :get="property">
-            <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
-              <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
-              <span v-else>{{ option.row[property.labelkey] }}</span>
-            </el-option>
-          </cd-list>
+          <cd-list v-if="showlist" class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :onerror="onerror"
+              :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :get="get" :resolvepayload="property.resolvepayload">
+              <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
+                <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
+                <span v-else>{{ option.row[property.labelkey] }}</span>
+              </el-option>
+              <el-option v-if="error" slot="no-data" :value="nullvalue" label="Не выбрано">
+                <cd-props :payload="error" :descriptor="errordescriptor"></cd-props>
+              </el-option>
+            </cd-list>
         </el-select>
       </template>
       <template v-else-if="editortype.isautocomplete">
@@ -107,13 +110,34 @@ export default {
     onfocus: { type: Function },
     onclear: { type: Function },
     onselect: { type: Function },
-    revert: { type: Boolean }
+    revert: { type: Boolean },
+    errordescriptor: {
+      type: Array,
+      default: function () {
+        return [
+          {
+            descriptor: [
+              {
+                datafield: 'message',
+                class: 'error-message'
+              },
+              {
+                datafield: 'details',
+                class: 'error-details'
+              }
+            ],
+            class: 'error-info'
+          }
+        ]
+      }
+    }
   },
   data (cell) {
     const property = cell.property
     return {
       isarray: Array.isArray(cell.value),
       cellvalue: cell.resolvevalue(property, cell.value),
+      nullvalue: null,
       editortype: {
         isselect: property.input === 'select',
         isautocomplete: property.input === 'autocomplete',
@@ -128,7 +152,8 @@ export default {
       },
       pickeroptions: property.options,
       values: (property.values || []),
-      error: Object
+      error: false,
+      showlist: true
     }
   },
   watch: {
@@ -142,6 +167,12 @@ export default {
     }
   },
   methods: {
+    retrieveoptions () {
+      const cell = this
+      return () => {
+        Vue.set(cell, 'values', cell.property.values)
+      }
+    },
     resolvevalue (property, value) {
       if (property.input === 'slider') {
         return (value || 0)
@@ -151,6 +182,19 @@ export default {
     },
     option (event) {
       const cell = this
+      if (event === null) {
+        cell.showlist = false
+        cell.error = false
+        return {
+          type: 'error',
+          info: cell.error,
+          reload: () => {
+            Vue.nextTick(() => {
+              cell.showlist = true
+            })
+          }
+        }
+      }
       return this.values.find(o => o[cell.property.valuekey] === event)
     },
     optionpropertyclass (...args) {
@@ -159,12 +203,15 @@ export default {
     },
     resolveresult (response) {
       this.values = this.property.resolveresult(response)
-      this.error = Object
+      this.error = false
     },
     onerror (reason) {
-      this.error = reason
+      this.error = {
+        message: reason.message,
+        details: reason.response.data
+      }
       this.values = []
-      this.value = ''
+      this.cellvalue = ''
     },
     onvisiblechange (event, callback) {
       if (callback) callback.call(event.property, event.$event)
@@ -182,13 +229,16 @@ export default {
       ).then((response) => {
         callback(cell.property.resolveresult(response))
       }).catch((reason) => {
-        console.log(reason)
+        cell.onerror(reason)
       })
     }
   },
   computed: {
     ischecked () {
       return this.value === true
+    },
+    get () {
+      return this.property
     }
   }
 }
@@ -208,6 +258,13 @@ export default {
     color: var(--bs-body-color)!important;
     cursor: default!important;;
   }
+  .error-info {
+    max-width: 250px;
+    white-space: pre-line;
+  }
+  .el-popper {
+    min-width: unset!important;
+  }
   /*
   .cd-clear--button {
     margin-left: -40px;
@@ -219,10 +276,6 @@ export default {
   }
   .form-control:focus{
     box-shadow: 0 0 0 0.05rem rgb(13 110 253 / 25%)!important;
-  }
-  .el-select-dropdown__item {
-    height: unset!important;
-    line-height: unset!important;
   }
   .option-descriptor {
     display: contents;
@@ -240,12 +293,19 @@ export default {
     -webkit-appearance: none;
     margin: 0;
   }
-
+  .el-select-dropdown__item {
+    height: unset!important;
+    line-height: unset!important;
+  }
   /* Firefox */
   input[type=number] {
     -moz-appearance: textfield;
   }
   .cd-slider {
     width: 100%;
+  }
+  .error-message {
+    font-size: 0.9rem;
+    width: 200px;
   }
 </style>
