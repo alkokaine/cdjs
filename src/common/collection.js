@@ -1,7 +1,6 @@
 export default {
   name: 'collection',
   props: {
-    config: { type: Object, description: 'Кажется, без нас никуда. Мы -- это настройки запроса. Возможно только Мы справимся с CORS, авторизацией на разных ендпойнтах и вообще чем угодно' },
     /**
      * без неё никуда
      * но шутка в том, что объект параметры-запроса может отличаться для разных
@@ -38,13 +37,13 @@ export default {
     */
     payload: {
       type: Object,
-      description: 'Прежде чем читать дальше, нужно смириться с тем, что почти всегда сервер от нас что-то ожидает, и это что-то должно передаваться в это свойство'
+      description: 'нужно смириться с тем, что почти всегда сервер от нас что-то ожидает, и это что-то должно передаваться в это свойство'
     },
     /**
       * keyfield: имя свойства с ключевым значением
       *
       */
-    keyfield: { type: String, required: true, description: 'Прежде чем читать дальше, нужно смириться с тем, что у элементов в коллекции есть неповторяющееся свойство, его идентификатор, он передаётся сюда' },
+    keyfield: { type: String, required: true, description: 'нужно смириться с тем, что у элементов в коллекции есть неповторяющееся свойство, его идентификатор, он передаётся сюда' },
     /**
      * объект или функция, возвращающая объект, содержащий
      * свойства строковые get, remove, add, update
@@ -52,7 +51,7 @@ export default {
      * пусть это будет функцией от параметров загрузки данных, см. watch.payload
      */
     // crud: { type: [Object, Function], description: '!!!!! кандидат на пересмотр !!!!! Пусть это будет объект с четырьма свойствами: get, update, delete, add { method: String, url: String }, для получения коллекции, добавления, удаления и редактирования объектов коллекци. В свойстве method будем указывать метод http запроса (post, get...) в свойстве url адрес метода ' },
-    get: { type: Object, description: 'Объект, содержащий урл и заголовок метода' },
+    get: { type: Object, description: 'Объект, содержащий урл, наименование хттп-метода, и возможно заголовки запроса' },
     /**
      * нужна ли постраничная загрузка
      */
@@ -93,18 +92,15 @@ export default {
   methods: {
     loaddata (url, payload) {
       const local = this
-      const request = local.$http[local.get.method]
-      if (request !== undefined && typeof request === 'function') {
-        request(url, local.resolvepayload(payload))
-          .then((response) => {
-            local.resolveresult(response)
-            local.error = false
-          })
-          .catch((reason) => {
-            local.error = reason
-            if (local.onerror !== undefined && typeof local.onerror === 'function') local.onerror(reason)
-          })
-      }
+      local.$http({ method: local.get.method, url: url, data: local.resolvepayload(payload), headers: local.get.headers })
+        .then((response) => {
+          local.resolveresult(response)
+          local.error = false
+        })
+        .catch((reason) => {
+          local.error = reason
+          if (local.onerror !== undefined && typeof local.onerror === 'function') local.onerror(reason)
+        })
     }
   }
 }
