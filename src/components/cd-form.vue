@@ -29,14 +29,14 @@
 <script>
 import Vue from 'vue'
 import utils from '../common/utils'
-import fieldset from './cd-fieldset.vue'
-import CdCell from './cd-cell.vue'
+import CDFieldset from './cd-fieldset.vue'
+import CDCell from './cd-cell.vue'
 
 export default {
   name: 'cd-form',
   components: {
-    'cd-fieldset': fieldset,
-    'cd-cell': CdCell
+    'cd-fieldset': CDFieldset,
+    'cd-cell': CDCell
   },
   props: {
     resettext: { type: String, default: 'Сбросить' },
@@ -157,6 +157,8 @@ export default {
       handler (newvalue) {
         if (newvalue) {
           this.revert = false
+        } else {
+
         }
       }
     }
