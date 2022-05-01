@@ -5,7 +5,7 @@
       <template v-if="editortype.isselect">
         <el-select class="w-100" :disabled="disabled" v-model="cellvalue" :value-key="property.valuekey" :clearable="property.clearable" :placeholder="property.placeholder"
           :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini" :remote="true" :remote-method="retrieveoptions"
-          v-on:change="onchange({ $event: option($event), property }, property.onchange)" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
+          v-on:change="onchange({ $event: option($event), property }, property.onselect)" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
           v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)" v-on:clear="onclear({ $event, property }, property.onclear)"
           v-on:blur="onblur({ $event, property }, property.onblur)" v-on:focus="onfocus({ $event, property }, property.onfocus)">
           <cd-list v-if="showlist" class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :onerror="onerror"
