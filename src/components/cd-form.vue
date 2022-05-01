@@ -108,23 +108,23 @@ export default {
         newvalue = $event.target.value
       }
       if (reload) this.onpropertychange(property, newvalue)
-      if (callback) callback.call(property, this.formobject, $event)
+      if (callback) callback.call(property, this.formobject, $event, this)
     },
     onblur ({ $event, property }, callback) {
-      if (callback) callback.call(property, this.formobject, $event)
+      if (callback) callback.call(property, this.formobject, $event, this)
     },
     oninput ({ $event, property }, callback) {
-      if (callback) callback.call(property, this.formobject, $event)
+      if (callback) callback.call(property, this.formobject, $event, this)
     },
     onclear ({ $event, property }, callback) {
-      if (callback) callback.call(property, this.formobject, $event)
+      if (callback) callback.call(property, this.formobject, $event, this)
     },
     onfocus ({ $event, property }, callback) {
-      if (callback) callback.call(property, this.formobject, $event)
+      if (callback) callback.call(property, this.formobject, $event, this)
     },
     onselect ({ $event, property }, callback) {
       Vue.set(this.formobject, property.datafield, $event[property.labelkey])
-      if (callback) callback.call(property, this.formobject, $event)
+      if (callback) callback.call(property, this.formobject, $event, this)
     },
     applychanges (event, source, target) {
       const form = this
@@ -158,7 +158,7 @@ export default {
         if (newvalue) {
           this.revert = false
         } else {
-
+          this.revert = true
         }
       }
     }
