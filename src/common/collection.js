@@ -57,27 +57,6 @@ export default {
      */
     paging: { type: Boolean, default: false, description: 'Нужна ли постраничная загрузка' }
   },
-  watch: {
-    /**
-     * собственно, реактивность
-     * изменение свойств параметров загрузки данных (фильтра)
-     * обработается функцией handler
-     */
-    payload: {
-      deep: true,
-      /**
-       *
-       * @param {Object} newvalue новое значение объекта payload
-       */
-      handler (newvalue) {
-        const local = this
-
-        if ((newvalue && typeof newvalue !== 'function') && (local.$http) && (local.get && local.get.url !== '')) {
-          local.loaddata(local.get.url, newvalue)
-        }
-      }
-    }
-  },
   computed: {
     rowkey () {
       const local = this
