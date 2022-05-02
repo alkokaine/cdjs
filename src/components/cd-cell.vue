@@ -5,19 +5,19 @@
       <template v-if="editortype.isselect">
         <el-select class="w-100" :disabled="disabled" v-model="cellvalue" :value-key="property.valuekey" :clearable="property.clearable" :placeholder="property.placeholder"
           :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini" :remote="true" :remote-method="retrieveoptions"
-          v-on:change="onchange({ $event: option($event), property }, property.onselect)" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
+          v-on:change="onchange({ $event: option($event), property }, ($event === '' ? property.reset : property.onselect))" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
           v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)" v-on:clear="onclear({ $event, property }, property.onclear)"
           v-on:blur="onblur({ $event, property }, property.onblur)" v-on:focus="onfocus({ $event, property }, property.onfocus)">
-          <cd-list v-if="showlist" class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :onerror="onerror"
-              :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :get="get" :resolvepayload="property.resolvepayload">
-              <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
-                <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
-                <span v-else>{{ option.row[property.labelkey] }}</span>
-              </el-option>
-              <el-option v-if="error" slot="no-data" :value="nullvalue" label="Не выбрано">
-                <cd-props :payload="error" :descriptor="errordescriptor"></cd-props>
-              </el-option>
-            </cd-list>
+          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :onerror="onerror"
+            :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :payload="property.payload" :get="get" :resolvepayload="property.resolvepayload">
+            <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
+              <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
+              <span v-else>{{ option.row[property.labelkey] }}</span>
+            </el-option>
+            <el-option slot="no-data" :value="nullvalue" label="Не выбрано">
+              <cd-props v-if="error" :payload="error" :descriptor="errordescriptor"></cd-props>
+            </el-option>
+          </cd-list>
         </el-select>
       </template>
       <template v-else-if="editortype.isautocomplete">
@@ -152,8 +152,7 @@ export default {
       },
       pickeroptions: property.options,
       values: (property.values || []),
-      error: false,
-      showlist: true
+      error: false
     }
   },
   watch: {
@@ -183,16 +182,10 @@ export default {
     option (event) {
       const cell = this
       if (event === null) {
-        cell.showlist = false
         cell.error = false
         return {
           type: 'error',
-          info: cell.error,
-          reload: () => {
-            Vue.nextTick(() => {
-              cell.showlist = true
-            })
-          }
+          info: cell.error
         }
       }
       return this.values.find(o => o[cell.property.valuekey] === event)
@@ -245,6 +238,10 @@ export default {
 </script>
 
 <style>
+  .el-select-dropdown__item {
+    height: unset!important;
+    line-height: unset!important;
+  }
   .cd-cell {
     display: flex;
     align-items: center;
@@ -259,11 +256,16 @@ export default {
     cursor: default!important;;
   }
   .error-info {
-    max-width: 250px;
     white-space: pre-line;
   }
   .el-popper {
     min-width: unset!important;
+  }
+    .error-message {
+    font-size: 0.9rem;
+  }
+  .error-details {
+    white-space: normal!important;
   }
   /*
   .cd-clear--button {
@@ -293,19 +295,11 @@ export default {
     -webkit-appearance: none;
     margin: 0;
   }
-  .el-select-dropdown__item {
-    height: unset!important;
-    line-height: unset!important;
-  }
   /* Firefox */
   input[type=number] {
     -moz-appearance: textfield;
   }
   .cd-slider {
     width: 100%;
-  }
-  .error-message {
-    font-size: 0.9rem;
-    width: 200px;
   }
 </style>
