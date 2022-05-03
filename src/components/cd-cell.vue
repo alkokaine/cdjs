@@ -8,7 +8,7 @@
           v-on:change="onchange({ $event: option($event), property }, ($event === '' ? property.reset : property.onselect))" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
           v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)" v-on:clear="onclear({ $event, property }, property.onclear)"
           v-on:blur="onblur({ $event, property }, property.onblur)" v-on:focus="onfocus({ $event, property }, property.onfocus)">
-          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="p-0 m-0 el-select-dropdown__item" :onerror="onerror"
+          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="el-select-dropdown__item pt-1 pb-1" :onerror="onerror"
             :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :payload="property.payload" :get="get" :resolvepayload="property.resolvepayload">
             <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
               <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
@@ -181,6 +181,9 @@ export default {
     },
     option (event) {
       const cell = this
+      if (Array.isArray(event)) {
+        return event
+      }
       if (event === null) {
         cell.error = false
         return {
