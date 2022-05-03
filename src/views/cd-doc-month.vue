@@ -79,6 +79,14 @@ export default {
           ])
         },
         {
+          datafield: 'empty_id',
+          text: 'тест',
+          input: 'select',
+          valuekey: 'empty_id',
+          labelkey: 'label',
+          values: []
+        },
+        {
           datafield: 'object_id',
           text: 'object_id',
           input: 'select',

@@ -20,8 +20,52 @@ import CDForm from '@/components/cd-form.vue'
 import CDDocGeneric from '@/generic/cd-doc-generic.vue'
 import ComponentInfo from '@/generic/cd-doc-component-info.vue'
 
+const buildingslotdescriptor = [
+  {
+    datafield: 'Name',
+    class: 'building-name pb-1'
+  },
+  {
+    datafield: 'BuildingTypeName',
+    class: 'building-type-name pb-1'
+  },
+  {
+    datafield: 'Address',
+    class: 'building-address'
+  }
+]
+
 export default {
   components: { 'cd-doc': CDDocGeneric, 'cd-info': ComponentInfo, 'cd-form': CDForm },
+  props: {
+    building: {
+      type: Object,
+      default: function (options = {}) {
+        return {
+          input: 'select',
+          datafield: 'building_id',
+          slotdescriptor: buildingslotdescriptor,
+          class: options.class,
+          text: 'Объект недвижимости',
+          onselect: options.onselect,
+          resolveresult (response) {
+            return response.data.Data
+          },
+          headers: {
+            Accept: '*/*',
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1MTk5ODQzMSwiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.26Rmkx8XTSjqzag91XdKJUyk73NmDsA4E6-ee7GbbAg'
+          },
+          url: '/local/api/building/object/196',
+          reset: options.reset,
+          method: 'get',
+          valuekey: 'BuildingID',
+          labelkey: 'Name',
+          clearable: (options.clearable || false)
+        }
+      }
+    }
+  },
   data (doc) {
     return {
       editmode: false,
@@ -39,6 +83,7 @@ export default {
                   datafield: 'Name',
                   text: 'Полное название'
                 },
+                doc.building,
                 {
                   descriptor: [
                     {

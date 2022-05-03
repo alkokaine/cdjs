@@ -114,60 +114,64 @@ export default {
         ]
       }
     },
-    cityfilter: {
-      type: Array,
+    countrydd: {
+      type: Object,
       default: function () {
         const view = this
-        return [
-          {
-            datafield: 'countryIds',
-            text: 'Страна',
-            input: 'select',
-            valuekey: 'code',
-            labelkey: 'name',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
-            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
-            method: 'get',
-            resolvepayload: (payload) => ({
-              params: {
-                offset: 0,
-                limit: 10
-              }
-            }),
-            resolveresult: (response) => response.data.data,
-            isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
-            onselect: (payload, option, parent) => {
-              if (option) {
-                const region = parent.descriptor.find(p => p.datafield === 'region_id')
-                Vue.set(region, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.code}/regions`)
-                Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=${option.code}`)
-              } else {
-                Vue.set(view.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
-              }
+        return {
+          datafield: 'countryIds',
+          text: 'Страна',
+          input: 'select',
+          valuekey: 'code',
+          labelkey: 'name',
+          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+          headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
+          method: 'get',
+          resolvepayload: (payload) => ({
+            params: {
+              offset: 0,
+              limit: 10
             }
-          },
-          {
-            datafield: 'region_id',
-            text: 'regions',
-            input: 'select',
-            valuekey: 'wikiDataId',
-            labelkey: 'name',
-            url: '',
-            method: 'get',
-            resolveresult: (response) => response.data.data,
-            resolvepayload: (payload) => ({
-              params: {
-                offset: 0,
-                limit: 10
-              }
-            }),
-            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
-            isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
-            onselect (payload, option, descriptor) {
-              if (option) Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
+          }),
+          resolveresult: (response) => response.data.data,
+          isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
+          onselect: (payload, option, parent) => {
+            if (option) {
+              const region = parent.descriptor.find(p => p.datafield === 'region_id')
+              Vue.set(region, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.code}/regions`)
+              Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=${option.code}`)
+            } else {
+              Vue.set(view.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
             }
           }
-        ]
+        }
+      }
+    },
+    regiondd: {
+      type: Object,
+      default: function () {
+        const view = this
+        return {
+          datafield: 'region_id',
+          text: 'regions',
+          input: 'select',
+          valuekey: 'wikiDataId',
+          labelkey: 'name',
+          url: '',
+          method: 'get',
+          resolveresult: (response) => response.data.data,
+          resolvepayload: (payload) => ({
+            params: {
+              offset: 0,
+              limit: 10
+            }
+          }),
+          headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
+          isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
+          onselect (payload, option, descriptor) {
+            if (option) Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
+          }
+        }
       }
     },
     simplegrid: {
@@ -192,30 +196,14 @@ export default {
         return simplegrid
       }
     },
-    filtered: {
-      type: Object,
-      default: function () {
-        const examples = this
-        const grid = {
-          get: {
-            method: 'get',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
-            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' }
-          },
-          usefilter: true,
-          filter: examples.cityfilter,
-          descriptor: examples.citydescriptor,
-          keyfield: 'Id',
-          total: 0,
-          paging: true,
-          resolveresult: (response) => examples.resolveresult(response),
-          resolvepayload (payload) {
-            return examples.resolvepayload(payload)
-          }
-        }
-        return grid
-      }
-    },
+    // filtered: {
+    //   type: Object,
+    //   default: function () {
+    //     const examples = this
+    //     const grid =
+    //     return grid
+    //   }
+    // },
     breweries: {
       type: Object,
       default: function () {
@@ -277,31 +265,15 @@ export default {
         }
         return form
       }
-    },
-    gridexamples: {
-      type: Array,
-      default: function () {
-        const view = this
-        return [
-          {
-            name: 'simple',
-            caption: 'Простой грид',
-            grid: view.simplegrid
-          },
-          {
-            name: 'filtered',
-            caption: 'Грид с фильтром',
-            grid: view.filtered
-          },
-          {
-            name: 'make-your-own-grid-in-5-min',
-            caption: 'Сделай свой грид за 5 минут',
-            form: view.form,
-            grid: view.simplegrid
-          }
-        ]
-      }
     }
+    // ,
+    // gridexamples: {
+    //   type: Array,
+    //   default: function () {
+    //     const view = this
+    //     return
+    //   }
+    // }
   },
   data (view) {
     const increase = () => { Vue.set(view, 'step', view.step + 1) }
@@ -391,7 +363,43 @@ export default {
         offset: 0,
         countryIds: null
       },
-      // gridexamples: ,
+      gridexamples: [
+        {
+          name: 'simple',
+          caption: 'Простой грид',
+          grid: view.simplegrid
+        },
+        {
+          name: 'filtered',
+          caption: 'Грид с фильтром',
+          grid: {
+            get: {
+              method: 'get',
+              url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
+              headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' }
+            },
+            usefilter: true,
+            filter: [
+              view.countrydd,
+              view.regiondd
+            ],
+            descriptor: view.citydescriptor,
+            keyfield: 'Id',
+            total: 0,
+            paging: true,
+            resolveresult: (response) => view.resolveresult(response),
+            resolvepayload (payload) {
+              return view.resolvepayload(payload)
+            }
+          }
+        },
+        {
+          name: 'make-your-own-grid-in-5-min',
+          caption: 'Сделай свой грид за 5 минут',
+          form: view.form,
+          grid: view.simplegrid
+        }
+      ],
       doc: [
         {
           id: 'grid-a',
