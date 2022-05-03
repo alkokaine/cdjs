@@ -9,7 +9,7 @@
     <div class="cd-grid--table">
       <table class="table table-sm border-bottom" :class="[{ 'table-striped' : striped, 'table-hover': highlightOnHover }, borderclass ]">
         <caption>
-          <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click="loaddata(get.url, payload)">{{ error }}</div></slot>
+          <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click.stop="loaddata(get.url, payload)">{{ error }}</div></slot>
         </caption>
         <thead v-if="!hideheader" class="cd-grid--head table-light border-top" :class="headerclass">
           <tr class="ms-0 me-0">
@@ -269,6 +269,14 @@ export default {
     onpopoverenter (event, args) {
       const onenter = args.prop.onenter
       if (onenter && typeof onenter === 'function') onenter(args.row, event)
+    }
+  },
+  watch: {
+    payload: {
+      deep: true,
+      handler (newvalue, oldvalue) {
+        this.loaddata(this.get.url, newvalue)
+      }
     }
   }
 }
