@@ -14,9 +14,20 @@
               <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
               <span v-else>{{ option.row[property.labelkey] }}</span>
             </el-option>
-            <el-option slot="no-data" :value="nullvalue" label="Не выбрано">
-              <cd-props v-if="error" :payload="error" :descriptor="errordescriptor"></cd-props>
-            </el-option>
+            <template slot="no-data">
+              <template v-if="error">
+                <el-option class="cd-error--option" :value="error" :label="error.message">
+                  <cd-props :payload="error" :descriptor="errordescriptor"></cd-props>
+                </el-option>
+              </template>
+              <template v-else>
+                <el-option class="cd-no-data--option text-center" :value="nullvalue" label="Не выбрано">
+                  <div class="cd-no-data w-100 mx-auto my-2">
+                    <div>Нет данных</div>
+                  </div>
+                </el-option>
+              </template>
+            </template>
           </cd-list>
         </el-select>
       </template>
@@ -118,11 +129,24 @@ export default {
           {
             descriptor: [
               {
-                datafield: 'message',
+                descriptor: [
+                  {
+                    datafield: 'status',
+                    class: 'error-status w-25'
+                  },
+                  {
+                    datafield: 'status_text',
+                    class: 'error-status-text w-75'
+                  }
+                ],
+                class: 'response-status'
+              },
+              {
+                datafield: 'response',
                 class: 'error-message'
               },
               {
-                datafield: 'details',
+                datafield: 'message',
                 class: 'error-details'
               }
             ],
@@ -181,15 +205,10 @@ export default {
     },
     option (event) {
       const cell = this
+      if (event === null || event === undefined) return null
+      if (event === cell.error) return event
       if (Array.isArray(event)) {
         return event
-      }
-      if (event === null) {
-        cell.error = false
-        return {
-          type: 'error',
-          info: cell.error
-        }
       }
       return this.values.find(o => o[cell.property.valuekey] === event)
     },
@@ -199,12 +218,16 @@ export default {
     },
     resolveresult (response) {
       this.values = this.property.resolveresult(response)
+      this.cellvalue = null
       this.error = false
     },
-    onerror (reason) {
+    onerror ({ message, request, response }) {
       this.error = {
-        message: reason.message,
-        details: reason.response.data
+        type: 'error',
+        status: (response || {}).status,
+        status_text: (response || {}).statusText,
+        response: (request || {}).response,
+        message: message
       }
       this.values = []
       this.cellvalue = ''
@@ -250,6 +273,10 @@ export default {
     align-items: center;
     flex-grow: 1;
   }
+  .cd-no-data--option {
+    width: 300px;
+    height: 75px;
+  }
   .cd-field {
     margin-bottom: 0.5em;
   }
@@ -264,11 +291,14 @@ export default {
   .el-popper {
     min-width: unset!important;
   }
-    .error-message {
-    font-size: 0.9rem;
+  .error-message {
+    font-size: 0.9em;
   }
   .error-details {
     white-space: normal!important;
+  }
+  .tumbleweed {
+    width: inherit;
   }
   /*
   .cd-clear--button {
