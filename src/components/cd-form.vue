@@ -96,11 +96,16 @@ export default {
       let newvalue = {}
       let reload = true
       if (property.input === 'select') {
-        if ($event.type === 'error') {
+        if ($event !== undefined && $event.type === 'error') {
+          const attemp = ((property.payload || {})).attemp || 0
+          Vue.set(property, 'payload', { attemp: attemp + 1 })
           reload = false
-          $event.reload()
         } else {
-          newvalue = (($event || {})[property.valuekey]) || null
+          if (Array.isArray($event)) {
+            newvalue = $event
+          } else {
+            newvalue = (($event || {})[property.valuekey]) || null
+          }
         }
       } else if (typeof $event === 'boolean' || $event === null | $event.type !== 'change') {
         newvalue = $event
