@@ -48,6 +48,19 @@ export default {
     inner: { type: Boolean, default: false, description: 'Признак того, что коллекция вложенная' },
     listrole: { type: String }
   },
+  watch: {
+    'get.url': {
+      immediate: true,
+      handler (newvalue, oldvalue) {
+        if (newvalue !== undefined) this.loaddata(newvalue, this.payload)
+      }
+    },
+    payload: {
+      handler (newvalue, oldvalue) {
+        if (newvalue !== undefined) this.loaddata(this.get.url, newvalue)
+      }
+    }
+  },
   // watch: {
   //   get: {
   //     deep: true,
