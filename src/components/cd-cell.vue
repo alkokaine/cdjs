@@ -14,20 +14,11 @@
               <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
               <span v-else>{{ option.row[property.labelkey] }}</span>
             </el-option>
-            <template slot="no-data">
-              <template v-if="error">
-                <el-option class="cd-error--option" :value="error" :label="error.message">
-                  <cd-props :payload="error" :descriptor="errordescriptor"></cd-props>
-                </el-option>
-              </template>
-              <template v-else>
-                <el-option class="cd-no-data--option text-center" :value="nullvalue" label="Не выбрано">
-                  <div class="cd-no-data w-100 mx-auto my-2">
-                    <div>Нет данных</div>
-                  </div>
-                </el-option>
-              </template>
-            </template>
+            <el-option slot="no-data" :value="(error ? error : nullvalue)">
+              <el-empty>
+                <cd-props class="error-info" v-if="error" :payload="error" :descriptor="errordescriptor"></cd-props>
+              </el-empty>
+            </el-option>
           </cd-list>
         </el-select>
       </template>
@@ -139,7 +130,7 @@ export default {
                     class: 'error-status-text w-75'
                   }
                 ],
-                class: 'response-status'
+                class: 'response-status d-inline'
               },
               {
                 datafield: 'response',
@@ -287,15 +278,15 @@ export default {
   }
   .error-info {
     white-space: pre-line;
+    width: 250px;
   }
   .el-popper {
     min-width: unset!important;
   }
   .error-message {
-    font-size: 0.9em;
+    font-size: 0.7em;
   }
   .error-details {
-    white-space: normal!important;
   }
   .tumbleweed {
     width: inherit;
@@ -321,6 +312,9 @@ export default {
   .cd-slider {
     width: 100%;
   } */
+  .el-empty__image {
+    width: 250px;
+  }
 </style>
 <style scoped>
   input::-webkit-outer-spin-button,
