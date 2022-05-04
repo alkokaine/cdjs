@@ -19,7 +19,7 @@
         </cd-fieldset>
       <div v-if="showcontrols && editmode" class="cd-form--buttons">
         <button class="btn btn-primary btn-sm ms-2 cd-reset-button" v-on:click="applychanges($event, payload, formobject)">{{ resettext }}</button>
-        <button class="btn btn-primary btn-sm ms-2 cd-submit-button" v-on:click="applychanges($event, formobject, payload)" v-bind:disabled="!haschange">{{ submittext }}</button>
+        <button class="btn btn-primary btn-sm ms-2 cd-submit-button" v-on:click="applychanges($event, formobject, payload)">{{ submittext }}</button>
       </div>
     </form>
     <slot name="footer"></slot>
@@ -107,6 +107,8 @@ export default {
             newvalue = (($event || {})[property.valuekey]) || null
           }
         }
+      } else if (property.input === 'date' || property.input === 'datetime') {
+        newvalue = new Date($event)
       } else if (typeof $event === 'boolean' || $event === null | $event.type !== 'change') {
         newvalue = $event
       } else {
