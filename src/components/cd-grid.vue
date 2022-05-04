@@ -169,6 +169,7 @@ export default {
     formatDate: {
       type: Function,
       default: function (date) {
+        if (date === null || date === undefined) return 'н/д'
         return formatter.format(new Date(date))
       }
     }
