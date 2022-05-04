@@ -15,6 +15,9 @@
         <template v-else-if="iswww(row)">
           <a :href="payload[row.datafield]">{{ payload[row.datafield] }}</a>
         </template>
+        <template v-else-if="isroute(row)">
+          <router-link :to="row.route(payload)">{{ payload[row.datafield] }}</router-link>
+        </template>
         <template v-else>
           {{ payload[row.datafield] }}
         </template>
@@ -49,6 +52,9 @@ export default {
     },
     email () {
       return (value) => `mailto:${value}`
+    },
+    isroute () {
+      return (property) => property.route !== undefined
     }
   },
   methods: {
@@ -61,5 +67,7 @@ export default {
 </script>
 
 <style>
-
+  .cd-prop {
+    padding-left: 0.2rem;
+  }
 </style>
