@@ -209,7 +209,7 @@ export default {
     },
     resolveresult (response) {
       this.values = this.property.resolveresult(response)
-      this.cellvalue = null
+      this.cellvalue = this.value
       this.error = false
     },
     onerror ({ message, request, response }) {
