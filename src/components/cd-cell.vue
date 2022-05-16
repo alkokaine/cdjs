@@ -7,7 +7,7 @@
           :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini" :remote="true" :remote-method="retrieveoptions"
           v-on:change="onchange({ $event: option($event), property }, ($event === '' ? property.reset : property.onselect))" v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
           v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)" v-on:clear="onclear({ $event, property }, property.onclear)"
-          v-on:blur="onblur({ $event, property }, property.onblur)" v-on:focus="onfocus({ $event, property }, property.onfocus)">
+          v-on:blur="onblur({ $event, property }, property.onblur)" v-on:focus="onfocus({ $event, property }, property.onfocus)" :required="required">
           <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="el-select-dropdown__item pt-1 pb-1" :onerror="onerror"
             :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :payload="property.payload" :get="get" :resolvepayload="property.resolvepayload">
             <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
@@ -27,7 +27,7 @@
           :value-key="property.valuekey" :placement="property.placement" :fetch-suggestions="fetchsuggestions" size="mini"
           :trigger-on-focus="property.focustrigger" :name="property.datafield" v-on:select="onselect({ $event, property }, property.onselect)"
           v-on:change="onchange({ $event, property }, property.onchange)" v-on:focus="onfocus({ $event, property }, property.onfocus)" v-on:blur="onblur({ $event, property }, property.onblur)"
-          v-on:input="oninput({ $event, property }, property.oninput)" v-on:clear="onclear({ $event, property }, property.onclear)">
+          v-on:input="oninput({ $event, property }, property.oninput)" v-on:clear="onclear({ $event, property }, property.onclear)" :required="required">
           <div slot-scope="option">
               <cd-props v-if="property.slotdescriptor" :payload="option.item" :descriptor="property.slotdescriptor"></cd-props>
               <span v-else>{{ option.item[property.labelkey] }}</span>
@@ -42,7 +42,7 @@
           v-on:blur="onblur({ $event, property }, property.onblur)"
           v-on:focus="onfocus({ $event, property }, property.onfocus)"
           v-on:input="oninput({ $event, property }, property.oninput)"
-          v-on:clear="onclear({ $event, property }, property.onclear)">
+          v-on:clear="onclear({ $event, property }, property.onclear)" :required="required">
         </el-date-picker>
       </template>
       <template v-else-if="editortype.isdatetime"></template>
@@ -52,13 +52,13 @@
           v-on:input="oninput({ $event, property }, property.oninput)"
           v-on:focus="onfocus({ $event, property }, property.onfocus)"
           v-on:change="onchange({ $event, property }, property.onchange)"
-          v-on:blur="onblur({ $event, property }, property.onblur)"/>
+          v-on:blur="onblur({ $event, property }, property.onblur)" :required="required"/>
       </div>
       <template v-else-if="editortype.ischeckbox">
         <el-checkbox class="cd-checkbox" size="mini" v-model="cellvalue" :disabled="disabled" v-on:change="onchange({ $event, property }, property.onchange)" :checked="ischecked"></el-checkbox>
       </template>
       <template v-else-if="editortype.isfile">
-        <el-upload class="cd-upload" :action="property.url" :headers="property.headers" :multiple="property.multiple"></el-upload>
+        <el-upload class="cd-upload" :action="property.url" :headers="property.headers" :multiple="property.multiple" :required="required"></el-upload>
       </template>
       <template v-else-if="editortype.istextarea">
         <el-input type="textarea" v-model="cellvalue" :disabled="disabled"
@@ -66,7 +66,7 @@
           v-on:change="onchange({ $event, property}, property.onchange)"
           v-on:input="oninput({ $event, property }, property.oninput)"
           v-on:focus="onfocus({ $event, property }, property.onfocus)"
-          v-on:clear="onclear({ $event, property }, property.onclear)"></el-input>
+          v-on:clear="onclear({ $event, property }, property.onclear)" :required="required"></el-input>
       </template>
       <template v-else-if="editortype.isslider">
         <input type="range" class="form-range" :min="property.min" :max="property.max" :step="property.step" v-model="cellvalue" :disabled="disabled"
@@ -77,7 +77,7 @@
         <el-switch v-model="cellvalue" v-on:change="onchange({ $event, property }, property.onchange)" :disabled="disabled"></el-switch>
       </template>
       <template v-else-if="!isarray">
-        <el-input v-model="cellvalue" size="mini" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable"
+        <el-input v-model="cellvalue" size="mini" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable" :required="required"
           v-on:change="onchange({ $event, property }, property.onchange)"
           v-on:input="oninput({ $event, property }, property.oninput)"
           v-on:focus="onfocus({ $event, property }, property.onfocus)"
@@ -102,6 +102,7 @@ export default {
     'cd-props': CDProps
   },
   props: {
+    required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     property: { type: Object, required: true },
     readonly: { type: Boolean, default: true },
@@ -258,62 +259,6 @@ export default {
   .el-select-dropdown__item {
     height: unset!important;
     line-height: unset!important;
-  }
-  .cd-cell {
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
-  }
-  .cd-no-data--option {
-    width: 300px;
-    height: 75px;
-  }
-  .cd-field {
-    margin-bottom: 0.5em;
-  }
-  .el-input.is-disabled .el-input__inner {
-    background-color: var(--bs-body-bg)!important;
-    color: var(--bs-body-color)!important;
-    cursor: default!important;;
-  }
-  .error-info {
-    white-space: pre-line;
-    width: 250px;
-  }
-  .el-popper {
-    min-width: unset!important;
-  }
-  .error-message {
-    font-size: 0.7em;
-  }
-  .error-details {
-  }
-  .tumbleweed {
-    width: inherit;
-  }
-  /*
-  .cd-clear--button {
-    margin-left: -40px;
-  }
-  input.is-readonly {
-    border-style: none;
-    cursor: default;
-    background-color: var(--bs-body-bg);
-  }
-  .form-control:focus{
-    box-shadow: 0 0 0 0.05rem rgb(13 110 253 / 25%)!important;
-  }
-  .option-descriptor {
-    display: contents;
-  }
-  .cd-select--options {
-    display: contents;
-  }
-  .cd-slider {
-    width: 100%;
-  } */
-  .el-empty__image {
-    width: 250px;
   }
 </style>
 <style scoped>
