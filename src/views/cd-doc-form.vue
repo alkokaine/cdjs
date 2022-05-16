@@ -3,7 +3,7 @@
     <cd-doc :content="content"></cd-doc>
     <cd-info property="props" :component="form"></cd-info>
     <el-checkbox v-model="editmode">AAA</el-checkbox> {{ editmode }}
-    <cd-form class="m-auto" :descriptor="descriptor" :payload="test" :onpropertychange="onpropertychange" :editmode="editmode" :showcontrols="true" :switchmode="oncancel">
+    <cd-form class="m-auto" :descriptor="descriptor" :payload="test" :showcontrols="true">
       <template slot-scope="{ property }">
         <template v-if="property.datafield === 'test'">
           AAAAAA
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-
+import Vue from 'vue'
 import CDForm from '@/components/cd-form.vue'
 import CDDocGeneric from '@/generic/cd-doc-generic.vue'
 import ComponentInfo from '@/generic/cd-doc-component-info.vue'
@@ -47,14 +47,16 @@ export default {
           slotdescriptor: buildingslotdescriptor,
           class: options.class,
           text: 'Объект недвижимости',
-          onselect: options.onselect,
+          onselect (payload, option, parent) {
+            Vue.set(payload, 'BuildingID', option.BuildingID)
+          },
           resolveresult (response) {
             return response.data.Data
           },
           headers: {
             Accept: '*/*',
             'Content-Type': 'application/json',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1MTk5ODQzMSwiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.26Rmkx8XTSjqzag91XdKJUyk73NmDsA4E6-ee7GbbAg'
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1NDcxMTY2OSwiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.UhM0s_gZdZkZPtvBdZQYbbi_6yN3kEd2hcw02Z3oCcs'
           },
           url: '/local/api/building/object/196',
           reset: options.reset,
@@ -81,7 +83,8 @@ export default {
               descriptor: [
                 {
                   datafield: 'Name',
-                  text: 'Полное название'
+                  text: 'Полное название',
+                  required: (payload) => payload.BuildingID > 0
                 },
                 doc.building,
                 {

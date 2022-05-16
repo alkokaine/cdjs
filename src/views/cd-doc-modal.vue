@@ -1,8 +1,15 @@
 <template>
   <div class="cd-doc-modal">
     <button v-on:click="isvisible = true">Show dialog</button>
-    <el-dialog :visible="isvisible" width="75%">
-      <cd-form :descriptor="descriptor" :payload="payload" :showcontrols="true"></cd-form>
+    <el-dialog :visible="isvisible" width="75%" :close-on-click-modal="true" :close-on-press-escape="true" top="5vh" :before-close="beforeClose" v-on:close="onClosing" v-on:closed="onClosed">
+      <div slot="title">Заголовок диалога в слоте title</div>
+      <cd-form name="editor" ref="editor" :descriptor="descriptor" :payload="payload" :onsubmit="submit">
+        <div slot="header">Заголовок формы в слоте header формы</div>
+      </cd-form>
+      <div slot="footer">
+        <button type="reset" form="editor" class="btn btn-primary btn-sm ms-2 cd-reset-button" v-on:click="isvisible = false">Отменить</button>
+        <button class="btn btn-primary btn-sm ms-2 cd-submit-button">Сохранить</button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -356,10 +363,20 @@ export default {
         }
       ]
     }
+  },
+  methods: {
+    submit (event, callback) {},
+    beforeClose (complete) {
+    },
+    onClosing () {},
+    onClosed () {}
   }
 }
 </script>
 
 <style>
-
+  .el-dialog__body {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 </style>
