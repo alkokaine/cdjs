@@ -3,7 +3,7 @@
     <legend v-if="haslegend(parent)" slot="legend" class="cd-legend position-absolute top-25 start-0 translate-middle-y ms-4">
       <span class="bg-secondary text-white px-3 py-1 user-select-none">{{ parent.text }}</span>
     </legend>
-    <cd-list class="cd-fieldset--props" :listclass="['list-unstyled cd-fieldset--inner', innerclass, { 'sm-container': !inner, 'mx-1 pt-4': haslegend(parent) }]" keyfield="datafield" :rowclass="['cd-field--wrap', { 'inner': inner, 'px-2' : !inner }]" :isrowvisible="isvisible" :collection="descriptor">
+    <cd-list class="cd-fieldset--props" :listclass="['list-unstyled cd-fieldset--inner', innerclass, { 'sm-container': !inner, 'm-2 pt-4': haslegend(parent) }]" keyfield="datafield" :rowclass="['cd-field--wrap', { 'inner': inner, 'px-2' : !inner }]" :isrowvisible="isvisible" :collection="descriptor">
       <template slot-scope="{ row }">
         <template v-if="hasdescriptor(row)">
           <cd-fieldset :descriptor="row.descriptor" :isvisible="isvisible" :isdisabled="isdisabled" :parent="row" :resolvevalue="resolvevalue" :innerclass="row.class" :inner="true">
