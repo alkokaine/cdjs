@@ -1,7 +1,7 @@
 <template>
   <div class="cd-list" v-on:mouseleave="listleave">
     <slot name="header"></slot>
-    <ul v-if="showitems" :role="listrole" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]">
+    <ul v-if="showitems" v-loading="isloading" :role="listrole" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]">
       <li v-if="isempty" class="cd-list--item no-data">
         <slot name="no-data"></slot>
       </li>

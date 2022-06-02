@@ -30,7 +30,7 @@
             <th scope="col"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-loading="isloading">
           <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
             <tr v-for="(row, rindex) in collection" :key="rowkey(row)" class="ms-0 me-0">
@@ -270,14 +270,6 @@ export default {
     onpopoverenter (event, args) {
       const onenter = args.prop.onenter
       if (onenter && typeof onenter === 'function') onenter(args.row, event)
-    }
-  },
-  watch: {
-    payload: {
-      deep: true,
-      handler (newvalue, oldvalue) {
-        this.loaddata(this.get.url, newvalue)
-      }
     }
   }
 }
