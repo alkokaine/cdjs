@@ -182,7 +182,11 @@ export default {
           get: {
             method: 'get',
             url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
-            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' }
+            headers: {
+              'Content-Type': 'application/json',
+              'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000',
+              'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
+            }
           },
           descriptor: examples.citydescriptor,
           keyfield: 'Id',
