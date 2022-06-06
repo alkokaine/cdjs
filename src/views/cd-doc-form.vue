@@ -3,7 +3,12 @@
     <cd-doc :content="content"></cd-doc>
     <cd-info property="props" :component="form"></cd-info>
     <el-checkbox v-model="editmode">AAA</el-checkbox> {{ editmode }}
-    <cd-form class="m-auto" :descriptor="descriptor" :payload="test" :showcontrols="true">
+    <cd-form class="m-auto" :descriptor="descriptor"
+      :payload="test"
+      :showcontrols="true"
+      :editmode="editmode"
+      :submit="submitform"
+      :reset="resetform">
       <template slot-scope="{ property }">
         <template v-if="property.datafield === 'test'">
           AAAAAA
@@ -11,6 +16,7 @@
       </template>
     </cd-form>
     {{ test }}
+    {{ shadow }}
   </div>
 </template>
 
@@ -75,6 +81,7 @@ export default {
       test: {
         date: new Date(Date.now())
       },
+      shadow: Object,
       descriptor: [
         {
           descriptor: [
@@ -421,12 +428,32 @@ export default {
       ]
     }
   },
+  watch: {
+    editmode: {
+      handler (newvalue, oldvalue) {
+        if (newvalue && !oldvalue) {
+          this.shadow = Object.assign({}, this.test)
+        } else {
+          if (this.isreset) {
+            this.test = Object.assign({}, this.shadow)
+          }
+        }
+      }
+    }
+  },
   methods: {
     onpropertychange (...args) {
       // console.log(args)
     },
     oncancel (event) {
       this.editmode = false
+    },
+    submitform ({ $event, payload }) {
+      this.test = payload
+      console.log('submitting form', $event, payload, this.test)
+    },
+    resetform ({ $event, payload }) {
+      console.log('resetting form', $event, payload, this.test)
     }
   }
 }
