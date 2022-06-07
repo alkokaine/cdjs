@@ -5,7 +5,7 @@
     <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
       <div>
         <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
-        <cd-grid v-if="grid" class="example-grid" ref="example" :keyfield="grid.keyfield"
+        <cd-grid v-if="grid" class="example-grid" ref="example" :keyfield="grid.keyfield" :headers="grid.headers"
           :get="grid.get"
           :payload="payload"
           :descriptor="grid.descriptor"
@@ -27,7 +27,7 @@
                 <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
               </cd-list>
             </div>
-            <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter"
+            <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter" :sync="true"
               :payload="payload"
               :inline="true"
               :onpropertychange="onfilterchange">
@@ -181,12 +181,12 @@ export default {
         const simplegrid = {
           get: {
             method: 'get',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000',
-              'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-            }
+            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000',
+            'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
           },
           descriptor: examples.citydescriptor,
           keyfield: 'Id',
@@ -252,7 +252,7 @@ export default {
           ],
           onselect (property, option, parent) {
             Vue.set(examples, 'collection', [])
-            Vue.set(examples, 'grid', option.grid)
+            Vue.set(examples, 'grid', this.values.find(v => v.key === option))
             Vue.set(examples, 'step', 0)
           }
         }
@@ -379,9 +379,9 @@ export default {
           grid: {
             get: {
               method: 'get',
-              url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
-              headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' }
+              url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
             },
+            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
             usefilter: true,
             filter: [
               view.countrydd,

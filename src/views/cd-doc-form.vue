@@ -89,6 +89,11 @@ export default {
               text: 'Общее',
               descriptor: [
                 {
+                  datafield: 'date1',
+                  input: 'date',
+                  text: 'date1'
+                },
+                {
                   datafield: 'Name',
                   text: 'Полное название',
                   required: (payload) => payload.BuildingID > 0
