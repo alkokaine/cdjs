@@ -21,11 +21,13 @@
 </template>
 
 <script>
+
 import collection from '../common/collection'
 import selection from '../common/selection'
+import watchurl from '../common/get-url-watch'
 export default {
   name: 'cd-list',
-  mixins: [collection, selection],
+  mixins: [collection, selection, watchurl],
   props: {
     isrowvisible: { type: Function },
     showitems: { type: Boolean, default: true, description: 'Прячем или нет элементы списка' },
@@ -49,12 +51,6 @@ export default {
     listrole: { type: String }
   },
   watch: {
-    'get.url': {
-      immediate: true,
-      handler (newvalue, oldvalue) {
-        if (newvalue !== undefined) this.loaddata(newvalue, this.payload)
-      }
-    },
     payload: {
       handler (newvalue, oldvalue) {
         if (newvalue !== undefined) this.loaddata(this.get.url, newvalue)
