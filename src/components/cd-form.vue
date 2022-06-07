@@ -26,18 +26,15 @@
         </button>
       </div>
     </form>
-    <slot name="footer">
-      {{ formobject }}
-    </slot>
+    <slot name="footer"></slot>
   </div>
 </template>
 
 <script>
-// import Vue from 'vue'
+import Vue from 'vue'
 import utils from '../common/utils'
 import CDFieldset from './cd-fieldset.vue'
 import CDCell from './cd-cell.vue'
-
 export default {
   name: 'cd-form',
   components: {
@@ -128,30 +125,30 @@ export default {
       callback(args)
     },
     onchange ({ $event, property }, callback) {
-      // if (this.sync) {
-      //   let newvalue = {}
-      //   if (property.input === 'select') {
-      //     if ($event !== null && $event !== undefined && $event.type === 'error') {
-      //       const attemp = ((property.payload || {})).attemp || 0
-      //       Vue.set(property, 'payload', { attemp: attemp + 1 })
-      //     } else {
-      //       if (Array.isArray($event)) {
-      //         newvalue = $event
-      //       } else {
-      //         newvalue = (($event || {})[property.valuekey]) || null
-      //       }
-      //     }
-      //   } else if (property.input === 'date' || property.input === 'datetime') {
-      //     newvalue = new Date($event)
-      //   } else if (typeof $event === 'boolean' || $event === null | $event.type !== 'change') {
-      //     newvalue = $event
-      //   } else {
-      //     newvalue = $event.target.value
-      //   }
-      //   Vue.set(this.payload, property.datafield, newvalue)
-      // }
+      let newvalue = {}
+      if (property.input === 'select') {
+        if ($event !== null && $event !== undefined && $event.type === 'error') {
+          const attemp = ((property.payload || {})).attemp || 0
+          Vue.set(property, 'payload', { attemp: attemp + 1 })
+        } else {
+          if (Array.isArray($event)) {
+            newvalue = $event
+          } else {
+            newvalue = (($event || {})[property.valuekey]) || null
+          }
+        }
+      } else if (property.input === 'date' || property.input === 'datetime') {
+        newvalue = (new Date($event)).toISOString()
+      } else if (typeof $event === 'boolean' || $event === null | $event.type !== 'change') {
+        newvalue = $event
+      } else {
+        newvalue = $event.target.value
+      }
       this.haschange = true
-      if (callback) callback.call(property, this.formobject, $event, this)
+      if (this.formobject[property.datafield] !== newvalue) {
+        Vue.set(this.formobject, property.datafield, newvalue)
+      }
+      if (callback) callback.call(property, this.formobject, newvalue, this)
     },
     onblur ({ $event, property }, callback) {
       if (callback) callback.call(property, this.formobject, $event, this)
@@ -160,6 +157,7 @@ export default {
       if (callback) callback.call(property, this.formobject, $event, this)
     },
     onclear ({ $event, property }, callback) {
+      Vue.set(this.formobject, property.datafield, null)
       if (callback) callback.call(property, this.formobject, $event, this)
     },
     onfocus ({ $event, property }, callback) {
