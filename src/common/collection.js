@@ -45,6 +45,7 @@ export default {
      * пусть это будет функцией от параметров загрузки данных, см. watch.payload
      */
     get: { type: Object, description: 'Объект, содержащий урл, наименование хттп-метода, и возможно заголовки запроса' },
+    headers: { type: Object, description: 'Заголовки запроса' },
     beforeRequest: { type: Function, description: 'Функция выполнится перед отправкой запроса' },
     errorRequest: { type: Function, description: 'Функция выполнится при ошибке' }
   },
@@ -84,7 +85,7 @@ export default {
         method: local.get.method,
         url: url,
         data: local.resolvepayload(payload),
-        headers: local.get.headers
+        headers: local.headers
       }).then((response) => {
         local.resolveresult(response)
         local.error = false
