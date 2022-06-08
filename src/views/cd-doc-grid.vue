@@ -84,6 +84,11 @@ export default {
             text: 'city'
           },
           {
+            datafield: 'money',
+            text: 'money',
+            input: 'money'
+          },
+          {
             datafield: 'country',
             text: 'country'
           },
@@ -471,7 +476,11 @@ export default {
     },
     resolveresult (response) {
       Vue.set(this, 'total', response.data.metadata.totalCount)
-      Vue.set(this, 'collection', response.data.data)
+      Vue.set(this, 'collection', response.data.data.map(d => {
+        var randomnum = Math.floor(Math.random() * (1000 - 100) + 100) / 100
+        Vue.set(d, 'money', randomnum)
+        return d
+      }))
     },
     onpagechange (newpage) {
       Vue.set(this.payload, 'offset', (newpage.page - 1) * newpage.pageSize)
