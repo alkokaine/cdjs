@@ -69,7 +69,10 @@ export default {
           method: 'get',
           valuekey: 'BuildingID',
           labelkey: 'Name',
-          clearable: (options.clearable || false)
+          clearable: (options.clearable || false),
+          isdisabled (option, payload, parent) {
+            return option.BuildingTypeID === 1
+          }
         }
       }
     }
@@ -203,6 +206,30 @@ export default {
               descriptor: [
                 {
                   descriptor: [
+                    {
+                      datafield: 'FullAddress',
+                      text: 'Подобрать адрес',
+                      input: 'autocomplete',
+                      url: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address',
+                      method: 'post',
+                      labelkey: 'value',
+                      headers: {
+                        Authorization: 'Token 0289160a02213271903b8c31ce47c670c58c3093',
+                        'Access-Control-Allow-Credentials': 'true'
+                      },
+                      data (query, parent) {
+                        return {
+                          query: `${query}`, locations_boost: [{ kladr_id: '51' }]
+                        }
+                      },
+                      resolveresult (response) {
+                        return response.data.suggestions
+                      },
+                      isdisabled (option, payload, parent) {
+                        return false
+                      },
+                      focustrigger: false
+                    },
                     {
                       datafield: 'PostIndex',
                       text: 'Почтовый индекс'

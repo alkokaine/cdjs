@@ -134,7 +134,7 @@ export default {
             }
           }),
           resolveresult: (response) => response.data.data,
-          isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
+          isdisabled: (option, payload, parent) => option !== undefined && (option.wikiDataId || '').endsWith(7),
           onselect: (payload, option, parent) => {
             if (option) {
               const region = parent.descriptor.find(p => p.datafield === 'region_id')
@@ -167,7 +167,7 @@ export default {
             }
           }),
           headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
-          isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
+          isdisabled: (option, payload, parent) => option !== undefined && (option.wikiDataId || '').endsWith(7),
           onselect (payload, option, descriptor) {
             if (option) Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
           }

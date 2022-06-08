@@ -181,7 +181,7 @@ params: Function // функция, которая возвращает пара
           method: 'get',
           resolveresult: (response) => response.data.data,
           resolvepayload: home.resolveCountryPayload,
-          isdisabled: (payload, option) => option.wikiDataId.endsWith(7)
+          isdisabled: (option, payload, parent) => option.wikiDataId.endsWith(7)
         },
         params: countryParams,
         paramsdescriptor: [
@@ -234,7 +234,7 @@ params: Function // функция, которая возвращает пара
             ],
             resolveresult: (response) => response.data.data,
             resolvepayload: home.resolveCountryPayload,
-            isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
+            isdisabled: (option, payload, parent) => option.wikiDataId.endsWith(7),
             onselect: (payload, option) => {
               if (option) Vue.set(payload, 'countryIds', `${option.code},`)
             }
