@@ -7,7 +7,7 @@
           <template v-if="property">
             <slot :property="property" :parent="parent">
               <cd-cell class="cd-field" :property="property" :class="property.class" :onchange="onchange" :parent="self"
-                :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect"
+                :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect" :resolvepayload="resolvefetchdata(property)"
                 :disabled="!editmode" v-model.lazy="formobject[property.datafield]" :revert="revert" :required="isrequired(property)"
                 :isoptiondisabled="resolveoptiondisabled(property)">
                 <el-popover slot="label" :disabled="true">
@@ -125,6 +125,16 @@ export default {
           return property.isdisabled(option, form.formobject, form)
         }
         return false
+      }
+    },
+    resolvefetchdata (property) {
+      const form = this
+      if (['autocomplete', 'select'].includes(property.input)) {
+        return (query) => {
+          if (Object.prototype.hasOwnProperty.call(property, 'resolvepayload') && typeof property.resolvepayload === 'function') {
+            return property.resolvepayload(query, form.formobject, form)
+          }
+        }
       }
     },
     onsubmit (args, callback) {

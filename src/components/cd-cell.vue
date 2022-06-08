@@ -13,11 +13,11 @@
           v-on:blur="onblur({ $event, property }, property.onblur)"
           @input="dispatch"
           v-on:focus="onfocus({ $event, property }, property.onfocus)" :required="required">
-          <cd-list class="cd-select--options" listclass="list-unstyled" rowclass="el-select-dropdown__item" :errorRequest="onerror" :beforeRequest="onbefore"
+          <cd-list class="cd-select--options" listclass="list-unstyled" :errorRequest="onerror" :beforeRequest="onbefore"
             :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :payload="property.payload" :get="property" :headers="property.headers" :resolvepayload="property.resolvepayload">
-            <el-option slot-scope="option" :value="option.row[property.valuekey]" :label="option.row[property.labelkey]">
-              <cd-props v-if="property.slotdescriptor" :payload="option.row" :descriptor="property.slotdescriptor"></cd-props>
-              <span v-else>{{ option.row[property.labelkey] }}</span>
+            <el-option slot-scope="{ row }" :value="row[property.valuekey]" :label="row[property.labelkey]" :disabled="isoptiondisabled(row)">
+              <cd-props v-if="property.slotdescriptor" :payload="row" :descriptor="property.slotdescriptor"></cd-props>
+              <span v-else>{{ row[property.labelkey] }}</span>
             </el-option>
             <div class="select-no-data" slot="no-data">
               <template v-if="error">
@@ -33,15 +33,15 @@
         </el-select>
       </template>
       <template v-else-if="editortype.isautocomplete">
-        <el-autocomplete class="w-100" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable" v-model="cellvalue" :debounce="500"
+        <el-autocomplete class="w-100" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable" v-model="cellvalue" :debounce="300"
           :value-key="property.valuekey" :placement="property.placement" :fetch-suggestions="fetchsuggestions" size="mini"
           :trigger-on-focus="property.focustrigger" :name="property.datafield" v-on:select="onselect({ $event, property }, property.onselect)"
           v-on:change="onchange({ $event, property }, property.onchange)" v-on:focus="onfocus({ $event, property }, property.onfocus)" v-on:blur="onblur({ $event, property }, property.onblur)"
           v-on:input="oninput({ $event, property }, property.oninput)" v-on:clear="onclear({ $event, property }, property.onclear)" :required="required"
           @input="dispatch">
-          <div slot-scope="option">
-              <cd-props v-if="property.slotdescriptor" :payload="option.item" :descriptor="property.slotdescriptor"></cd-props>
-              <span v-else>{{ option.item[property.labelkey] }}</span>
+          <div slot-scope="{ item }" :class="['cd-autocomplete--option my-1', {'pe-none': isoptiondisabled(item) }]">
+              <cd-props v-if="property.slotdescriptor" :payload="item" :descriptor="property.slotdescriptor"></cd-props>
+              <span v-else>{{ item[property.labelkey] }}</span>
           </div>
         </el-autocomplete>
       </template>
@@ -125,6 +125,7 @@ export default {
     onclear: { type: Function },
     onselect: { type: Function },
     revert: { type: Boolean },
+    isoptiondisabled: { type: [Boolean, Function] },
     errordescriptor: {
       type: Array,
       default: function () {
@@ -157,7 +158,9 @@ export default {
           }
         ]
       }
-    }
+    },
+    parent: { type: Object },
+    resolvepayload: { type: Function }
   },
   data (cell) {
     const property = cell.property
@@ -218,7 +221,6 @@ export default {
       return this.values.find(o => o[cell.property.valuekey] === event)
     },
     optionpropertyclass (...args) {
-      // console.log(args)
       return 'option-property'
     },
     resolveresult (response) {
@@ -251,7 +253,7 @@ export default {
     fetchsuggestions (query, callback) {
       const cell = this
       cell.$http[cell.property.method](cell.property.url,
-        cell.property.data(query),
+        cell.resolvepayload(query),
         {
           headers: cell.property.headers
         }
@@ -277,6 +279,10 @@ export default {
   .el-select-dropdown__item {
     height: unset!important;
     line-height: unset!important;
+  }
+  .cd-autocomplete--option {
+    white-space: normal;
+    line-height: 1rem;
   }
 </style>
 <style scoped>
