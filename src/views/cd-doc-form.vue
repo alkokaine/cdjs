@@ -217,7 +217,7 @@ export default {
                         Authorization: 'Token 0289160a02213271903b8c31ce47c670c58c3093',
                         'Access-Control-Allow-Credentials': 'true'
                       },
-                      data (query, parent) {
+                      resolvepayload (query, payload, parent) {
                         return {
                           query: `${query}`, locations_boost: [{ kladr_id: '51' }]
                         }
@@ -228,7 +228,10 @@ export default {
                       isdisabled (option, payload, parent) {
                         return false
                       },
-                      focustrigger: false
+                      focustrigger: false,
+                      onselect (...args) {
+                        console.log(args)
+                      }
                     },
                     {
                       datafield: 'PostIndex',
