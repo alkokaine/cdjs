@@ -78,6 +78,9 @@
                             <template v-else-if="prop.input === 'checkbox'">
                               <input class="form-check-input pe-none" type="checkbox" :checked="row[prop.datafield]"/>
                             </template>
+                            <template v-else-if="prop.input === 'money'">
+                              {{ formatMoney(row[prop.datafield]) }}
+                            </template>
                             <template v-else>
                               {{ row[prop.datafield] }}
                             </template>
@@ -171,6 +174,13 @@ export default {
       default: function (date) {
         if (date === null || date === undefined) return 'н/д'
         return formatter.format(new Date(date))
+      }
+    },
+    formatMoney: {
+      type: Function,
+      default: function (money) {
+        if (money === null || money === undefined) return 'н/д'
+        return Number(money || 0).toLocaleString('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 2, minimumFractionDigits: 2, useGrouping: true })
       }
     }
   },

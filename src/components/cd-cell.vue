@@ -173,7 +173,7 @@ export default {
         isautocomplete: property.input === 'autocomplete',
         isdate: property.input === 'date',
         isdatetime: property.input === 'datetime',
-        isnumber: property.input === 'number',
+        isnumber: ['number', 'money'].includes(property.input),
         ischeckbox: property.input === 'checkbox',
         isfile: property.input === 'file',
         istextarea: property.input === 'textarea',
