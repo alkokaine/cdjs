@@ -6,9 +6,10 @@
         <template slot-scope="{ property, parent }">
           <template v-if="property">
             <slot :property="property" :parent="parent">
-              <cd-cell class="cd-field" :property="property" :class="property.class" :onchange="onchange"
+              <cd-cell class="cd-field" :property="property" :class="property.class" :onchange="onchange" :parent="self"
                 :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect"
-                :disabled="!editmode" v-model.lazy="formobject[property.datafield]" :revert="revert" :required="isrequired(property)">
+                :disabled="!editmode" v-model.lazy="formobject[property.datafield]" :revert="revert" :required="isrequired(property)"
+                :isoptiondisabled="resolveoptiondisabled(property)">
                 <el-popover slot="label" :disabled="true">
                   <label tabindex="-1" slot="reference" class="cd-label form-label mb-0 user-select-none" :for="property.datafield">{{ property.text }}</label>
                 </el-popover>
@@ -117,6 +118,15 @@ export default {
     }
   },
   methods: {
+    resolveoptiondisabled (property) {
+      const form = this
+      return (option) => {
+        if (Object.prototype.hasOwnProperty.call(property, 'isdisabled') && typeof property.isdisabled === 'function') {
+          return property.isdisabled(option, form.formobject, form)
+        }
+        return false
+      }
+    },
     onsubmit (args, callback) {
       callback(args)
     },
@@ -172,7 +182,8 @@ export default {
     return {
       formobject: form.sync ? form.payload : Object.assign({}, form.payload),
       haschange: false,
-      revert: false
+      revert: false,
+      self: form
     }
   },
   watch: {
@@ -189,11 +200,6 @@ export default {
             form.revert = false
           }, 150)
         }
-      }
-    },
-    payload: {
-      handler (newvalue, oldvalue) {
-        this.formobject = this.payload.sync ? newvalue : Object.assign({}, newvalue)
       }
     }
   }
