@@ -33,71 +33,78 @@
         <tbody v-loading="isloading">
           <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
-            <tr v-for="(row, rindex) in collection" :key="rowkey(row)" class="ms-0 me-0">
-              <td v-if="selectrows" class="cd-checkbox--cell">
-                <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event, row)" :checked="isrowselected(row)"/>
-              </td>
-              <td :ref="propcellkey({}, rindex, 0)">
-                <slot :data="{ row, $rowindex: rindex }" :start="true"></slot>
-              </td>
-              <td v-for="(prop, pindex) in columns"
-                    :key="propcellkey(prop, rindex, pindex)" class="cd-grid--cell"
-                    :class="[resolvetdclass(prop, row), { 'text-center' : prop.input === 'checkbox'}]"
-                    v-on:click="oncellclick(prop, { $event, row })">
-                    <el-popover class="cd-grid--tooltip"
-                                :disabled="hasnopopover(prop) || isdisabledpopover(prop, row)" :popper-class="resolvepopperclass(prop, row)"
-                                :trigger="resolvepopovertrigger(prop, row)"
-                                v-on:hide="onpopoverhide($event, { prop, row })"
-                                v-on:show="onpopovershow($event, { prop, row })"
-                                v-on:after-leave="onpopoverleave($event, { prop, row })"
-                                v-on:after-enter="onpopoverenter($event, { prop, row })"
-                                :width="resolvepopoverwidth(prop, row)"
-                                :popper-options="resolvepopoveroptions(prop, row)"
-                                :title="resolvepopovertitle(prop, row)"
-                                :content="resolvepopovercontent(prop, row)">
-                      <template v-if="prop.popover">
-                        <slot :ispopover="true" :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
-                          <div class="cd-popover--default">укажите содержимое подсказки для свойства {{ prop.datafield }} или используйте слот, где ispopover == true  </div>
-                        </slot>
-                      </template>
-                      <template slot="reference">
-                        <slot :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
-                          <div class="w-auto">
-                            <template v-if="prop.icon">
-                              <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
-                            </template>
-                            <template v-else-if="prop.route">
-                              <router-link :to="prop.route(row)">
-                                <template v-if="prop.format">{{ prop.format(row) }}</template>
-                                <template v-else>{{ row[prop.datafield] }}</template>
-                              </router-link>
-                            </template>
-                            <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
-                              {{ formatDate(row[prop.datafield]) }}
-                            </template>
-                            <template v-else-if="prop.input === 'checkbox'">
-                              <input class="form-check-input pe-none" type="checkbox" :checked="row[prop.datafield]"/>
-                            </template>
-                            <template v-else-if="prop.input === 'money'">
-                              {{ formatMoney(row[prop.datafield]) }}
-                            </template>
-                            <template v-else>
-                              {{ row[prop.datafield] }}
-                            </template>
-                          </div>
-                        </slot>
-                      </template>
-                    </el-popover>
-              </td>
-              <td v-if="columns.length === 0">
-                <slot :data="{ row, $rowindex: rindex }" :row="true">
-                  {{ row }}
-                </slot>
-              </td>
-              <td :ref="propcellkey({}, rindex, 999)">
-                <slot :data="{ row, $rowindex: rindex }" :end="true"></slot>
-              </td>
-            </tr>
+            <template v-for="(row, rindex) in collection">
+              <tr class="ms-0 me-0"  :key="rowkey(row)">
+                <td v-if="selectrows" class="cd-checkbox--cell">
+                  <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event, row)" :checked="isrowselected(row)"/>
+                </td>
+                <td :ref="propcellkey({}, rindex, 0)">
+                  <slot :data="{ row, $rowindex: rindex }" :start="true"></slot>
+                </td>
+                <td v-for="(prop, pindex) in columns"
+                      :key="propcellkey(prop, rindex, pindex)" class="cd-grid--cell"
+                      :class="[resolvetdclass(prop, row), { 'text-center' : prop.input === 'checkbox'}]"
+                      v-on:click="oncellclick(prop, { $event, row })">
+                      <el-popover class="cd-grid--tooltip"
+                                  :disabled="hasnopopover(prop) || isdisabledpopover(prop, row)" :popper-class="resolvepopperclass(prop, row)"
+                                  :trigger="resolvepopovertrigger(prop, row)"
+                                  v-on:hide="onpopoverhide($event, { prop, row })"
+                                  v-on:show="onpopovershow($event, { prop, row })"
+                                  v-on:after-leave="onpopoverleave($event, { prop, row })"
+                                  v-on:after-enter="onpopoverenter($event, { prop, row })"
+                                  :width="resolvepopoverwidth(prop, row)"
+                                  :popper-options="resolvepopoveroptions(prop, row)"
+                                  :title="resolvepopovertitle(prop, row)"
+                                  :content="resolvepopovercontent(prop, row)">
+                        <template v-if="prop.popover">
+                          <slot :ispopover="true" :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
+                            <div class="cd-popover--default">укажите содержимое подсказки для свойства {{ prop.datafield }} или используйте слот, где ispopover == true  </div>
+                          </slot>
+                        </template>
+                        <template slot="reference">
+                          <slot :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
+                            <div class="w-auto">
+                              <template v-if="prop.icon">
+                                <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
+                              </template>
+                              <template v-else-if="prop.route">
+                                <router-link :to="prop.route(row)">
+                                  <template v-if="prop.format">{{ prop.format(row) }}</template>
+                                  <template v-else>{{ row[prop.datafield] }}</template>
+                                </router-link>
+                              </template>
+                              <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
+                                {{ formatDate(row[prop.datafield]) }}
+                              </template>
+                              <template v-else-if="prop.input === 'checkbox'">
+                                <input class="form-check-input pe-none" type="checkbox" :checked="row[prop.datafield]"/>
+                              </template>
+                              <template v-else-if="prop.input === 'money'">
+                                {{ formatMoney(row[prop.datafield]) }}
+                              </template>
+                              <template v-else>
+                                {{ row[prop.datafield] }}
+                              </template>
+                            </div>
+                          </slot>
+                        </template>
+                      </el-popover>
+                </td>
+                <td v-if="columns.length === 0">
+                  <slot :data="{ row, $rowindex: rindex }" :row="true">
+                    {{ row }}
+                  </slot>
+                </td>
+                <td :ref="propcellkey({}, rindex, 999)">
+                  <slot :data="{ row, $rowindex: rindex }" :end="true"></slot>
+                </td>
+              </tr>
+              <tr v-if="expandable" :key="appendix(rowkey(row))" class="ms-0 me-0">
+                <td class="cd-grid-row--expanded cd-grid--cell" :colspan="columns.length">
+                  <slot :rowdetails="true" :data="{ row, $rowindex: rindex }"></slot>
+                </td>
+              </tr>
+            </template>
           </template>
           <template v-else>
             <tr class="cd-grid--no-data">
@@ -182,6 +189,10 @@ export default {
         if (money === null || money === undefined) return 'н/д'
         return Number(money || 0).toLocaleString('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 2, minimumFractionDigits: 2, useGrouping: true })
       }
+    },
+    expandable: {
+      type: Boolean,
+      default: false
     }
   },
   data (grid) {
@@ -192,6 +203,9 @@ export default {
     }
   },
   computed: {
+    appendix () {
+      return (key) => `${key}_apx`
+    },
     isdisabledpopover () {
       const grid = this
       return (property, row) => (grid.resolvepopoverproperty(property, 'isdisabled', row))
