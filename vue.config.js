@@ -18,11 +18,11 @@ module.exports = {
         '/city': {
           target: 'https://wft-geo-db.p.rapidapi.com/v1/geo'
         },
-        '/address': {
-          target: 'https://suggestions.dadata.ru',
+        '/suggestions': {
+          target: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest',
           changeOrigin: true,
           pathRewrite: {
-            '/address': ''
+            '/suggestions': ''
           }
         },
         '/local': {
@@ -32,7 +32,7 @@ module.exports = {
           }
         }
       },
-      headers: { 'Access-Control-Allow-Origin': 'http://192.168.106.62:8082' }
+      headers: { 'Access-Control-Allow-Origin': 'http://localhost:8082' }
     }
   }
 }
