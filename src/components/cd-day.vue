@@ -1,6 +1,6 @@
 <template>
-  <div class="cd-day" :class="{ 'border mb-2' : tile && !compact, 'row border-bottom border-start border-end': !tile && !compact }">
-    <div v-if="!compact" class="cd-day--header container-sm row p-0 m-0" :class="{ 'border-1 border-bottom' : tile, 'col-1': !tile }">
+  <div class="cd-day" :class="{ 'border mb-2' : tile && !compact, 'border-bottom border-start border-end': !tile && !compact }">
+    <div v-if="!compact" class="cd-day--header container-sm p-0 m-0 row" :class="{ 'border-1 border-bottom' : tile }">
       <div class="cd-day--number col w-auto">
         {{ day }}
       </div>
@@ -9,7 +9,7 @@
         <div class="cd-day--weekday">{{ weekday }}</div>
       </div>
     </div>
-    <div class="cd-day--content" :class="{ 'col border-start': !tile && !compact, 'container-sm': !compact }">
+    <div class="cd-day--content" :class="{ 'col border-start border-top': !tile && !compact, 'container-sm': !compact }">
       <slot>
         <span v-if="compact">{{ day }}</span>
       </slot>
@@ -49,10 +49,14 @@ export default {
 <style>
   .cd-day--header {
     height: fit-content;
+    background-color: lightgray;
   }
   .cd-day--number {
     font-size: 2em;
     font-weight: bold;
     width: inherit;
-}
+  }
+  .cd-day--info {
+    text-align: left;
+  }
 </style>

@@ -43,7 +43,7 @@
     </div>
     <div v-if="!compact && createnew" slot="footer">
       <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose" width="30%">
-        <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :onpropertychange="ontemplatechange">
+        <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :sync="true" :showcontrols="true">
           <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
             :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
             :tile="false"
@@ -134,7 +134,7 @@ export default {
       },
       description: 'Массив дней недели'
     },
-    mode: { type: Number, default: 1 },
+    mode: { type: [Boolean, Number], default: 1 },
     isdayvisible: { type: Function, default: (day) => (true) },
     isdayselected: { type: Function },
     format: { type: String, default: 'YYYY-MM-DD' },
@@ -253,7 +253,7 @@ export default {
     //   return `https://isdayoff.ru/api/getdata?year=${this.payload.Year}&month=${this.payload.MonthID}&pre=1&covid=1&sd=0`
     // },
     islistview () {
-      return this.mode === 0
+      return !this.mode
     },
     daynumber () {
       return (day) => (day.date.getDay())
@@ -275,7 +275,7 @@ export default {
       return `${this.formatter.format(this.monthdate)} ${this.payload.Year}`
     },
     source () {
-      return this.mode === 0 ? this.calendar : this.weekdays
+      return this.mode ? this.weekdays : this.calendar
     },
     weekdaylist () {
       const month = this
@@ -301,6 +301,7 @@ export default {
     addday () {
     },
     ontemplatechange (...args) {
+      console.log(args)
     },
     weekdayselect (event, weekday) {
       const index = this.selectedweekdays.indexOf(weekday.row.id)
