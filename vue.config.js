@@ -15,8 +15,12 @@ module.exports = {
             '/dayoff': ''
           }
         },
-        '/city': {
-          target: 'https://wft-geo-db.p.rapidapi.com/v1/geo'
+        '/geo': {
+          target: 'https://wft-geo-db.p.rapidapi.com/v1/geo',
+          pathRewrite: {
+            '/geo': ''
+          },
+          changeOrigin: false
         },
         '/suggestions': {
           target: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest',
