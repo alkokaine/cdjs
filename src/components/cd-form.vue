@@ -1,18 +1,16 @@
 <template>
   <div class="cd-form">
     <slot name="header"></slot>
-    <form :name="name" v-loading="revert" class="cd-form--content" v-on:submit.prevent>
+    <el-form :model="formobject" size="mini" ref="innerform" v-loading="revert" :name="name" class="cd-form--content" :class="{ 'needs-validation': validate }" @submit.native.prevent>
       <cd-fieldset class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :descriptor="descriptor" :isvisible="isvisible" :readonly="isreadonly">
         <template slot-scope="{ property, parent }">
           <template v-if="property">
             <slot :property="property" :parent="parent">
-              <cd-cell class="cd-field" :property="property" :class="property.class" :onchange="onchange" :parent="self"
+              <cd-cell class="cd-field mb-2" :property="property" :class="property.class" :onchange="onchange" :parent="self"
                 :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect" :resolvepayload="resolvefetchdata(property)"
                 :disabled="!editmode" v-model.lazy="formobject[property.datafield]" :revert="revert" :required="isrequired(property)"
                 :isoptiondisabled="resolveoptiondisabled(property)">
-                <el-popover slot="label" :disabled="true">
-                  <label tabindex="-1" slot="reference" class="cd-label form-label mb-0 user-select-none" :for="property.datafield">{{ property.text }}</label>
-                </el-popover>
+                <label slot="label" tabindex="-1" class="cd-label form-label mb-0 user-select-none" :for="property.datafield">{{ property.text }}</label>
               </cd-cell>
             </slot>
           </template>
@@ -22,11 +20,11 @@
         <button class="btn btn-sm btn-outline-secondary mx-1 cd-reset--button" type="reset" v-on:click="onreset({ $event, payload }, reset)">
           <slot name="reset">{{ resettext }}</slot>
         </button>
-        <button class="btn btn-primary btn-sm mx-1" type="submit" v-on:click="onsubmit({ $event, payload: formobject }, submit)">
+        <button class="btn btn-primary btn-sm mx-1" v-on:click="onsubmit({ $event, payload: formobject }, submit)">
           <slot name="submit">{{ submittext }}</slot>
         </button>
       </div>
-    </form>
+    </el-form>
     <slot name="footer"></slot>
   </div>
 </template>
@@ -43,6 +41,7 @@ export default {
     'cd-cell': CDCell
   },
   props: {
+    validate: { type: Boolean, default: true },
     resettext: { type: String, default: 'Отменить' },
     submittext: { type: String, default: 'Отправить' },
     name: { type: String },
@@ -138,10 +137,18 @@ export default {
       }
     },
     onsubmit (args, callback) {
-      callback(args)
+      this.$refs.innerform.validate((valid) => {
+        if (valid) {
+          callback(args)
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     onreset (args, callback) {
-      this.formobject = Object.assign({}, args.payload)
+      const form = this
+      form.formobject = Object.assign({}, form.payload)
       callback(args)
     },
     onchange ({ $event, property }, callback) {
@@ -193,7 +200,8 @@ export default {
       formobject: form.sync ? form.payload : Object.assign({}, form.payload),
       haschange: false,
       revert: false,
-      self: form
+      self: form,
+      validateinfo: []
     }
   },
   watch: {
@@ -208,7 +216,7 @@ export default {
         if (newvalue) {
           setTimeout(() => {
             form.revert = false
-          }, 150)
+          }, 50)
         }
       }
     }
@@ -217,7 +225,6 @@ export default {
 </script>
 
 <style>
-
 </style>
 <style scoped>
   label {
