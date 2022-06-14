@@ -100,7 +100,7 @@
                 </td>
               </tr>
               <tr v-if="expandable" :key="appendix(rowkey(row))" class="ms-0 me-0">
-                <td class="cd-grid-row--expanded cd-grid--cell" :colspan="columns.length">
+                <td class="cd-grid-row--expanded cd-grid--cell" :colspan="columnstotal">
                   <slot :rowdetails="true" :data="{ row, $rowindex: rindex }"></slot>
                 </td>
               </tr>
@@ -203,6 +203,9 @@ export default {
     }
   },
   computed: {
+    columnstotal () {
+      return this.columns.length + (this.selectrows ? 3 : 2)
+    },
     appendix () {
       return (key) => `${key}_apx`
     },
