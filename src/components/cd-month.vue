@@ -9,7 +9,8 @@
     </div>
     <div class="month-item-wrap" slot-scope="content" :class="{ 'weekday-container': content.row.id }">
       <template v-if="mode">
-        <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled col" :rowclass="resolvedayclass" :listitemclicked="ondayselect" :isrowvisible="isdayvisible">
+        <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled col"
+          :rowclass="resolvedayclass" :listitemclicked="ondayselect" :isrowvisible="isdayvisible">
           <div class="weekday-name" slot="header">
             <div v-if="selectweekday">
               <input type="checkbox" v-on:change="onweekdayselect($event, content)" :checked="isweekdayselected(content)"/>
