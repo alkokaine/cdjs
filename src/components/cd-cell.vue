@@ -14,7 +14,7 @@
           @input="dispatch"
           v-on:focus="onfocus({ $event, property }, property.onfocus)" >
           <cd-list class="cd-select--options" listclass="list-unstyled" :errorRequest="onerror" :beforeRequest="onbefore"
-            :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :payload="property.payload" :get="property" :headers="property.headers" :resolvepayload="property.resolvepayload">
+            :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :payload="property.payload" :get="property" :headers="property.headers" :resolvepayload="resolvepayload">
             <el-option slot-scope="{ row }" :value="row[property.valuekey]" :label="row[property.labelkey]" :disabled="isoptiondisabled(row)">
               <cd-props v-if="property.slotdescriptor" :payload="row" :descriptor="property.slotdescriptor"></cd-props>
               <span v-else>{{ row[property.labelkey] }}</span>
