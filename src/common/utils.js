@@ -197,11 +197,11 @@ const ispropertyvisible = function (property, payload, propertyowner) {
   return true
 }
 
-const ispropertyeditable = function (property, payload, propertyowner) {
+const ispropertyeditable = function (property, payload) {
   if (hasProperty.call(property, 'canedit')) {
-    if (typeof property.canedit === 'function') return property.canedit(propertyowner, payload)
+    if (typeof property.canedit === 'function') return property.canedit(payload)
     if (typeof property.canedit === 'boolean') return property.canedit
-    console.warn(`[CDJS:WARNING] для property.isvisible ожидается булевское значение, или функция, возвращающая булевское значение. Получено ${typeof property.isvisible}`, property)
+    console.warn(`[CDJS:WARNING] для property.canedit ожидается булевское значение, или функция, возвращающая булевское значение. Получено ${typeof property.canedit}`, property)
     return true
   }
   return true
