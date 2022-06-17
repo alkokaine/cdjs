@@ -1,14 +1,14 @@
 <template>
   <div class="cd-form">
     <slot name="header"></slot>
-    <el-form :model="formobject" size="mini" ref="innerform" v-loading="revert" :name="name" class="cd-form--content" :class="{ 'needs-validation': validate }" @submit.native.prevent>
+    <el-form :model="formobject" size="mini" ref="innerform" v-loading="revert" :name="name" class="cd-form--content" :rules="rules" @submit.native.prevent>
       <cd-fieldset class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :descriptor="descriptor" :isvisible="isvisible" :readonly="isreadonly">
         <template slot-scope="{ property, parent }">
           <template v-if="property">
             <slot :property="property" :parent="parent">
               <cd-cell class="cd-field mb-2" :property="property" :class="property.class" :onchange="onchange" :parent="self"
                 :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect" :resolvepayload="resolvefetchdata(property)"
-                :disabled="!editmode" v-model.lazy="formobject[property.datafield]" :revert="revert" :required="isrequired(property)"
+                :disabled="!ispropertyeditable(property)" v-model.lazy="formobject[property.datafield]" :revert="revert" :required="isrequired(property)"
                 :isoptiondisabled="resolveoptiondisabled(property)">
                 <label slot="label" tabindex="-1" class="cd-label form-label mb-0 user-select-none" :for="property.datafield">{{ property.text }}</label>
               </cd-cell>
@@ -34,6 +34,12 @@ import Vue from 'vue'
 import utils from '../common/utils'
 import CDFieldset from './cd-fieldset.vue'
 import CDCell from './cd-cell.vue'
+
+const hasOwnProperty = Object.prototype.hasOwnProperty
+const isFunction = function (check) {
+  return (typeof this[check] === 'function')
+}
+
 export default {
   name: 'cd-form',
   components: {
@@ -86,6 +92,20 @@ export default {
   computed: {
     flatprops () {
       return utils.flatterer(this.descriptor, [])
+    },
+    ispropertyeditable () {
+      const form = this
+      return (property) => form.editmode && utils.ispropertyeditable(property, form.formobject)
+    },
+    rules () {
+      const form = this
+      const rulesContainer = {}
+      form.flatprops.forEach(property => {
+        if (hasOwnProperty.call(property, 'datafield') && hasOwnProperty.call(property, 'rules')) {
+          Vue.set(rulesContainer, property.datafield, isFunction.call(property, 'rules') ? property.rules(form.formobject) : property.rules)
+        }
+      })
+      return rulesContainer
     },
     resolvevalue () {
       const form = this
