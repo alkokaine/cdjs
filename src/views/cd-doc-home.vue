@@ -29,7 +29,7 @@ import CDForm from '@/components/cd-form.vue'
 import CDSelect from '@/components/cd-select.vue'
 import CDPropExample from '@/generic/cd-prop-example.vue'
 import readyvaluesoptions from '@/examples/propertyoptions.js'
-
+import keys from '@/views/keys'
 const countryParams = {
   limit: 10,
   namePrefix: '',
@@ -161,12 +161,8 @@ params: Function // функция, которая возвращает пара
           input: 'select',
           valuekey: 'wikiDataId',
           labelkey: 'name',
-          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000',
-            'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-          },
+          url: '/geo/countries',
+          headers: keys.geoheaders,
           slotdescriptor: [
             {
               datafield: 'code'
@@ -200,8 +196,8 @@ params: Function // функция, которая возвращает пара
         payload: {
           datafield: 'id',
           text: 'Город',
-          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
-          headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
+          url: '/geo/cities',
+          headers: keys.geoheaders,
           method: 'get',
           input: 'select',
           labelkey: 'city',
@@ -224,8 +220,8 @@ params: Function // функция, которая возвращает пара
             input: 'select',
             valuekey: 'wikiDataId',
             labelkey: 'name',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
-            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
+            url: '/geo/countries',
+            headers: keys.geoheaders,
             method: 'get',
             slotdescriptor: [
               {

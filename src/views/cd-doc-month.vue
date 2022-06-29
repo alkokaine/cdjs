@@ -1,14 +1,14 @@
 <template>
   <cd-setting-container>
-    <cd-form :payload="payload" :descriptor="settings" :onpropertychange="onpropertychange"></cd-form>
-    <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false">
-      <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :onpropertychange="onpropertychange"></cd-form>
-      <cd-list slot-scope="day" listclass="list-unstyled" :collection="details(day.day)" keyfield="id">
-        <div class="row" slot-scope="event">
-          <el-popover :content="event.row.name" trigger="hover" placement="top" :disabled="payload.mode === 0">
-            <div slot="reference" class="col-2">{{ format(event.row) }}</div>
-          </el-popover>
-          <div v-if="payload.mode === 0" class="col-8">{{ event.row.name }}</div>
+    <cd-form :payload="payload" :descriptor="settings" :sync="true"></cd-form>
+    <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false" :showheader="true">
+      <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :sync="true">
+        <div slot="footer"></div>
+      </cd-form>
+      <cd-list slot-scope="{ day }" listclass="list-unstyled" :collection="details(day)" keyfield="id">
+        <div class="row" slot-scope="{ row }">
+          <div class="col-1">{{ format(row) }}</div>
+          <div v-if="!payload.mode" class="col-10">{{ row.name }}</div>
         </div>
         <span slot="no-data">Нет данных</span>
       </cd-list>
@@ -37,19 +37,12 @@ export default {
         {
           datafield: 'mode',
           text: 'Показывать все',
-          input: 'checkbox',
-          toogle (payload) {
-            if (payload.mode === 0) Vue.set(payload, 'mode', 1)
-            else Vue.set(payload, 'mode', 0)
-          }
+          input: 'checkbox'
         },
         {
           datafield: 'canadd',
           text: 'Можно ли добавлять события',
-          input: 'checkbox',
-          toogle (payload) {
-            Vue.set(payload, 'canadd', !payload.canadd)
-          }
+          input: 'checkbox'
         }
       ],
       payload: {
@@ -72,8 +65,7 @@ export default {
           url: '/olympic/olypi/sports',
           resolveresult: (response) => (response.data.sports),
           method: 'get',
-          onselect (payload, option) {
-            Vue.set(payload, 'sport_id', option.sport_id)
+          onselect (...args) {
           },
           rules: (payload) => ([
           ])
@@ -95,7 +87,7 @@ export default {
           headers: {
             Accept: '*/*',
             'Content-Type': 'application/json',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1NDcxMTY2OSwiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.UhM0s_gZdZkZPtvBdZQYbbi_6yN3kEd2hcw02Z3oCcs'
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1NzM0NzUzNywiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.TjrvqCqUDleM1dpGmSSoXB6BAXrY3bEVWMnFQEHzYnc'
           },
           url: '/local/api/objects/short',
           method: 'post',
@@ -115,19 +107,23 @@ export default {
           labelkey: 'unrestricted_value',
           headers: {
             'Content-Type': 'application/json',
-            Accept: '*/*',
-            Authorization: 'Token 08ca729eaf9a69c5d90fd9bde48adb7d8131a60a'
+            Authorization: 'Token 0289160a02213271903b8c31ce47c670c58c3093'
           },
-          data: (query) => ({
-            query: query,
-            count: 20,
-            locations_boost: [{
-              kladr_id: '51'
-            }]
-          }),
+          onselect (payload, event, parent) {
+            console.log(this, payload, event)
+          },
+          resolvepayload (query, payload, parent) {
+            return {
+              query: query,
+              count: 20,
+              locations_boost: [{
+                kladr_id: '51'
+              }]
+            }
+          },
           focustrigger: false,
           clearable: true,
-          url: '/address/suggestions/api/4_1/rs/suggest/address',
+          url: '/suggestions/address',
           resolveresult: (response) => (response.data.suggestions)
         }
       ],
@@ -169,7 +165,7 @@ export default {
       }
       const dh = this
       return (day) => {
-        return dh.holidays.filter(f => dh.checkday(f, day) && (dh.olympicpayload.sport_id === null || f.sport_id === dh.olympicpayload.sport_id)).sort(sorter)
+        return dh.holidays.filter(f => dh.checkday(f, day) && (dh.olympicpayload.sport_id.length === 0 || dh.olympicpayload.sport_id.includes(f.sport_id))).sort(sorter)
       }
     },
     isdayvisible () {
@@ -179,6 +175,7 @@ export default {
   },
   methods: {
     checkday (exist, check) {
+      if (check.date === undefined) return false
       return exist.day === check.date.getDate() && exist.date.getMonth() === check.date.getMonth()
     },
     onpropertychange (...args) {

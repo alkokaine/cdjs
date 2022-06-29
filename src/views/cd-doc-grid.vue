@@ -5,50 +5,50 @@
     <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
       <div>
         <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
-        <cd-grid v-if="grid" class="example-grid" ref="example" :keyfield="grid.keyfield" :headers="grid.headers"
-          :get="grid.get"
-          :payload="payload"
-          :descriptor="grid.descriptor"
-          :resolveresult="grid.resolveresult"
-          :resolvepayload="grid.resolvepayload"
-          :collection="collection"
-          :selectrows="true"
-          :total="total"
-          :paging="grid.paging"
-          :pageSize="10"
-          :onpagechange="onpagechange">
-          <div slot="grid-tuner">
-            <div v-if="currentindex === 2">
-              <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
-                <div slot="header">
-                  <div v-for="(text, index) in tutorial[step].text" :key="index">{{ text }}</div>
-                  <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-prop-list>
-                </div>
-                <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
-              </cd-list>
+        <cd-grid class="example-grid" ref="example" :keyfield="grid.keyfield" :headers="grid.headers" :expandable="true"
+            :get="grid.get"
+            :payload="payload"
+            :descriptor="grid.descriptor"
+            :resolveresult="grid.resolveresult"
+            :resolvepayload="grid.resolvepayload"
+            :collection="collection"
+            :selectrows="true"
+            :total="total"
+            :paging="grid.paging"
+            :pageSize="10"
+            :onpagechange="onpagechange">
+            <div slot="grid-tuner">
+              <div v-if="currentindex === 2">
+                <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
+                  <div slot="header">
+                    <div v-for="(text, index) in tutorial[step].text" :key="index">{{ text }}</div>
+                    <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-prop-list>
+                  </div>
+                  <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
+                </cd-list>
+              </div>
+              <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter" :sync="true"
+                :payload="payload"
+                :inline="true"
+                :onpropertychange="onfilterchange">
+              </cd-form>
             </div>
-            <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter" :sync="true"
-              :payload="payload"
-              :inline="true"
-              :onpropertychange="onfilterchange">
-            </cd-form>
-          </div>
-          <template slot-scope="scope">
-            <template v-if="!scope.property">
-              <template>
-                <template v-if="scope.start">
-                  <span></span>
-                </template>
-                <template v-else-if="scope.end">
-                  <span></span>
-                </template>
-                <template v-else-if="scope.data.row">
-                  {{ scope.data.row }}
+            <template slot-scope="scope">
+              <template v-if="!scope.property">
+                <template>
+                  <template v-if="scope.start">
+                    <span></span>
+                  </template>
+                  <template v-else-if="scope.end">
+                    <span></span>
+                  </template>
+                  <template v-else-if="scope.data.row">
+                    {{ scope.data.row }}
+                  </template>
                 </template>
               </template>
             </template>
-          </template>
-        </cd-grid>
+          </cd-grid>
       </div>
     </cd-tabs>
   </div>
@@ -62,6 +62,7 @@ import CDGrid from '@/components/cd-grid.vue'
 import CDForm from '@/components/cd-form.vue'
 import CDTabs from '@/components/cd-tabs.vue'
 import CDList from '@/components/cd-list.vue'
+import keys from '@/views/keys'
 import CDPropList from '@/generic/cd-prop-list.vue'
 export default {
   name: 'cd-doc-grid',
@@ -127,10 +128,10 @@ export default {
           datafield: 'countryIds',
           text: 'Страна',
           input: 'select',
-          valuekey: 'code',
+          valuekey: 'wikiDataId',
           labelkey: 'name',
-          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
-          headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
+          url: '/geo/countries',
+          headers: keys.geoheaders,
           method: 'get',
           resolvepayload: (payload) => ({
             params: {
@@ -143,10 +144,10 @@ export default {
           onselect: (payload, option, parent) => {
             if (option) {
               const region = parent.descriptor.find(p => p.datafield === 'region_id')
-              Vue.set(region, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.code}/regions`)
-              Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=${option.code}`)
+              setTimeout(() => Vue.set(region, 'url', `/geo/countries/${option.code}/regions`), 1500)
+              setTimeout(() => Vue.set(view.grid.get, 'url', `/geo/cities?countryIds=${option.code}`), 1500)
             } else {
-              Vue.set(view.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
+              setTimeout(() => Vue.set(view.grid.get, 'url', '/geo/cities'), 1500)
             }
           }
         }
@@ -171,10 +172,10 @@ export default {
               limit: 10
             }
           }),
-          headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
+          headers: keys.geoheaders,
           isdisabled: (option, payload, parent) => option !== undefined && (option.wikiDataId || '').endsWith(7),
           onselect (payload, option, descriptor) {
-            if (option) Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
+            if (option) Vue.set(view.grid.get, 'url', `/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
           }
         }
       }
@@ -186,15 +187,11 @@ export default {
         const simplegrid = {
           get: {
             method: 'get',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
+            url: '/geo/cities'
           },
-          headers: {
-            'Content-Type': 'application/json',
-            'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000',
-            'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-          },
+          headers: keys.geoheaders,
           descriptor: examples.citydescriptor,
-          keyfield: 'Id',
+          keyfield: 'wikiDataId',
           total: 0,
           paging: true,
           resolveresult: (response) => examples.resolveresult(response),
@@ -220,7 +217,7 @@ export default {
         const breweries = {
           get: {
             method: 'get',
-            url: 'https://api.openbrewerydb.org/breweries'
+            url: '/beer/breweries'
           },
           descriptor: [],
           keyfield: 'id',
@@ -257,7 +254,8 @@ export default {
           ],
           onselect (property, option, parent) {
             Vue.set(examples, 'collection', [])
-            Vue.set(examples, 'grid', this.values.find(v => v.key === option))
+            const newgrid = this.values.find(v => v.key === option.key)
+            Vue.set(examples, 'grid', newgrid.grid)
             Vue.set(examples, 'step', 0)
           }
         }
@@ -384,16 +382,16 @@ export default {
           grid: {
             get: {
               method: 'get',
-              url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
+              url: '/geo/cities'
             },
-            headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000', 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com' },
+            headers: keys.geoheaders,
             usefilter: true,
             filter: [
               view.countrydd,
               view.regiondd
             ],
             descriptor: view.citydescriptor,
-            keyfield: 'Id',
+            keyfield: 'id',
             total: 0,
             paging: true,
             resolveresult: (response) => view.resolveresult(response),
@@ -459,14 +457,8 @@ export default {
     },
     onfilterchange (propertyholder, property, value) {
       if (property.datafield === 'countryIds') {
-        Vue.set(this.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
+        Vue.set(this.grid.get, 'url', '/geo/cities')
       }
-      // if (property.datafield !== 'region_id') {
-      //   if (property.datafield === 'countryIds') {
-      //     Vue.set(this.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
-      //   }
-      //   Vue.set(this.payload, property.datafield, value)
-      // }
     },
     selectexample (event, args) {
       this.currentindex = args.index
@@ -476,11 +468,7 @@ export default {
     },
     resolveresult (response) {
       Vue.set(this, 'total', response.data.metadata.totalCount)
-      Vue.set(this, 'collection', response.data.data.map(d => {
-        var randomnum = Math.floor(Math.random() * (1000 - 100) + 100) / 100
-        Vue.set(d, 'money', randomnum)
-        return d
-      }))
+      Vue.set(this, 'collection', response.data.data)
     },
     onpagechange (newpage) {
       Vue.set(this.payload, 'offset', (newpage.page - 1) * newpage.pageSize)

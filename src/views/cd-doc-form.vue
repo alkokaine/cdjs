@@ -8,6 +8,7 @@
       :showcontrols="true"
       :editmode="editmode"
       :submit="submitform"
+      :sync="false"
       :reset="resetform">
       <template slot-scope="{ property }">
         <template v-if="property.datafield === 'test'">
@@ -81,9 +82,7 @@ export default {
     return {
       editmode: false,
       form: CDForm,
-      test: {
-        date: new Date(Date.now())
-      },
+      test: {},
       shadow: Object,
       descriptor: [
         {
@@ -94,7 +93,13 @@ export default {
                 {
                   datafield: 'date1',
                   input: 'date',
-                  text: 'date1'
+                  text: 'date1',
+                  rules: [
+                    {
+                      required: true,
+                      message: 'Укажите дату'
+                    }
+                  ]
                 },
                 {
                   datafield: 'Name',
@@ -210,7 +215,7 @@ export default {
                       datafield: 'FullAddress',
                       text: 'Подобрать адрес',
                       input: 'autocomplete',
-                      url: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address',
+                      url: '/suggestions/suggest/address',
                       method: 'post',
                       labelkey: 'value',
                       headers: {
@@ -274,7 +279,22 @@ export default {
                   descriptor: [
                     {
                       datafield: 'PhoneNumber',
-                      text: 'Телефон'
+                      text: 'Телефон',
+                      hidden (payload) {
+                        return payload.date1 === undefined || payload.date1 === null
+                      },
+                      canedit (payload) {
+                        return true
+                      },
+                      rules: function (payload) {
+                        const hasdate = payload.date1 instanceof Date && !isNaN(payload.date1)
+                        return [
+                          {
+                            required: !hasdate,
+                            message: 'Укажите номер телефона'
+                          }
+                        ]
+                      }
                     },
                     {
                       datafield: 'EMail',
@@ -463,19 +483,19 @@ export default {
       ]
     }
   },
-  watch: {
-    editmode: {
-      handler (newvalue, oldvalue) {
-        if (newvalue && !oldvalue) {
-          this.shadow = Object.assign({}, this.test)
-        } else {
-          if (this.isreset) {
-            this.test = Object.assign({}, this.shadow)
-          }
-        }
-      }
-    }
-  },
+  // watch: {
+  //   editmode: {
+  //     handler (newvalue, oldvalue) {
+  //       if (newvalue && !oldvalue) {
+  //         this.shadow = Object.assign({}, this.test)
+  //       } else {
+  //         if (this.isreset) {
+  //           this.test = Object.assign({}, this.shadow)
+  //         }
+  //       }
+  //     }
+  //   }
+  // },
   methods: {
     onpropertychange (...args) {
       // console.log(args)
@@ -484,7 +504,11 @@ export default {
       this.editmode = false
     },
     submitform ({ $event, payload }) {
-      this.test = payload
+      const form = this
+
+      Object.keys(payload).forEach(key => {
+        Vue.set(form.test, key, payload[key])
+      })
       console.log('submitting form', $event, payload, this.test)
     },
     resetform ({ $event, payload }) {

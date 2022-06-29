@@ -1,16 +1,13 @@
 <template>
   <div class="cd-doc-modal">
     <button v-on:click="isvisible = true">Show dialog</button>
-    <el-dialog :visible="isvisible" width="75%" :close-on-click-modal="true" :close-on-press-escape="true" top="5vh" :before-close="beforeClose" v-on:close="onClosing" v-on:closed="onClosed">
+    <el-dialog :visible="isvisible" width="75%" :close-on-click-modal="true" :close-on-press-escape="true" top="5vh" :before-close="beforeClose" v-on:close="onClosing" v-on:closed="onClosed" :destroy-on-close="true">
       <div slot="title">Заголовок диалога в слоте title</div>
-      <cd-form name="editor" ref="editor" :descriptor="descriptor" :payload="payload" :onsubmit="submit">
+      <cd-form name="editor" ref="editor" :descriptor="descriptor" :payload="payload" :submit="submitform" :reset="resetform" :showcontrols="true">
         <div slot="header">Заголовок формы в слоте header формы</div>
       </cd-form>
-      <div slot="footer">
-        <button type="reset" form="editor" class="btn btn-primary btn-sm ms-2 cd-reset-button" v-on:click="isvisible = false">Отменить</button>
-        <button class="btn btn-primary btn-sm ms-2 cd-submit-button">Сохранить</button>
-      </div>
     </el-dialog>
+    {{ payload }}
   </div>
 </template>
 
@@ -365,11 +362,27 @@ export default {
     }
   },
   methods: {
-    submit (event, callback) {},
-    beforeClose (complete) {
+    submit (event, callback) {
+      console.log(event)
     },
-    onClosing () {},
-    onClosed () {}
+    beforeClose (complete) {
+      console.log(complete)
+    },
+    onClosing (event) {
+      console.log(event)
+    },
+    onClosed (event) {
+      console.log(event)
+    },
+    submitform ({ $event, payload }) {
+      this.payload = Object.assign({}, payload)
+      console.log('submitting form', $event, payload, this.payload)
+      this.isvisible = false
+    },
+    resetform ({ $event, payload }) {
+      console.log('resetting form', $event, payload, this.payload)
+      this.isvisible = false
+    }
   }
 }
 </script>
