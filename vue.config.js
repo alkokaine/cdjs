@@ -2,6 +2,13 @@ module.exports = {
   configureWebpack: {
     devServer: {
       proxy: {
+        '/beer': {
+          target: 'https://api.openbrewerydb.org',
+          changeOrigin: true,
+          pathRewrite: {
+            '/beer': ''
+          }
+        },
         '/olympic': {
           target: 'http://sebastianszwarc.pl:9000',
           changeOrigin: true,
