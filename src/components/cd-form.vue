@@ -8,7 +8,7 @@
             <slot :property="property" :parent="parent">
               <cd-cell class="cd-field mb-2" :property="property" :class="property.class" :onchange="onchange" :parent="self"
                 :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect" :resolvepayload="resolvefetchdata(property)"
-                :disabled="!ispropertyeditable(property)" v-model.lazy="formobject[property.datafield]" :revert="revert" :required="isrequired(property)"
+                :disabled="!ispropertyeditable(property)" v-model="formobject[property.datafield]" :revert="revert" :required="isrequired(property)"
                 :isoptiondisabled="resolveoptiondisabled(property)">
                 <label slot="label" tabindex="-1" class="cd-label form-label mb-0 user-select-none" :for="property.datafield">{{ property.text }}</label>
               </cd-cell>
@@ -195,7 +195,7 @@ export default {
       if (this.formobject[property.datafield] !== newvalue) {
         Vue.set(this.formobject, property.datafield, newvalue)
       }
-      if (callback) callback.call(property, this.formobject, newvalue, this)
+      if (callback) callback.call(property, this.formobject, ['select', 'autocomplete'].includes(property.input) ? $event : newvalue, this)
     },
     onblur ({ $event, property }, callback) {
       if (callback) callback.call(property, this.formobject, $event, this)
@@ -211,7 +211,6 @@ export default {
       if (callback) callback.call(property, this.formobject, $event, this)
     },
     onselect ({ $event, property }, callback) {
-      // Vue.set(this.formobject, property.datafield, $event[property.labelkey])
       if (callback) callback.call(property, this.formobject, $event, this)
     }
   },
