@@ -8,7 +8,7 @@
     </div>
     <div class="cd-grid--table">
       <table class="table table-sm border-bottom" :class="[{ 'table-striped' : striped, 'table-hover': highlightOnHover }, borderclass ]">
-        <caption>
+        <caption class="cd-grid--caption" :class="captionclass">
           <slot name="table-caption"><div class="no-data--reload" v-if="error" v-on:click.stop="loaddata(get.url, payload)">{{ error }}</div></slot>
         </caption>
         <thead v-if="!hideheader" class="cd-grid--head table-light border-top" :class="headerclass">
@@ -30,7 +30,7 @@
             <th scope="col"></th>
           </tr>
         </thead>
-        <tbody v-loading="isloading">
+        <tbody v-loading="isloading" class="cd-grid---tbody" :class="tbodyclass">
           <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
             <template v-for="(row, rindex) in collection">
@@ -153,7 +153,8 @@ const resolveborder = (borders) => {
 export default {
   mixins: [collection, watchurl, props, methods, selection],
   props: {
-    gridsettings: { type: String, description: 'Попробуем css grid' },
+    captionclass: { type: [Object, Array, String], default: 'cd-grid--caption' },
+    tbodyclass: { type: [Object, Array, String], default: 'cd-grid--tbody' },
     headerclass: { type: String, description: 'Класс для элемента thead таблицы' },
     borders: { type: String, validator: (value) => (['all', 'rows', 'cols', 'none'].indexOf(value) !== -1), default: 'rows' },
     striped: { type: Boolean, default: false, description: 'zebra-striping' },
