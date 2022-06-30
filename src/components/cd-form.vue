@@ -1,18 +1,20 @@
 <template>
-  <div class="cd-form">
+  <div class="cd-form" :class="rootclass">
     <slot name="header"></slot>
-    <el-form :model="formobject" size="mini" ref="innerform" v-loading="revert" :name="name" class="cd-form--content" :rules="rules" @submit.native.prevent>
+    <el-form :model="formobject" size="mini" ref="innerform" v-loading="revert" :name="name" class="cd-form--content" :class="formclass" :rules="rules" @submit.native.prevent>
       <cd-fieldset class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :descriptor="descriptor" :isvisible="isvisible" :readonly="isreadonly">
         <template slot-scope="{ property, parent }">
           <template v-if="property">
-            <slot :property="property" :parent="parent">
-              <cd-cell class="cd-field mb-2" :property="property" :class="property.class" :onchange="onchange" :parent="self"
-                :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect" :resolvepayload="resolvefetchdata(property)"
-                :disabled="!ispropertyeditable(property)" v-model="formobject[property.datafield]" :revert="revert" :required="isrequired(property)"
-                :isoptiondisabled="resolveoptiondisabled(property)">
-                <label slot="label" tabindex="-1" class="cd-label form-label mb-0 user-select-none" :for="property.datafield">{{ property.text }}</label>
-              </cd-cell>
-            </slot>
+            <el-form-item class="cd-cell mb-2" :error="propertyerror(property)" :prop="property.datafield" :class="{ 'd-block': property.input === 'textarea' }" :required="isrequired(property)">
+              <label slot="label" tabindex="-1" class="cd-label form-label mb-0 user-select-none" :for="property.datafield">{{ property.text }}</label>
+              <slot :property="property" :parent="parent">
+                <cd-cell :property="property" :class="property.class" :onchange="onchange" :parent="self"
+                  :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect" :resolvepayload="resolvefetchdata(property)"
+                  :disabled="!ispropertyeditable(property)" v-model="formobject[property.datafield]" :revert="revert"
+                  :isoptiondisabled="resolveoptiondisabled(property)">
+                </cd-cell>
+              </slot>
+            </el-form-item>
           </template>
         </template>
       </cd-fieldset>
@@ -50,17 +52,15 @@ export default {
     validate: { type: Boolean, default: true },
     resettext: { type: String, default: 'Отменить' },
     submittext: { type: String, default: 'Отправить' },
-    name: { type: String },
-    formclass: { type: String, default: '' },
-    rootclass: { type: String, default: '' },
-    onpropertychange: {
-      type: Function,
-      default: function (property, value) {
-        // const form = this
-        // Vue.set(form.formobject, property.datafield, value)
-      },
-      description: 'Функция, которая выполнится при изменении свойства объекта payload'
+    errors: {
+      type: Array,
+      default: function () {
+        return []
+      }
     },
+    name: { type: String },
+    formclass: { type: String, default: 'cd-form--inner' },
+    rootclass: { type: String, default: 'cd-form' },
     payload: { type: Object, required: true, description: 'Объект, который размещается на форме' },
     descriptor: {
       type: Array,
@@ -90,6 +90,14 @@ export default {
     }
   },
   computed: {
+    propertyerror () {
+      const form = this
+      return (property) => {
+        const propertyerrors = form.errors.filter(f => f.property === property.datafield)
+        const text = propertyerrors.reduce((prev, current) => prev.concat(current.error), '')
+        return text
+      }
+    },
     flatprops () {
       return utils.flatterer(this.descriptor, [])
     },
@@ -261,4 +269,7 @@ export default {
   .el-popper {
     min-width: unset!important;
   }
+  /* .el-form-item__error {
+    position: inherit!important;
+  } */
 </style>
