@@ -182,6 +182,13 @@ export default {
       error: false
     }
   },
+  watch: {
+    'property.url': {
+      handler (newvalue) {
+        this.values = []
+      }
+    }
+  },
   methods: {
     dispatch (e) {
       const isevent = isNaN(+e) && e.target !== undefined
