@@ -22,6 +22,8 @@ import CDSettingContainer from '@/components/cd-setting-container.vue'
 import CDMonth from '@/components/cd-month.vue'
 import CDForm from '@/components/cd-form.vue'
 import CDList from '@/components/cd-list.vue'
+import keys from '@/views/keys'
+
 export default {
   name: 'cd-doc-month',
   components: {
@@ -105,10 +107,8 @@ export default {
           input: 'autocomplete',
           method: 'post',
           labelkey: 'unrestricted_value',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Token 0289160a02213271903b8c31ce47c670c58c3093'
-          },
+          valuekey: 'unrestricted_value',
+          headers: keys.dadataheaders,
           onselect (payload, event, parent) {
             console.log(this, payload, event)
           },
