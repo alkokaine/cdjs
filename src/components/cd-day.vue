@@ -1,10 +1,10 @@
 <template>
   <div class="cd-day" :class="{ 'border mb-2' : tile && !compact, 'border-bottom border-start border-end': !tile && !compact }">
     <div v-if="!compact" class="cd-day--header container-sm p-0 m-0 row" :class="{ 'border-1 border-bottom' : tile }">
-      <div class="cd-day--number col w-auto">
+      <div class="cd-day--number col">
         {{ day }}
       </div>
-      <div class="cd-day--info col w-auto">
+      <div class="cd-day--info col">
         <div class="cd-day--month">{{ month }}</div>
         <div class="cd-day--weekday">{{ weekday }}</div>
       </div>
@@ -54,7 +54,7 @@ export default {
   .cd-day--number {
     font-size: 2em;
     font-weight: bold;
-    width: inherit;
+    max-width: min-content;
   }
   .cd-day--info {
     text-align: left;
