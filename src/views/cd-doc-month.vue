@@ -45,6 +45,16 @@ export default {
           datafield: 'canadd',
           text: 'Можно ли добавлять события',
           input: 'checkbox'
+        },
+        {
+          datafield: 'month',
+          text: 'месяц',
+          input: 'date',
+          onchange (payload, value, parent) {
+            const date = new Date(value)
+            Vue.set(payload, 'MonthID', date.getMonth() + 1)
+            Vue.set(payload, 'Year', date.getFullYear())
+          }
         }
       ],
       payload: {
@@ -210,5 +220,8 @@ export default {
   .day-holidays {
     list-style: none;
     padding-inline-start: unset;
+  }
+  .setting-form--container {
+    z-index: 10;
   }
 </style>
