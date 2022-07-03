@@ -1,6 +1,6 @@
 <template>
   <cd-setting-container>
-    <cd-form :payload="payload" :descriptor="settings" :sync="true"></cd-form>
+    <cd-form :payload="payload" :descriptor="settings"></cd-form>
     <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false" :showheader="true">
       <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :sync="true">
         <div slot="footer"></div>
@@ -52,8 +52,8 @@ export default {
           input: 'date',
           onchange (payload, value, parent) {
             const date = new Date(value)
-            Vue.set(payload, 'MonthID', date.getMonth() + 1)
-            Vue.set(payload, 'Year', date.getFullYear())
+            Vue.set(docmonth.payload, 'MonthID', date.getMonth() + 1)
+            Vue.set(docmonth.payload, 'Year', date.getFullYear())
           }
         }
       ],
