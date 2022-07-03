@@ -31,7 +31,7 @@
         </cd-day>
       </template>
     </div>
-    <template v-if="canadd && !payload.mode">
+    <template v-if="canadd">
       <div class="cd-day new-day--template container-sm" slot="placeholder">
         <div class="cd-day--number col btn btn-group btn-group-lg" role="group" aria-label="new-day-group">
           <button class="btn bi bi-calendar2-week btn-link" v-on:click.stop="templateselect"></button>
@@ -43,7 +43,7 @@
       Нет данных
     </div>
     <div v-if="!compact && createnew" slot="footer">
-      <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose" width="30%">
+      <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose">
         <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :sync="true" :showcontrols="true">
           <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
             :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
@@ -212,10 +212,46 @@ export default {
       ],
       newtask: {},
       selectedweekdays: [],
-      selecteddays: []
+      selecteddays: [],
+      calendar: []
     }
   },
   watch: {
+    payload: {
+      deep: true,
+      immediate: true,
+      handler (newvalue) {
+        if (newvalue !== undefined) {
+          const month = this
+          // const monthstart = date(month.payload.Year, month.payload.MonthID, 1)
+          const monthnum = month.payload.MonthID < 10 ? `0${month.payload.MonthID}` : `${month.payload.MonthID}`
+          let days = []
+          month.$http.get(`/dayoff/getdata?year=${newvalue.Year}&month=${monthnum}&pre=1&covid=1&sd=0`)
+            .then((response) => {
+              days = Array.from(response.request.response)
+                .map((m, index) => ({ date: date(month.payload.Year, month.payload.MonthID, index + 1).toDate(), code: Number(m) }))
+            })
+            .catch((reason) => {
+              days = Array.from(Array(daysInMonth(newvalue.Year, newvalue.MonthID)).keys())
+                .map((m, index) => ({ date: date(month.payload.Year, month.payload.MonthID, index + 1) }))
+            })
+            .finally(() => {
+              const fd = date(newvalue.Year, newvalue.MonthID, days[0].date.getDate())
+              if (fd.day() === 1) month.calendar = days
+              const result = []
+              let ln = fd.day() - 1
+              if (ln < 0) ln = 6 - ln - 1
+              while (ln > 0) {
+                const d = fd.subtract(1, 'days')
+                date(month.payload.Year, month.payload.MonthID)
+                result.unshift({ date: d.toDate(), isprev: true })
+                ln -= 1
+              }
+              month.calendar = result.concat(days)
+            })
+        }
+      }
+    },
     runtemplate: {
       handler (newvalue) {
         if (newvalue === true) {
@@ -233,26 +269,6 @@ export default {
     dayclass () {
       return this.newtask.id === 4 ? 'selectable' : ''
     },
-    calendar () {
-      const month = this
-      const days = Array.from(Array(daysInMonth(month.payload.Year, month.payload.MonthID)).keys())
-        .map((_d, index) => ({ date: date(month.payload.Year, month.payload.MonthID, _d + 1).toDate() }))
-      const monthstart = date(month.payload.Year, month.payload.MonthID, 1)
-      const weekday = monthstart.day()
-      if (weekday === 1) return days
-      const result = []
-      let ln = weekday - 1
-      if (ln < 0) ln = 6 - ln - 1
-      while (ln > 0) {
-        const d = monthstart.subtract(1, 'days')
-        result.unshift({ date: d.toDate(), isprev: true })
-        ln -= 1
-      }
-      return result.concat(days)
-    },
-    // url () {
-    //   return `https://isdayoff.ru/api/getdata?year=${this.payload.Year}&month=${this.payload.MonthID}&pre=1&covid=1&sd=0`
-    // },
     islistview () {
       return !this.mode
     },
