@@ -1,6 +1,6 @@
 <template>
   <cd-setting-container>
-    <cd-form :payload="payload" :descriptor="settings"></cd-form>
+    <cd-form :payload="payload" :descriptor="settings" :sync="true"></cd-form>
     <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false" :showheader="true">
       <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :sync="true">
         <div slot="footer"></div>
@@ -191,19 +191,22 @@ export default {
     onpropertychange (...args) {
       // console.log(...args)
     },
-    createnewevent (dates) {
+    createnewevent (dates, payload, callback) {
       const dm = this
-      dates.forEach(date => {
+      dates.forEach(d => {
         dm.holidays.push({
-          key: date.valueOf(),
-          day: date.getDate(),
-          month: date.getMonth(),
+          key: d.date.valueOf(),
+          day: d.date.getDate(),
+          month: d.date.getMonth(),
           sport_id: dm.olympicpayload.sport_id,
-          date: date,
+          date: d.date,
           name: 'no-name',
           description: 'no-description'
         })
       })
+      Vue.set(dm.payload, 'Year', payload.Year)
+      Vue.set(dm.payload, 'MonthID', payload.MonthID)
+      callback()
     }
   }
 }

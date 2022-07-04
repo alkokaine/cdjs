@@ -44,7 +44,7 @@
     <div v-if="!compact && createnew" slot="footer">
       <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose">
         <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :sync="true" :showcontrols="true" :reset="closedialog" :submit="run">
-          <cd-month ref="template" class="month-template-preview" slot="footer" :payload="generatorconfig" :canadd="false"
+          <cd-month ref="template" class="month-template-preview" slot="footer" :payload="generatorconfig" :canadd="false" :oncalendarready="onready"
             :isdayselected="generatorconfig.daycompare" :ondayselect="generatorconfig.ondayselect" :onweekdayselect="weekdayselect"
             :tile="false"
             :isweekdayselected="resolveweekdayselected" :selectweekday="generatorconfig.template_id === 3" :compact="true" :resolvedayclass="dayclass">
@@ -131,6 +131,7 @@ export default {
       },
       description: 'Массив дней недели'
     },
+    oncalendarready: { type: Function, description: 'Выполним, когда получен календарь на указанный в payload месяц' },
     mode: { type: [Boolean, Number], default: 1 },
     isdayvisible: { type: Function, default: (day) => (true) },
     isdayselected: { type: Function },
@@ -152,6 +153,7 @@ export default {
           datafield: 'template_id',
           text: 'Выберите шаблон',
           input: 'select',
+          clearable: true,
           labelkey: 'text',
           valuekey: 'id',
           values: [
@@ -187,14 +189,15 @@ export default {
                 }
               },
               daycompare (dayscope) {
-                return cdm.selecteddays.indexOf(dayscope.date.getDate()) !== -1
+                return dayscope.isprev === undefined && cdm.selecteddays.indexOf(dayscope.date.getDate()) !== -1
               }
             }
           ],
+          reset (payload, option, parent) {
+            Vue.set(payload, 'daycompare', undefined)
+            Vue.set(payload, 'ondayselect', undefined)
+          },
           onselect (payload, option, parent) {
-            console.log(parent)
-            // Vue.set(payload, 'selecteddays', cdm.calendar.filter(option.daycompare))
-            // // cdm.newtask = option
             Vue.set(payload, 'daycompare', option.daycompare)
             Vue.set(payload, 'ondayselect', option.ondayselect)
           }
@@ -212,7 +215,8 @@ export default {
       // newtask: {},
       selectedweekdays: [],
       selecteddays: [],
-      calendar: []
+      calendar: [],
+      newcalendar: []
     }
   },
   watch: {
@@ -239,6 +243,9 @@ export default {
             })
             .finally(() => {
               const fd = date(month.payload.Year, newvalue, days[0].date.getDate())
+              if (month.oncalendarready !== undefined) {
+                month.oncalendarready(days)
+              }
               if (fd.day() === 1) month.calendar = days
               const result = []
               let ln = fd.day() - 1
@@ -305,6 +312,9 @@ export default {
     }
   },
   methods: {
+    onready (calendar) {
+      this.newcalendar = calendar
+    },
     ondialogclose () {
       this.selectedweekdays = []
       this.selecteddays = []
@@ -313,9 +323,6 @@ export default {
       this.runtemplate = true
     },
     addday () {
-    },
-    ontemplatechange (...args) {
-      console.log(args)
     },
     weekdayselect (event, weekday) {
       const index = this.selectedweekdays.indexOf(weekday.row.id)
@@ -326,12 +333,10 @@ export default {
       return this.selectedweekdays.indexOf(weekday.row.id) >= 0
     },
     closedialog (...args) {
-      console.log(args)
       this.runtemplate = false
     },
     run ({ $event, payload }) {
-      console.log(payload)
-      console.log(this.$refs.template.calendar)
+      this.createnew(this.newcalendar.filter(payload.daycompare), payload, this.closedialog)
     }
   }
 }
