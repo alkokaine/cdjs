@@ -186,6 +186,7 @@ export default {
     'property.url': {
       handler (newvalue) {
         this.values = []
+        this.cellvalue = null
       }
     }
   },
