@@ -17,7 +17,7 @@ module.exports = {
           }
         },
         '/dayoff': {
-          target: 'https://isdayoff.ru',
+          target: 'https://isdayoff.ru/api',
           pathRewrite: {
             '/dayoff': ''
           }

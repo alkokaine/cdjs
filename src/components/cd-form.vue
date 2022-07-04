@@ -18,6 +18,7 @@
           </template>
         </template>
       </cd-fieldset>
+      <slot name="footer"></slot>
       <div class="cd-form--controls" v-if="showcontrols">
         <button class="btn btn-sm btn-outline-secondary mx-1 cd-reset--button" type="reset" v-on:click="onreset({ $event, payload }, reset)">
           <slot name="reset">{{ resettext }}</slot>
@@ -27,7 +28,6 @@
         </button>
       </div>
     </el-form>
-    <slot name="footer"></slot>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <cd-setting-container>
-    <cd-form :payload="payload" :descriptor="settings" :sync="true"></cd-form>
+    <cd-form :payload="payload" :descriptor="settings"></cd-form>
     <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false" :showheader="true">
       <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :sync="true">
         <div slot="footer"></div>
@@ -22,6 +22,8 @@ import CDSettingContainer from '@/components/cd-setting-container.vue'
 import CDMonth from '@/components/cd-month.vue'
 import CDForm from '@/components/cd-form.vue'
 import CDList from '@/components/cd-list.vue'
+import keys from '@/views/keys'
+
 export default {
   name: 'cd-doc-month',
   components: {
@@ -43,6 +45,16 @@ export default {
           datafield: 'canadd',
           text: 'Можно ли добавлять события',
           input: 'checkbox'
+        },
+        {
+          datafield: 'month',
+          text: 'месяц',
+          input: 'date',
+          onchange (payload, value, parent) {
+            const date = new Date(value)
+            Vue.set(docmonth.payload, 'MonthID', date.getMonth() + 1)
+            Vue.set(docmonth.payload, 'Year', date.getFullYear())
+          }
         }
       ],
       payload: {
@@ -106,10 +118,7 @@ export default {
           method: 'post',
           labelkey: 'unrestricted_value',
           valuekey: 'unrestricted_value',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Token 0289160a02213271903b8c31ce47c670c58c3093'
-          },
+          headers: keys.dadataheaders,
           onselect (payload, event, parent) {
             console.log(this, payload, event)
           },
@@ -211,5 +220,8 @@ export default {
   .day-holidays {
     list-style: none;
     padding-inline-start: unset;
+  }
+  .setting-form--container {
+    z-index: 10;
   }
 </style>

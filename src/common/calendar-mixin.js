@@ -1,3 +1,4 @@
+const formatter = new Intl.DateTimeFormat('ru-RU', { month: 'long' })
 export default {
   props: {
     payload: {
@@ -21,6 +22,13 @@ export default {
         const isyear = yearvalue !== undefined && yearvalue !== null && Number.isInteger(yearvalue)
         return ismonth && isyear
       }
+    }
+  },
+  computed: {
+    monthname () {
+      const payload = this.payload
+      const date = new Date(payload.Year, payload.MonthID - 1, 1)
+      return `${formatter.format(date)} ${payload.Year}`
     }
   }
 }

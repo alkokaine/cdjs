@@ -110,7 +110,6 @@ export default {
     'cd-props': CDProps
   },
   props: {
-    required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     property: { type: Object, required: true },
     readonly: { type: Boolean, default: true },
@@ -121,7 +120,6 @@ export default {
     onfocus: { type: Function },
     onclear: { type: Function },
     onselect: { type: Function },
-    revert: { type: Boolean },
     isoptiondisabled: { type: [Boolean, Function] },
     errordescriptor: {
       type: Array,

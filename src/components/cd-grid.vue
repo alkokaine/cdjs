@@ -170,30 +170,34 @@ export default {
       type: Function,
       default: function (response) {
         return response.data
-      }
+      },
+      description: 'Функция, извлекающая из ответа данные для грида'
     },
     collection: {
       type: Array,
       required: true,
-      description: 'Коллекция для отображения в гриде'
+      description: 'Коллекция данных для отображения в гриде'
     },
     formatDate: {
       type: Function,
       default: function (date) {
         if (date === null || date === undefined) return 'н/д'
         return formatter.format(new Date(date))
-      }
+      },
+      description: 'как форматировать даты'
     },
     formatMoney: {
       type: Function,
       default: function (money) {
         if (money === null || money === undefined) return 'н/д'
         return Number(money || 0).toLocaleString('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 2, minimumFractionDigits: 2, useGrouping: true })
-      }
+      },
+      description: 'как форматировать денежные величины'
     },
     expandable: {
       type: Boolean,
-      default: false
+      default: false,
+      description: 'Раскрывать ли строки грида'
     }
   },
   data (grid) {
@@ -248,9 +252,6 @@ export default {
     },
     columns: function () {
       return utils.flatterer(this.descriptor, []).filter((p) => utils.ispropertyvisible(p, this.payload, {}))
-    },
-    propertyconfig: function () {
-      return (property, row) => utils.propertyconfig.call(this, property, row, this.iscurrentrow(row), this.payload)
     },
     propcellkey: function () {
       return (prop, ri, pi) => `cell_${ri}_${pi}`
