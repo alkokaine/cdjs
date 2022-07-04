@@ -105,6 +105,7 @@ export default {
           input: 'autocomplete',
           method: 'post',
           labelkey: 'unrestricted_value',
+          valuekey: 'unrestricted_value',
           headers: {
             'Content-Type': 'application/json',
             Authorization: 'Token 0289160a02213271903b8c31ce47c670c58c3093'
