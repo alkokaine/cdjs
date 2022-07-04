@@ -3,8 +3,7 @@
     :rowclass="rootrowclass" :collection="source" keyfield="key" :isrowvisible="isdayvisible">
     <div class="month-header" slot="header">
       <slot name="month-header">
-        <div v-if="showheader">{{ monthheader }}</div>
-        <button v-if="mode && canadd" class="btn btn-sm btn-link" v-on:click="templateselect">Заполнить по расписанию</button>
+        <cd-month-header v-if="showheader" :payload="payload"></cd-month-header>
       </slot>
     </div>
     <div class="month-item-wrap" slot-scope="content" :class="{ 'weekday-container': content.row.id }">
@@ -44,31 +43,27 @@
     </div>
     <div v-if="!compact && createnew" slot="footer">
       <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose">
-        <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :sync="true" :showcontrols="true">
-          <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
-            :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
+        <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :sync="true" :showcontrols="true" :reset="closedialog" :submit="run">
+          <cd-month ref="template" class="month-template-preview" slot="footer" :payload="generatorconfig" :canadd="false"
+            :isdayselected="generatorconfig.daycompare" :ondayselect="generatorconfig.ondayselect" :onweekdayselect="weekdayselect"
             :tile="false"
-            :isweekdayselected="resolveweekdayselected" :selectweekday="newtask.id === 3" :compact="true" :resolvedayclass="dayclass">
-            <span slot="month-header" class="compact">{{ monthheader }}</span>
+            :isweekdayselected="resolveweekdayselected" :selectweekday="generatorconfig.template_id === 3" :compact="true" :resolvedayclass="dayclass">
           </cd-month>
         </cd-form>
-        <div class="commit-template" slot="footer">
-          <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="closedialog">Отменить</button>
-          <button type="button" class="btn btn-sm btn-primary" v-on:click="run($event, calendar.filter(newtask.daycompare))">Сохранить</button>
-        </div>
       </el-dialog>
     </div>
   </cd-list>
 </template>
 
 <script>
+import Vue from 'vue'
 import calendar from '../common/calendar-mixin'
 import CDList from './cd-list.vue'
 import CDForm from './cd-form.vue'
 import CDDay from './cd-day.vue'
 import moment from 'moment'
 import { Dialog } from 'element-ui'
-
+import header from './cd-month-header.vue'
 const daysInMonth = (year, month) => (moment(`${year}-${month}`, 'YYYY-MM')).daysInMonth()
 const date = (year, month, day) => (moment(`${year}-${month}-${day}`, 'YYYY-MM-DD'))
 
@@ -79,7 +74,8 @@ export default {
     'cd-list': CDList,
     'cd-form': CDForm,
     'cd-day': CDDay,
-    'el-dialog': Dialog
+    'el-dialog': Dialog,
+    'cd-month-header': header
   },
   props: {
     tile: { type: Boolean, default: true },
@@ -151,7 +147,6 @@ export default {
     return {
       generatorconfig: Object,
       runtemplate: false,
-      formatter: new Intl.DateTimeFormat('ru-RU', { month: 'long' }),
       templatedescriptor: [
         {
           datafield: 'template_id',
@@ -196,8 +191,12 @@ export default {
               }
             }
           ],
-          onselect (payload, option) {
-            cdm.newtask = option
+          onselect (payload, option, parent) {
+            console.log(parent)
+            // Vue.set(payload, 'selecteddays', cdm.calendar.filter(option.daycompare))
+            // // cdm.newtask = option
+            Vue.set(payload, 'daycompare', option.daycompare)
+            Vue.set(payload, 'ondayselect', option.ondayselect)
           }
         },
         {
@@ -210,40 +209,43 @@ export default {
           }
         }
       ],
-      newtask: {},
+      // newtask: {},
       selectedweekdays: [],
       selecteddays: [],
       calendar: []
     }
   },
   watch: {
-    payload: {
-      deep: true,
+    'payload.MonthID': {
       immediate: true,
-      handler (newvalue) {
-        if (newvalue !== undefined) {
-          const month = this
-          // const monthstart = date(month.payload.Year, month.payload.MonthID, 1)
-          const monthnum = month.payload.MonthID < 10 ? `0${month.payload.MonthID}` : `${month.payload.MonthID}`
+      handler (newvalue, oldvalue) {
+        const month = this
+        if (newvalue === 13) {
+          Vue.set(month.payload, 'Year', month.payload.Year + 1)
+          Vue.set(month.payload, 'MonthID', 1)
+        } else if (newvalue === 0) {
+          Vue.set(month.payload, 'Year', month.payload.Year - 1)
+          Vue.set(month.payload, 'MonthID', 12)
+        } else {
           let days = []
-          month.$http.get(`/dayoff/getdata?year=${newvalue.Year}&month=${monthnum}&pre=1&covid=1&sd=0`)
+          month.$http.get(`/dayoff/getdata?year=${month.payload.Year}&month=${newvalue}&pre=1&covid=1&sd=0`)
             .then((response) => {
               days = Array.from(response.request.response)
-                .map((m, index) => ({ date: date(month.payload.Year, month.payload.MonthID, index + 1).toDate(), code: Number(m) }))
+                .map((m, index) => ({ date: date(month.payload.Year, newvalue, index + 1).toDate(), code: Number(m) }))
             })
             .catch((reason) => {
-              days = Array.from(Array(daysInMonth(newvalue.Year, newvalue.MonthID)).keys())
-                .map((m, index) => ({ date: date(month.payload.Year, month.payload.MonthID, index + 1) }))
+              days = Array.from(Array(daysInMonth(month.payload.Year, newvalue)).keys())
+                .map((m, index) => ({ date: date(month.payload.Year, newvalue, index + 1) }))
             })
             .finally(() => {
-              const fd = date(newvalue.Year, newvalue.MonthID, days[0].date.getDate())
+              const fd = date(month.payload.Year, newvalue, days[0].date.getDate())
               if (fd.day() === 1) month.calendar = days
               const result = []
               let ln = fd.day() - 1
               if (ln < 0) ln = 6 - ln - 1
               while (ln > 0) {
                 const d = fd.subtract(1, 'days')
-                date(month.payload.Year, month.payload.MonthID)
+                // date(month.payload.Year, month.payload.MonthID)
                 result.unshift({ date: d.toDate(), isprev: true })
                 ln -= 1
               }
@@ -257,7 +259,9 @@ export default {
         if (newvalue === true) {
           this.generatorconfig = {
             template_id: null,
-            workdays: false
+            workdays: false,
+            MonthID: this.payload.MonthID,
+            Year: this.payload.Year
           }
         } else {
           this.generatorconfig = Object
@@ -267,7 +271,7 @@ export default {
   },
   computed: {
     dayclass () {
-      return this.newtask.id === 4 ? 'selectable' : ''
+      return this.payload.template_id === 4 ? 'selectable' : ''
     },
     islistview () {
       return !this.mode
@@ -284,12 +288,6 @@ export default {
         if (month.isdayselected !== undefined && month.isdayselected(day.row)) return 'selected'
         return ''
       }
-    },
-    monthdate () {
-      return new Date(this.payload.Year, this.payload.MonthID - 1, 1)
-    },
-    monthheader () {
-      return `${this.formatter.format(this.monthdate)} ${this.payload.Year}`
     },
     source () {
       return this.mode ? this.weekdays : this.calendar
@@ -310,7 +308,6 @@ export default {
     ondialogclose () {
       this.selectedweekdays = []
       this.selecteddays = []
-      this.newtask = {}
     },
     templateselect () {
       this.runtemplate = true
@@ -328,11 +325,13 @@ export default {
     resolveweekdayselected (weekday) {
       return this.selectedweekdays.indexOf(weekday.row.id) >= 0
     },
-    closedialog () {
+    closedialog (...args) {
+      console.log(args)
       this.runtemplate = false
     },
-    run (event, days) {
-      this.createnew(days.map(d => d.date))
+    run ({ $event, payload }) {
+      console.log(payload)
+      console.log(this.$refs.template.calendar)
     }
   }
 }
@@ -344,6 +343,8 @@ export default {
   }
   .month-header {
     text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
   }
   .prev-month {
     opacity: 0.5;
