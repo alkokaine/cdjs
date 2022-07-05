@@ -10,12 +10,14 @@
             :payload="payload"
             :descriptor="grid.descriptor"
             :resolveresult="grid.resolveresult"
+            :resolvepageparams="grid.resolvepageparams"
             :resolvepayload="grid.resolvepayload"
             :collection="collection"
             :selectrows="true"
             :total="total"
             :paging="grid.paging"
             :pageSize="10"
+            :page="currentpage"
             :onpagechange="onpagechange">
             <div slot="grid-tuner">
               <div v-if="currentindex === 2">
@@ -134,10 +136,7 @@ export default {
           headers: keys.geoheaders,
           method: 'get',
           resolvepayload: (payload) => ({
-            params: {
-              offset: 0,
-              limit: 10
-            }
+            params: payload
           }),
           resolveresult: (response) => response.data.data,
           isdisabled: (option, payload, parent) => option !== undefined && (option.wikiDataId || '').endsWith(7),
@@ -145,7 +144,7 @@ export default {
             if (option) {
               const region = parent.descriptor.find(p => p.datafield === 'region_id')
               setTimeout(() => Vue.set(region, 'url', `/geo/countries/${option.code}/regions`), 1500)
-              setTimeout(() => Vue.set(view.grid.get, 'url', `/geo/cities?countryIds=${option.code}`), 1500)
+              setTimeout(() => Vue.set(view.grid.get, 'url', `/geo/cities?countryIds=${option.code}&`), 1500)
             } else {
               setTimeout(() => Vue.set(view.grid.get, 'url', '/geo/cities'), 1500)
             }
@@ -195,9 +194,16 @@ export default {
           total: 0,
           paging: true,
           resolveresult: (response) => examples.resolveresult(response),
-          resolvepayload (payload) {
-            return examples.resolvepayload(payload)
+          resolvepageparams (page, pagesize) {
+            return {
+              limit: pagesize,
+              offset: (page - 1) * pagesize
+            }
           }
+          // resolveurl: (url, page, pageSize) => {
+          //   if (url.indexOf('?') !== -1) return `${url}offset=${(page - 1) * pageSize}&limit=10`
+          //   return `${url}?offset=${(page - 1) * pageSize}&limit=10`
+          // }
         }
         return simplegrid
       }
@@ -287,6 +293,7 @@ export default {
     return {
       infos: CDGrid.mixins.concat(CDGrid),
       currentindex: 0,
+      currentpage: 1,
       selected: Object,
       preview: [],
       tutorial: [
@@ -363,11 +370,9 @@ export default {
       settingform: false,
       total: 0,
       payload: {
-        limit: 10,
         minPopulation: null,
         namePrefix: null,
         distanceUnit: null,
-        offset: 0,
         countryIds: null
       },
       gridexamples: [
@@ -390,14 +395,17 @@ export default {
               view.countrydd,
               view.regiondd
             ],
+            resolvepageparams (page, pagesize) {
+              return {
+                limit: pagesize,
+                offset: (page - 1) * pagesize
+              }
+            },
             descriptor: view.citydescriptor,
             keyfield: 'id',
             total: 0,
             paging: true,
-            resolveresult: (response) => view.resolveresult(response),
-            resolvepayload (payload) {
-              return view.resolvepayload(payload)
-            }
+            resolveresult: (response) => view.resolveresult(response)
           }
         },
         {
@@ -471,7 +479,7 @@ export default {
       Vue.set(this, 'collection', response.data.data)
     },
     onpagechange (newpage) {
-      Vue.set(this.payload, 'offset', (newpage.page - 1) * newpage.pageSize)
+      this.currentpage = newpage.page
     },
     onremoveproperty (property) {
       this.hasremoved = true
