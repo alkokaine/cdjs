@@ -134,6 +134,7 @@
 <script>
 import collection from '../common/collection'
 import selection from '../common/selection'
+import paging from '../common/paging'
 import props from '../common/property-decorator'
 import methods from '../common/methods'
 import utils from '../common/utils'
@@ -151,7 +152,7 @@ const resolveborder = (borders) => {
 }
 
 export default {
-  mixins: [collection, watchurl, props, methods, selection],
+  mixins: [collection, watchurl, props, methods, selection, paging],
   props: {
     captionclass: { type: [Object, Array, String], default: 'cd-grid--caption' },
     tbodyclass: { type: [Object, Array, String], default: 'cd-grid--tbody' },
@@ -160,12 +161,8 @@ export default {
     striped: { type: Boolean, default: false, description: 'zebra-striping' },
     highlightOnHover: { type: Boolean, default: false, description: 'для подсветки строк при hover' },
     hideheader: { type: Boolean, default: false, description: 'Скрывать ли header грида' },
-    paging: { type: Boolean, default: false, description: 'Использовать ли постраничную загрузку' },
-    total: { type: Number, description: 'При постраничной загрузке данных, эта штука возвращается контроллером вместе с коллекцией, означает сколько-всего-элементов-в-коллекции' },
-    pageSize: { type: Number, default: 20, description: 'При постраничной загрузке данных, размер страницы в элементах' },
     onpagechange: { type: Function, description: 'Что проиозойдёт при смене страницы', default: function (event, pageargs) {} },
     selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' },
-    pagesvisible: { type: Number, default: 5, description: 'Диапазон страниц, видимый без разрывов в компоненте постраничной загрузки' },
     resolveresult: {
       type: Function,
       default: function (response) {
