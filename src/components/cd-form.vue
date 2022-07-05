@@ -207,7 +207,7 @@ export default {
       this.haschange = true
       if (this.formobject[property.datafield] !== newvalue) {
         Vue.set(this.formobject, property.datafield, newvalue)
-      }      
+      }
       if (callback) callback.call(property, this.formobject, ['select', 'autocomplete'].includes(property.input) ? $event : newvalue, this)
       if (form.onpropertychange !== undefined) form.onpropertychange(property, form.formobject)
     },
