@@ -8,7 +8,7 @@
 
 <script>
 import Vue from 'vue'
-import calendar from '@/common/calendar-mixin'
+import calendar from '../common/calendar-mixin'
 export default {
   name: 'cd-month-header',
   mixins: [calendar],
