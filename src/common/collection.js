@@ -84,7 +84,7 @@ export default {
       axios({
         method: local.get.method,
         url: url,
-        data: local.resolvepayload(payload),
+        params: local.resolvepayload(payload),
         headers: local.headers
       }).then((response) => {
         local.resolveresult(response)
