@@ -61,6 +61,10 @@ export default {
     name: { type: String },
     formclass: { type: String, default: 'cd-form--inner' },
     rootclass: { type: String, default: 'cd-form' },
+    onpropertychange: {
+      type: Function,
+      description: 'Функция, которая выполнится при изменении свойства объекта formobject'
+    },
     payload: { type: Object, required: true, description: 'Объект, который размещается на форме' },
     descriptor: {
       type: Array,
@@ -180,6 +184,7 @@ export default {
       callback(args)
     },
     onchange ({ $event, property }, callback) {
+      const form = this
       let newvalue = {}
       if (property.input === 'select') {
         if ($event !== null && $event !== undefined && $event.type === 'error') {
@@ -203,7 +208,9 @@ export default {
       if (this.formobject[property.datafield] !== newvalue) {
         Vue.set(this.formobject, property.datafield, newvalue)
       }
+      
       if (callback) callback.call(property, this.formobject, ['select', 'autocomplete'].includes(property.input) ? $event : newvalue, this)
+      if (form.onpropertychange !== undefined) form.onpropertychange(property, form.formobject)
     },
     onblur ({ $event, property }, callback) {
       if (callback) callback.call(property, this.formobject, $event, this)
