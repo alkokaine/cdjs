@@ -102,7 +102,7 @@ export default {
             Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1NzM0NzUzNywiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.TjrvqCqUDleM1dpGmSSoXB6BAXrY3bEVWMnFQEHzYnc'
           },
           url: '/local/api/objects/short',
-          method: 'post',
+          method: 'get',
           resolveresult: (response) => (response.data.Data),
           resolvepayload: (payload) => ({
             ObjectIDs: [],
