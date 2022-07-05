@@ -118,9 +118,9 @@
         </tbody>
         <tfoot class="border-top-0"></tfoot>
       </table>
-      <el-pagination v-if="paging" class="p-2 m-auto" v-on:current-change="onpagechange({ page: $event, pagesize: payload.PageSize })"
-                           :current-page="payload.Page"
-                           :page-size="payload.PageSize"
+      <el-pagination v-if="paging" class="p-2 m-auto" v-on:current-change="onpagechange({ page: $event, pagesize: pageSize })"
+                           :current-page="page"
+                           :page-size="pageSize"
                            layout="prev, pager, next"
                            :hide-on-single-page="true"
                            :total="total"
@@ -136,6 +136,7 @@ import collection from '../common/collection'
 import selection from '../common/selection'
 import paging from '../common/paging'
 import props from '../common/property-decorator'
+import payloadwatch from '../common/payload-watch'
 import methods from '../common/methods'
 import utils from '../common/utils'
 import watchurl from '../common/get-url-watch'
@@ -152,7 +153,7 @@ const resolveborder = (borders) => {
 }
 
 export default {
-  mixins: [collection, watchurl, props, methods, selection, paging],
+  mixins: [collection, watchurl, props, methods, selection, paging, payloadwatch],
   props: {
     captionclass: { type: [Object, Array, String], default: 'cd-grid--caption' },
     tbodyclass: { type: [Object, Array, String], default: 'cd-grid--tbody' },
