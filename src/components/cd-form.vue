@@ -149,6 +149,10 @@ export default {
     }
   },
   methods: {
+    setpropertyvalue (datafield, propertyname, propertyvalue) {
+      const property = this.flatprops.find(f => f.datafield === datafield)
+      Vue.set(property, propertyname, propertyvalue)
+    },
     resolveoptiondisabled (property) {
       const form = this
       return (option) => {
