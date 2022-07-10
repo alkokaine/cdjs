@@ -45,50 +45,31 @@
                       :key="propcellkey(prop, rindex, pindex)" class="cd-grid--cell"
                       :class="[resolvetdclass(prop, row), { 'text-center' : prop.input === 'checkbox'}]"
                       v-on:click="oncellclick(prop, { $event, row })">
-                      <el-popover class="cd-grid--tooltip"
-                                  :disabled="hasnopopover(prop) || isdisabledpopover(prop, row)" :popper-class="resolvepopperclass(prop, row)"
-                                  :trigger="resolvepopovertrigger(prop, row)"
-                                  v-on:hide="onpopoverhide($event, { prop, row })"
-                                  v-on:show="onpopovershow($event, { prop, row })"
-                                  v-on:after-leave="onpopoverleave($event, { prop, row })"
-                                  v-on:after-enter="onpopoverenter($event, { prop, row })"
-                                  :width="resolvepopoverwidth(prop, row)"
-                                  :popper-options="resolvepopoveroptions(prop, row)"
-                                  :title="resolvepopovertitle(prop, row)"
-                                  :content="resolvepopovercontent(prop, row)">
-                        <template v-if="prop.popover">
-                          <slot :ispopover="true" :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
-                            <div class="cd-popover--default">укажите содержимое подсказки для свойства {{ prop.datafield }} или используйте слот, где ispopover == true  </div>
-                          </slot>
-                        </template>
-                        <template slot="reference">
-                          <slot :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
-                            <div class="w-auto">
-                              <template v-if="prop.icon">
-                                <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
-                              </template>
-                              <template v-else-if="prop.route">
-                                <router-link :to="prop.route(row)">
-                                  <template v-if="prop.format">{{ prop.format(row) }}</template>
-                                  <template v-else>{{ row[prop.datafield] }}</template>
-                                </router-link>
-                              </template>
-                              <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
-                                {{ formatDate(row[prop.datafield]) }}
-                              </template>
-                              <template v-else-if="prop.input === 'checkbox'">
-                                <input class="form-check-input pe-none" type="checkbox" :checked="row[prop.datafield]"/>
-                              </template>
-                              <template v-else-if="prop.input === 'money'">
-                                {{ formatMoney(row[prop.datafield]) }}
-                              </template>
-                              <template v-else>
-                                {{ row[prop.datafield] }}
-                              </template>
-                            </div>
-                          </slot>
-                        </template>
-                      </el-popover>
+                  <slot :data="{ row, $rowindex: rindex }" :property="{ prop, $propindex: pindex }">
+                    <div class="w-auto">
+                      <template v-if="prop.icon">
+                        <i class="cd-cell--icon" :class="resolveicon(prop, row)"></i>
+                      </template>
+                      <template v-else-if="prop.route">
+                        <router-link :to="prop.route(row)">
+                          <template v-if="prop.format">{{ prop.format(row) }}</template>
+                          <template v-else>{{ row[prop.datafield] }}</template>
+                        </router-link>
+                      </template>
+                      <template v-else-if="prop.input === 'date' || prop.input === 'datetime'">
+                        {{ formatDate(row[prop.datafield]) }}
+                      </template>
+                      <template v-else-if="prop.input === 'checkbox'">
+                        <input class="form-check-input pe-none" type="checkbox" :checked="row[prop.datafield]"/>
+                      </template>
+                      <template v-else-if="prop.input === 'money'">
+                        {{ formatMoney(row[prop.datafield]) }}
+                      </template>
+                      <template v-else>
+                        {{ row[prop.datafield] }}
+                      </template>
+                    </div>
+                  </slot>
                 </td>
                 <td v-if="columns.length === 0">
                   <slot :data="{ row, $rowindex: rindex }" :row="true">
