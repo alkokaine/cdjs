@@ -26,6 +26,7 @@ import Vue from 'vue'
 import CDForm from '@/components/cd-form.vue'
 import CDDocGeneric from '@/generic/cd-doc-generic.vue'
 import ComponentInfo from '@/generic/cd-doc-component-info.vue'
+import keys from './keys'
 
 const buildingslotdescriptor = [
   {
@@ -212,31 +213,29 @@ export default {
                 {
                   descriptor: [
                     {
-                      datafield: 'FullAddress',
-                      text: 'Подобрать адрес',
+                      datafield: 'address',
+                      text: 'address',
                       input: 'autocomplete',
-                      url: '/suggestions/suggest/address',
                       method: 'post',
-                      labelkey: 'value',
-                      headers: {
-                        Authorization: 'Token 0289160a02213271903b8c31ce47c670c58c3093',
-                        'Access-Control-Allow-Credentials': 'true'
+                      labelkey: 'unrestricted_value',
+                      valuekey: 'unrestricted_value',
+                      headers: keys.dadataheaders,
+                      onselect (payload, event, parent) {
+                        console.log(this, payload, event)
                       },
                       resolvepayload (query, payload, parent) {
                         return {
-                          query: `${query}`, locations_boost: [{ kladr_id: '51' }]
+                          query: query,
+                          count: 20,
+                          locations_boost: [{
+                            kladr_id: '51'
+                          }]
                         }
                       },
-                      resolveresult (response) {
-                        return response.data.suggestions
-                      },
-                      isdisabled (option, payload, parent) {
-                        return false
-                      },
                       focustrigger: false,
-                      onselect (...args) {
-                        console.log(args)
-                      }
+                      clearable: true,
+                      url: '/suggestions/address',
+                      resolveresult: (response) => (response.data.suggestions)
                     },
                     {
                       datafield: 'PostIndex',
