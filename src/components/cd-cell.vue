@@ -99,12 +99,8 @@
 import Vue from 'vue'
 import CDList from './cd-list.vue'
 import CDProps from './cd-props.vue'
-const { getDirective } = require('vue-debounce')
 export default {
   name: 'cd-cell',
-  directives: {
-    debounce: getDirective()
-  },
   components: {
     'cd-list': CDList,
     'cd-props': CDProps
