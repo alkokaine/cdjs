@@ -1,17 +1,24 @@
 <template>
-  <div class="cd-list" v-on:mouseleave="listleave">
+  <div class="cd-list">
     <slot name="header"></slot>
-    <ul v-if="showitems" v-loading="isloading" :role="listrole" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]">
+    <ul v-loading="isloading" class="cd-list--wrap" :class="[listclass, { 'inner': inner }]" :role="listRole">
       <li v-if="isempty" class="cd-list--item no-data">
         <slot name="no-data"></slot>
       </li>
-      <li v-for="(row, index) in filtered"
-        :key="rowkey(row)" class="cd-list--item" :class="rowclassResolved(row, index)"
-        v-on:click="listitemclicked($event, { row, index })"
-        v-on:mouseenter="listitementered($event, { row, index })"
-        role="presentation">
-        <slot :row="row" :index="index"></slot>
-      </li>
+      <template v-if="showitems">
+        <li v-for="(row, index) in filtered" :key="rowkey(row, index)" class="cd-list--item" :class="rowclassResolved(row, index)" :role="itemRole"
+          @click="handleitemevent({ $event, row, index }, onLiClick)"
+          @mousedown="handleitemevent({ $event, row, index }, onLiMouseDown)"
+          @mouseenter="handleitemevent({ $event, row, index }, onLiMouseEnter)"
+          @mouseleave="handleitemevent({ $event, row, index }, onLiMouseLeave)"
+          @mousemove="handleitemevent({ $event, row, index }, onLiMouseMove)"
+          @mouseout="handleitemevent({ $event, row, index }, onLiMouseOut)"
+          @mouseover="handleitemevent({ $event, row, index }, onLiMouseOver)"
+          @mouseup="handleitemevent({ $event, row, index }, onLiMouseUp)"
+          @mousewheel="handleitemevent({ $event, row, index }, onLiMouseWheel)">
+          <slot :row="row" :index="index"></slot>
+        </li>
+      </template>
       <li v-if="$slots.placeholder" class="cd-list--item cd-list--placeholder" role="presentation">
         <slot name="placeholder"></slot>
       </li>
@@ -23,11 +30,11 @@
 <script>
 
 import collection from '../common/collection'
-import selection from '../common/selection'
-import watchurl from '../common/get-url-watch'
+import utils from '../common/utils'
+
 export default {
   name: 'cd-list',
-  mixins: [collection, selection, watchurl],
+  mixins: [collection],
   props: {
     isrowvisible: { type: Function },
     showitems: { type: Boolean, default: true, description: 'Прячем или нет элементы списка' },
@@ -39,21 +46,55 @@ export default {
      * строка или функция, возвращающая css-класс для строки коллекции
      */
     rowclass: { type: [String, Array, Function], default: '', description: 'Строка или функция, возвращающая строку с классом для элемента списка, ' },
-    listitemclicked: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится по клику на элементе списка' },
-    listitementered: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при входе мыши на элемент списка' },
-    listitemleaved: { type: Function, default: function (event, scope) {}, description: 'Функция, которая выполнится при выходе из элемента списка' },
-    listleave: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при выходе мыши из списка' },
-    listenter: { type: Function, default: function (event) {}, description: 'Функция, которая выполнится при входе мыши в список' },
+    onLiClick: { type: Function, description: 'Функция-обработчик события onclick' },
+    onLiMouseDown: { type: Function, description: 'Функция-обработчик события onmousedown' },
+    onLiMouseEnter: { type: Function, description: 'Функция-обработчик события onmouseenter' },
+    onLiMouseLeave: { type: Function, description: 'Функция-обработчик события onmouseleave' },
+    onLiMouseMove: { type: Function, description: 'Функция-обработчик события onmousemove' },
+    onLiMouseOut: { type: Function, description: 'Функция-обработчик события onmouseout' },
+    onLiMouseOver: { type: Function, description: 'Функция-обработчик события onmouseover' },
+    onLiMouseUp: { type: Function, description: 'Функция-обработчик события onmouseup' },
+    onLiMouseWheel: { type: Function, description: 'Функция-обработчик события onmousewheel' },
+    itemRole: {
+      type: String,
+      validator: function (value) {
+        if (utils.ListItemAriaRole.indexOf(value) === -1) {
+          console.error('[CDJS:PropertyError] invalid property value, expected:', utils.ListAriaRole)
+          return false
+        }
+        return true
+      },
+      default: 'presentation',
+      description: 'Волшебная aria-role элемента списка'
+    },
+    listRole: {
+      type: String,
+      default: 'presentation',
+      description: 'aria-role списка',
+      validator: function (value) {
+        if (utils.ListAriaRole.indexOf(value) === -1) {
+          console.error('[CDJS:PropertyError] invalid property value, expected:', utils.ListItemAriaRole)
+          return false
+        }
+        return true
+      }
+    },
     /**
      * свойство-признак того, что эта коллекция вложена в другую
      */
-    inner: { type: Boolean, default: false, description: 'Признак того, что коллекция вложенная' },
-    listrole: { type: String }
+    inner: { type: Boolean, default: false, description: 'Признак того, что коллекция вложенная' }
   },
   watch: {
     payload: {
       handler (newvalue, oldvalue) {
         if (newvalue !== undefined) this.loaddata(this.get.url, newvalue)
+      }
+    }
+  },
+  methods: {
+    handleitemevent ({ $event, row, index }, callback) {
+      if (callback) {
+        callback($event, { row, index })
       }
     }
   },

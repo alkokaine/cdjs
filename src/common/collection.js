@@ -37,7 +37,7 @@ export default {
       * keyfield: имя свойства с ключевым значением
       *
       */
-    keyfield: { type: String, required: true, description: 'нужно смириться с тем, что у элементов в коллекции есть неповторяющееся свойство, его идентификатор, он передаётся сюда' },
+    keyfield: { type: String },
     /**
      * объект или функция, возвращающая объект, содержащий
      * свойства строковые get, remove, add, update
@@ -52,7 +52,11 @@ export default {
   computed: {
     rowkey () {
       const local = this
-      return (row) => row[local.keyfield]
+      return (row, index) => {
+        if (local.keyfield === undefined) return index
+        if (row[local.keyfield] === undefined) return `${local.keyfield}_${index}`
+        return `${row[local.keyfield]}_${index}`
+      }
     }
   },
   data (col) {

@@ -170,6 +170,13 @@ const extractarguments = function getArgs (func) {
   if (result === null) result = []
   return result
 }
+
+const ListItemAriaRole = ['presentation', 'menuitem', 'menuitemcheckbox',
+  'menuitemradio', 'option', 'none', 'radio', 'separator',
+  'tab', 'treeitem']
+const ListAriaRole = ['directory', 'group', 'listbox', 'menu', 'menubar',
+  'none', 'presentation', 'radiogroup', 'tablist', 'toolbar', 'tree']
+
 export default {
   resolvePropertyValue,
   range,
@@ -178,5 +185,7 @@ export default {
   flatterer,
   countchildren,
   headerrows,
-  extractarguments
+  extractarguments,
+  ListItemAriaRole,
+  ListAriaRole
 }
