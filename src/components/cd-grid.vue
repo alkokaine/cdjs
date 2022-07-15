@@ -34,7 +34,7 @@
           <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
             <template v-for="(row, rindex) in collection">
-              <tr class="ms-0 me-0"  :key="rowkey(row, index)">
+              <tr class="ms-0 me-0"  :key="rowkey(row, rindex)">
                 <td v-if="selectrows" class="cd-checkbox--cell">
                   <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event, row)" :checked="isrowselected(row)"/>
                 </td>
