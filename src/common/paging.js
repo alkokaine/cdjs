@@ -20,13 +20,13 @@ export default {
     resolvepageparams: { type: Function, default: (page, pageSize) => ({ Page: page, PageSize: pageSize }) }
   },
   watch: {
-    page: {
-      handler (newvalue) {
-        const paging = this
-        const payload = Object.assign({}, paging.payload, paging.resolvepageparams(newvalue, paging.pageSize))
-        const url = paging.resolveurl(paging.get.url, newvalue, paging.pageSize)
-        paging.loaddata(url, payload)
-      }
-    }
+    // page: {
+    //   handler (newvalue) {
+    //     const paging = this
+    //     const payload = Object.assign({}, paging.payload, paging.resolvepageparams(newvalue, paging.pageSize))
+    //     const url = paging.resolveurl(paging.get.url, newvalue, paging.pageSize)
+    //     paging.loaddata(url, payload)
+    //   }
+    // }
   }
 }

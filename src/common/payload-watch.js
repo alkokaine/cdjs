@@ -4,14 +4,14 @@ export default {
     get: { type: Object }
   },
   watch: {
-    payload: {
-      deep: true,
-      handler (newvalue, oldvalue) {
-        const parent = this
-        if (newvalue) {
-          parent.loaddata(parent.get.url, newvalue)
-        }
-      }
-    }
+    // payload: {
+    //   deep: true,
+    //   handler (newvalue, oldvalue) {
+    //     const parent = this
+    //     if (newvalue) {
+    //       parent.loaddata(parent.get.url, newvalue)
+    //     }
+    //   }
+    // }
   }
 }
