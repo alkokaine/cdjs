@@ -1,9 +1,9 @@
 <template>
   <div class="cd-field">
     <template v-if="editortype.isselect">
-      <el-select class="w-100" :disabled="disabled" v-model="cellvalue" :value-key="property.valuekey" :clearable="property.clearable" :placeholder="property.placeholder"
-        :filterable="property.filterable"
-        :collapse-tags="property.collapsetags" :multiple="property.multiple" size="mini" :remote="true" :remote-method="retrieveoptions"
+      <el-select :id="property.datafield" class="w-100" :disabled="disabled" v-model="cellvalue" :value-key="property.valuekey"
+        :clearable="property.clearable" :placeholder="property.placeholder" :filterable="property.filterable" :collapse-tags="property.collapsetags"
+        :multiple="property.multiple" size="mini" :remote="property.remote" :remote-method="retrieveoptions"
         v-on:change="onchange({ $event: option($event), property }, ($event === '' ? property.reset : property.onselect))"
         v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
         v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)"
@@ -31,9 +31,9 @@
       </el-select>
     </template>
     <template v-else-if="editortype.isautocomplete">
-      <el-autocomplete class="w-100" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable" v-model="cellvalue" :debounce="300"
+      <el-autocomplete :id="property.datafield" class="w-100" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable" v-model="cellvalue" :debounce="300"
         :value-key="property.valuekey" :placement="property.placement" :fetch-suggestions="fetchsuggestions" size="mini"
-        :trigger-on-focus="property.focustrigger" :name="property.datafield" v-on:select="onselect({ $event, property }, property.onselect)"
+        :trigger-on-focus="property.focustrigger" v-on:select="onselect({ $event, property }, property.onselect)"
         v-on:change="onchange({ $event, property }, property.onchange)" v-on:focus="onfocus({ $event, property }, property.onfocus)" v-on:blur="onblur({ $event, property }, property.onblur)"
         v-on:input="oninput({ $event, property }, property.oninput)" v-on:clear="onclear({ $event, property }, property.onclear)"
         @input="dispatch">
@@ -44,9 +44,9 @@
       </el-autocomplete>
     </template>
     <template v-else-if="editortype.isdate">
-      <el-date-picker class="w-100" :disabled="disabled" size="mini" v-model="cellvalue" :placeholder="property.placeholder" :clearable="property.clearable"
+      <el-date-picker :id="property.datafield" class="w-100" :disabled="disabled" size="mini" v-model="cellvalue" :placeholder="property.placeholder" :clearable="property.clearable"
         :format="property.displayformat" :value-format="property.valueformat"
-        :editable="property.editable" :name="property.datafield" :picker-options="pickeroptions"
+        :editable="property.editable" :picker-options="pickeroptions"
         v-on:change="onchange({ $event, property },  property.onchange)"
         v-on:blur="onblur({ $event, property }, property.onblur)"
         v-on:focus="onfocus({ $event, property }, property.onfocus)"
@@ -56,7 +56,7 @@
     </template>
     <template v-else-if="editortype.isdatetime"></template>
     <div v-else-if="editortype.isnumber" class="el-input el-input--mini w-100" :class="[{ 'is-disabled': disabled }]">
-      <input :disabled="disabled" class="el-input el-input__inner" :class="[{ 'is-disabled': disabled }]" type="number" v-model="cellvalue"
+      <input :id="property.datafield" :disabled="disabled" class="el-input el-input__inner" :class="[{ 'is-disabled': disabled }]" type="number" v-model="cellvalue"
         :clearable="property.clearable"
         v-on:input="oninput({ $event, property }, property.oninput)"
         v-on:focus="onfocus({ $event, property }, property.onfocus)"
@@ -64,13 +64,13 @@
         v-on:blur="onblur({ $event, property }, property.onblur)"  @input="dispatch"/>
     </div>
     <template v-else-if="editortype.ischeckbox">
-      <el-checkbox class="cd-checkbox" size="mini" v-model="cellvalue" :disabled="disabled" v-on:change="onchange({ $event, property }, property.onchange)" :checked="ischecked" @input="dispatch"></el-checkbox>
+      <el-checkbox :id="property.datafield" class="cd-checkbox" size="mini" v-model="cellvalue" :disabled="disabled" v-on:change="onchange({ $event, property }, property.onchange)" :checked="ischecked" @input="dispatch"></el-checkbox>
     </template>
     <template v-else-if="editortype.isfile">
-      <el-upload class="cd-upload" :action="property.url" :headers="property.headers" :multiple="property.multiple" ></el-upload>
+      <el-upload :id="property.datafield" class="cd-upload" :action="property.url" :headers="property.headers" :multiple="property.multiple" ></el-upload>
     </template>
     <template v-else-if="editortype.istextarea">
-      <el-input type="textarea" v-model="cellvalue" :disabled="disabled"
+      <el-input :id="property.datafield" type="textarea" v-model="cellvalue" :disabled="disabled"
         v-on:blur="onblur({ $event, property}, property.onblur)"
         v-on:change="onchange({ $event, property}, property.onchange)"
         v-on:input="oninput({ $event, property }, property.oninput)"
@@ -78,15 +78,15 @@
         v-on:clear="onclear({ $event, property }, property.onclear)"  @input="dispatch"></el-input>
     </template>
     <template v-else-if="editortype.isslider">
-      <input type="range" class="form-range" :min="property.min" :max="property.max" :step="property.step" v-model="cellvalue" :disabled="disabled"
+      <input :id="property.datafield" type="range" class="form-range" :min="property.min" :max="property.max" :step="property.step" v-model="cellvalue" :disabled="disabled"
         v-on:change="onchange({ $event, property }, property.onchange)"
         v-on:input="oninput({ $event, property }, property.oninput)" @input="dispatch"/>
     </template>
     <template v-else-if="editortype.isswitch">
-      <el-switch v-model="cellvalue" v-on:change="onchange({ $event, property }, property.onchange)" :disabled="disabled" @input="dispatch"></el-switch>
+      <el-switch :id="property.datafield" v-model="cellvalue" v-on:change="onchange({ $event, property }, property.onchange)" :disabled="disabled" @input="dispatch"></el-switch>
     </template>
     <template v-else-if="!isarray">
-      <el-input v-model="cellvalue" size="mini" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable"
+      <el-input :id="property.datafield" v-model="cellvalue" size="mini" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable"
         v-on:change="onchange({ $event, property }, property.onchange)"
         v-on:input="oninput({ $event, property }, property.oninput)"
         v-on:focus="onfocus({ $event, property }, property.onfocus)"
@@ -264,11 +264,11 @@ export default {
     }
   },
   computed: {
-    ischecked () {
-      return this.value === true
+    ischecked ({ value }) {
+      return value === true
     },
-    isempty () {
-      return this.values.length === 0
+    isempty ({ values }) {
+      return values.length === 0
     }
   }
 }
