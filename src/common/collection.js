@@ -1,3 +1,4 @@
+import axios from 'axios'
 export default {
   name: 'collection',
   props: {
@@ -10,8 +11,7 @@ export default {
     resolvepayload: {
       type: Function,
       returns: Object,
-      description: 'Возвращает изменённый объект payload, подходящий для отправки с запросом. По умолчанию возвращается неизменённый объект',
-      default: (payload) => (payload)
+      description: 'Возвращает изменённый объект payload, подходящий для отправки с запросом. По умолчанию возвращается неизменённый объект'
     },
     /**
      * функция, которая из ответа сервера вернёт непосредственно коллекцию
@@ -47,18 +47,94 @@ export default {
     get: { type: Object, description: 'Объект, содержащий урл, наименование хттп-метода, и возможно заголовки запроса' },
     headers: { type: Object, description: 'Заголовки запроса' },
     beforeRequest: { type: Function, description: 'Функция выполнится перед отправкой запроса' },
-    errorRequest: { type: Function, description: 'Функция выполнится при ошибке' }
+    errorRequest: { type: Function, description: 'Функция выполнится при ошибке' },
+    /**
+     * строка или функция, возвращающая css-класс для строки коллекции
+     */
+    rowclass: { type: [String, Array, Function], default: '', description: 'Строка или функция, возвращающая строку с классом для элемента списка, ' }
   },
-  computed: {
-    rowkey () {
-      const local = this
-      return (row) => row[local.keyfield]
+  data () {
+    return {
+      state: {
+        isLoading: false,
+        error: false
+      }
     }
   },
-  data (col) {
-    return {
-      error: false,
-      isloading: false
+  computed: {
+    $axios ({ errorRequest, beforeRequest, resolveresult }) {
+      const state = this.state
+      const axiosInstance = axios.create()
+      axiosInstance.interceptors.request.use(config => {
+        state.isLoading = true
+        if (beforeRequest !== undefined) {
+          const returned = beforeRequest(config)
+          return returned === undefined ? config : returned
+        } else {
+          return config
+        }
+      }, error => {
+        if (errorRequest !== undefined) errorRequest(() => Promise.reject(error))
+        setTimeout(() => { state.isLoading = false }, 100)
+        return error
+      })
+      axiosInstance.interceptors.response.use(response => {
+        setTimeout(() => {
+          state.isLoading = false
+        }, 100)
+        return response
+      }, error => {
+        setTimeout(() => {
+          state.isloading = false
+          state.error = error
+        }, 100)
+      })
+      return (params) => {
+        if (params.url === undefined) return Promise.resolve()
+        return axiosInstance(params).then(response => resolveresult(response)).catch(error => errorRequest(error))
+      }
+    },
+    error ({ state }) {
+      return state.error
+    },
+    payloadResolved ({ payload, resolvepayload }) {
+      return resolvepayload === undefined ? payload : resolvepayload(payload)
+    },
+    rowkey ({ keyfield }) {
+      return (row) => row[keyfield]
+    },
+    rowClassResolved ({ rowclass }) {
+      return (row) => {
+        if (typeof rowclass === 'function') return rowclass(row)
+        return rowclass
+      }
+    },
+    url ({ get }) {
+      return (get || {}).url
+    },
+    method ({ get }) {
+      return (get || {}).method
+    },
+    dataRetriever ({ axiosConfig, $axios }) {
+      return $axios(axiosConfig)
+    },
+    axiosConfig ({ method, url, payloadResolved, headers }) {
+      return {
+        method: method,
+        url: url,
+        params: payloadResolved,
+        headers: headers
+      }
+    },
+    isloading ({ state }) {
+      return state.isLoading
+    }
+  },
+  watch: {
+    dataRetriever: {
+      handler (newvalue) {
+        return newvalue.then(() => console.log('data loaded')).catch(error => console.error(error))
+      }
     }
   },
   methods: {
