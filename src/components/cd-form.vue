@@ -5,8 +5,8 @@
       <cd-fieldset class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :descriptor="descriptor" :isvisible="isvisible" :readonly="isreadonly">
         <template slot-scope="{ property, parent }">
           <template v-if="property">
-            <el-form-item class="cd-cell mb-2" :error="propertyerror(property)" :prop="property.datafield" :class="{ 'd-block': property.input === 'textarea' }" :required="isrequired(property)">
-              <label slot="label" tabindex="-1" class="cd-label form-label mb-0 user-select-none" :for="property.datafield">{{ property.text }}</label>
+            <el-form-item class="cd-cell mb-2" :error="propertyerror(property)" :prop="property.datafield" :class="{ 'd-block': property.input === 'textarea' }" :required="isrequired(property)" :for="property.datafield">
+              <span slot="label" tabindex="-1" class="cd-label form-label mb-0 fw-bold user-select-none">{{ property.text }}</span>
               <slot :property="property" :parent="parent">
                 <cd-cell :property="property" :class="property.class" :onchange="onchange" :parent="self"
                   :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect" :resolvepayload="resolvefetchdata(property)"
@@ -94,56 +94,49 @@ export default {
     }
   },
   computed: {
-    propertyerror () {
-      const form = this
+    propertyerror ({ errors }) {
       return (property) => {
-        const propertyerrors = form.errors.filter(f => f.property === property.datafield)
+        const propertyerrors = errors.filter(f => f.property === property.datafield)
         const text = propertyerrors.reduce((prev, current) => prev.concat(current.error), '')
         return text
       }
     },
-    flatprops () {
-      return utils.flatterer(this.descriptor, [])
+    flatprops ({ descriptor }) {
+      return utils.flatterer(descriptor, [])
     },
-    ispropertyeditable () {
-      const form = this
-      return (property) => form.editmode && utils.ispropertyeditable(property, form.formobject)
+    ispropertyeditable ({ editmode, formobject }) {
+      return (property) => editmode && utils.ispropertyeditable(property, formobject)
     },
-    rules () {
-      const form = this
+    rules ({ flatprops, formobject }) {
       const rulesContainer = {}
-      form.flatprops.forEach(property => {
+      flatprops.forEach(property => {
         if (hasOwnProperty.call(property, 'datafield') && hasOwnProperty.call(property, 'rules')) {
-          Vue.set(rulesContainer, property.datafield, isFunction.call(property, 'rules') ? property.rules(form.formobject) : property.rules)
+          Vue.set(rulesContainer, property.datafield, isFunction.call(property, 'rules') ? property.rules(formobject) : property.rules)
         }
       })
       return rulesContainer
     },
-    resolvevalue () {
-      const form = this
-      return (property) => (form.formobject || {})[property.datafield]
+    resolvevalue ({ formobject }) {
+      return (property) => (formobject || {})[property.datafield]
     },
-    descriptorproperty () {
-      const form = this
-      return (property) => (name) => utils.resolvePropertyValue(property, name, form.formobject)
+    descriptorproperty ({ formobject }) {
+      return (property) => (name) => utils.resolvePropertyValue(property, name, formobject)
     },
-    isvisible () {
-      return (property) => utils.ispropertyvisible(property, null, this.formobject)
+    isvisible ({ formobject }) {
+      return (property) => utils.ispropertyvisible(property, null, formobject)
     },
-    isreadonly () {
-      return (property) => !utils.ispropertyeditable(property, null, this.formobject)
+    isreadonly ({ formobject }) {
+      return (property) => !utils.ispropertyeditable(property, null, formobject)
     },
-    resolvefieldclass () {
-      const form = this
+    resolvefieldclass ({ formobject }) {
       return (prop) => {
-        if (typeof prop.fieldclass === 'function') return prop.fieldclass(form.formobject)
+        if (typeof prop.fieldclass === 'function') return prop.fieldclass(formobject)
         return prop.fieldclass
       }
     },
-    isrequired () {
-      const form = this
+    isrequired ({ formobject }) {
       return (prop) => {
-        if (typeof prop.required === 'function') return prop.required(form.formobject)
+        if (typeof prop.required === 'function') return prop.required(formobject)
         return prop.required
       }
     }
