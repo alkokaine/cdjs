@@ -16,7 +16,7 @@
             <th v-if="selectrows" class="cd-checkbox--cell">
               <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event)" :checked="allselected"/>
             </th>
-            <th scope="col"></th>
+            <th scope="col" :class="startCellTh"></th>
             <template v-if="columns.length">
               <th scope="col"
                 v-for="(col, jindex) in columns"
@@ -27,14 +27,14 @@
             <template v-else>
               <th scope="col"></th>
             </template>
-            <th scope="col"></th>
+            <th scope="col" :class="endCellTh"></th>
           </tr>
         </thead>
         <tbody v-loading="isloading" class="cd-grid---tbody" :class="tbodyclass">
           <template v-if="collection && collection.length">
             <!-- проходим в цикле по list -->
             <template v-for="(row, rindex) in collection">
-              <tr class="ms-0 me-0"  :key="rowkey(row)">
+              <tr class="ms-0 me-0"  :key="rowkey(row)" :class="rowClassResolved(row)">
                 <td v-if="selectrows" class="cd-checkbox--cell">
                   <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event, row)" :checked="isrowselected(row)"/>
                 </td>
@@ -145,6 +145,8 @@ export default {
     hideheader: { type: Boolean, default: false, description: 'Скрывать ли header грида' },
     onpagechange: { type: Function, description: 'Что проиозойдёт при смене страницы', default: function (event, pageargs) {} },
     selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' },
+    startCellTh: { type: [Object, Array, String], default: 'cd-grid--start-th' },
+    endCellTh: { type: [Object, Array, String], default: 'cd-grid--end-th' },
     resolveresult: {
       type: Function,
       default: function (response) {
