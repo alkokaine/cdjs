@@ -29,7 +29,13 @@ const weekdays = (
     })
     ))
 
-const weekDescriptor = compact => weekdays.map(m => ({ datafield: m.weekday.long, text: compact ? m.weekday.short : m.weekday.long, day: m.day }))
+const weekDescriptor = compact => weekdays.map(m => ({
+  datafield: m.weekday.long,
+  text: compact ? m.weekday.short : m.weekday.long,
+  day: m.day,
+  tdclass: ['weekday-cell', { compact: compact }],
+  headerclass: 'text-center'
+}))
 
 function getMonthDays (moment) {
   const daysInMonth = Array(moment.daysInMonth()).keys()
