@@ -34,7 +34,7 @@ const weekDescriptor = compact => weekdays.map(m => ({
   text: compact ? m.weekday.short : m.weekday.long,
   day: m.day,
   tdclass: ['weekday-cell', { compact: compact }],
-  headerclass: 'text-center'
+  headerclass: 'text-center text-uppercase'
 }))
 
 function getMonthDays (moment) {
