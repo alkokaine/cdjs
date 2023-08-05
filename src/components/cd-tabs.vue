@@ -1,5 +1,5 @@
 <template>
-  <cd-list class="cd-tabs container" :class="{ 'row': isCol, 'col': isRow}" :collection="tabs" :keyfield="tabKey"
+  <cd-list class="cd-tabs px-4" :class="{ 'row': isCol, 'col': isRow}" :collection="tabs" :keyfield="tabKey"
     :listclass="['cd-tabs--wrap list-unstyled nav nav-tabs border-0 px-0', tabListClass,
       {
         'flex-column w-auto': isCol,
@@ -20,8 +20,8 @@
     }" slot="pre">
       <div :class="{ 'w-1': isRow, 'h-1': isCol }"/>
     </div>
-    <a class="nav-link p-0 cd-tab border-0 mb-0" data-toggle="tab" slot-scope="{ row, index }" :href="`#${row[tabKey]}`">
-      <div v-on:click.capture="onTabSelect($event, row)" class="cd-tab--header p-2 border rounded-0"
+    <a class="nav-link p-0 cd-tab border-0 mb-0" data-toggle="tab" slot-scope="{ row, index }" :href="`#${row[tabKey]}`" v-on:click="onTabSelect($event, row)">
+      <div class="cd-tab--header p-2 border rounded-0"
         :class="[row.class, innerClass.rounded, isActive(row) ? ['active', innerClass.activeBorder] : innerClass.border]">
         <slot :tab="row" :index="index">
           <span class="cd-tab--header-default">{{ resolveTabCaption(row) }}</span>
