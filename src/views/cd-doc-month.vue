@@ -1,11 +1,10 @@
 <template>
   <cd-setting-container>
     <cd-form :payload="settings" :descriptor="descriptor" :sync="true"></cd-form>
-    <!-- <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false" :showheader="true"> -->
       <cd-month slot="content" :go-prev="setDate" :date="settings.mdate" :compareDate="compareDate" :select-weekdays="settings.selectWeekdays" :compact="settings.compact" :mode="settings.mode" :orientation="settings.orientation" :multiple="settings.multiple" :prepend-days="settings.prependDays">
         <div slot-scope="{ day, week }">
-            <div class="month-day">{{ day }}</div>
-            <div class="month-week">{{ week }}</div>
+          <div class="month-day">{{ day }}</div>
+          <div class="month-week">{{ week }}</div>
         </div>
       </cd-month>
   </cd-setting-container>
