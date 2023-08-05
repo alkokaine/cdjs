@@ -1,13 +1,18 @@
 <template>
-  <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs d-flex flex-row flex-nowrap w-100"
-    :orientation="orientation" :tab-list-class="{ 'align-items-end': inLeft, 'align-items-start': inRight }">
+  <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs d-flex flex-row flex-nowrap w-100" :tab-class="dayClass"
+    :orientation="orientation">
     <div slot="header">
       <slot name="header"></slot>
     </div>
-    <div class="cd-day--wrap cd-day--tab" :class="[{ 'mw-100': isCol }]" slot-scope="{ tab }" v-on:clcik="selectDay($event, tab)">
-      <span slot="header">{{ tabCaption(tab) }}</span>
+    <div class="cd-day--wrap cd-day--tab" :class="[{ 'mw-100': isCol }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
+      <div class="cd-day-tab--content d-flex flex-nowrap flex-row align-items-center">
+        <slot name="title" :day="tab"></slot>
+        <div class="p-2">
+          <a class="text-decoration-none" :href="href(tab)">{{ tabCaption(tab) }}</a>
+        </div>
+      </div>
     </div>
-    <div slot="content" class="p-2 m-2">
+    <div slot="content">
       <cd-list :collection="selectedDays" keyfield="daykey" listclass="list-unstyled" rowclass="month-day--details row my-2 w-auto">
         <div slot-scope="{ row }" :id="row.daykey">
           <slot :day="row"></slot>
@@ -29,6 +34,7 @@ export default {
 
   },
   props: {
+    dayClass: { type: [String, Object, Array, Function] },
     days: { type: Array, required: true, description: 'Коллекция дней' },
     orientation: { type: String, description: 'Положение и направление дней' },
     compareDate: { type: Function, required: true, description: 'Функция сравнения дат' },
@@ -63,6 +69,9 @@ export default {
     },
     tabCaption ({ format }) {
       return ({ date }) => formatter.format(date, format)
+    },
+    href () {
+      return ({ daykey }) => (`#${daykey}`)
     }
   }
 }
