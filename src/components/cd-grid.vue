@@ -38,7 +38,7 @@
                 <td v-if="selectrows" class="cd-checkbox--cell">
                   <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event, row)" :checked="isrowselected(row)"/>
                 </td>
-                <td :ref="propcellkey({}, rindex, 0)">
+                <td :ref="propcellkey({}, rindex, 0)" :class="startCellTd">
                   <slot :data="{ row, $rowindex: rindex }" :start="true"></slot>
                 </td>
                 <td v-for="(prop, pindex) in columns"
@@ -76,7 +76,7 @@
                     {{ row }}
                   </slot>
                 </td>
-                <td :ref="propcellkey({}, rindex, 999)">
+                <td :ref="propcellkey({}, rindex, 999)" :class="endCellTd">
                   <slot :data="{ row, $rowindex: rindex }" :end="true"></slot>
                 </td>
               </tr>
@@ -147,6 +147,8 @@ export default {
     selectrows: { type: Boolean, default: false, description: 'показывать ли колонку с чекбоксами для отметки строк' },
     startCellTh: { type: [Object, Array, String], default: 'cd-grid--start-th' },
     endCellTh: { type: [Object, Array, String], default: 'cd-grid--end-th' },
+    startCellTd: { type: [Object, Array, String], default: 'cd-grid--start-td' },
+    endCellTd: { type: [Object, Array, String], default: 'cd-grid--end-td' },
     resolveresult: {
       type: Function,
       default: function (response) {
@@ -300,5 +302,11 @@ export default {
   .cd-popover--content {
     min-width: max-content!important;
     max-width: min-content;
+  }
+  .cd-grid--end-td {
+    max-width: 1em;
+  }
+  .cd-grid--start-td {
+    max-width: 1em;
   }
 </style>
