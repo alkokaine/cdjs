@@ -1,30 +1,33 @@
 <template>
-  <div class="cd-month--wrapper">
+  <div class="cd-month--wrapper mx-auto">
     <slot name="month-header"></slot>
     <template v-if="ischedule">
       <cd-day-grid class="cd-month" :compact="compact"
         :week-range="weekRange" :days="keyedDays" :compare-date="compareDate"
         :select-weekdays="selectWeekdays" :multiple="multiple">
-        <div slot="header">grid-header {{ calendarDate }}</div>
         <cd-day slot-scope="{ day, week }" v-if="day" :info="day" :compact="compact" v-on:click.native="onDaySelect($event, day, week)" :is-selected="isDaySelected(day)">
             <div slot="header" class="cd-day--header">
-              <slot name="header" :day="day" :week="week"></slot>
+              <button class="btn btn-link text-decoration-none bi px-2" v-on:click.capture.stop="removeDay($event, day)" :class="{ 'd-none': compact, 'bi-x-square text-light': isDaySelected(day) }"></button>
             </div>
             <template v-if="!compact">
-              <slot :day="day" :week="week"></slot>
+              <div class="day-content text-pre">
+                <slot :day="day" :week="week"></slot>
+              </div>
             </template>
         </cd-day>
       </cd-day-grid>
     </template>
     <template v-else>
-      <cd-day-tabs class="cd-month" :days="keyedDays" :select-day="onDaySelect" :orientation="orientation"
-        :compare-date="compareDate" :multiple="multiple" :selected-days="selectedDays">
-        <div slot="header">tab-header {{ calendarDate }}</div>
+      <cd-day-tabs class="cd-month ms-3" :days="keyedDays" :select-day="onDaySelect" :orientation="orientation"
+        :compare-date="compareDate" :multiple="multiple" :selected-days="selectedDays" :day-class="resolveTabClass">
+        <span slot="title" slot-scope="{ day }"><button class="btn btn-link text-decoration-none bi px-2" v-on:click="removeDay($event, day)" :class="{ 'bi-check-square-fill': isDaySelected(day) }"></button></span>
         <cd-day slot-scope="{ day }" :info="day" :is-selected="isDaySelected(day)">
           <div slot="header">
             <slot name="header" :day="day"></slot>
           </div>
-          <slot :day="day"></slot>
+            <div class="day-content text-pre">
+              <slot :day="day"></slot>
+            </div>
         </cd-day>
       </cd-day-tabs>
     </template>
@@ -39,7 +42,7 @@ import utils from '@/common/utils'
 import CDDayGrid from '@/components/cd-day-grid.vue'
 import CDDayTab from '@/components/cd-day-tabs.vue'
 import CDDay from '@/components/cd-day.vue'
-
+const formatter = new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric'})
 export default {
   name: 'cd-month',
   components: {
@@ -72,7 +75,8 @@ export default {
       isLoading: false,
       selectedWeekdays: [],
       selectedDays: [],
-      editEvent: Object
+      editEvent: Object,
+      calendarDays: Array
     }
   },
   watch: {
@@ -83,26 +87,43 @@ export default {
     }
   },
   methods: {
+    setDays (days) {
+      this.calendarDays = days
+    }
   },
   computed: {
-    onDaySelect ({ selectedDays, multiple, goPrev }) {
+    resolveTabClass ({ isDaySelected }) {
+      return ( tab ) => {
+        return [ 'cd-month-tab-day', isDaySelected(tab) ? 'cd-day-tab-selected': 'cd-day-tab' ]
+      }
+    },
+    removeDay ({ selectedDays }) {
+      return ($event, { daykey }) => {
+        const index = selectedDays.findIndex(d => d.daykey == daykey)
+        if (index >= 0) selectedDays.splice(index, 1)
+      }
+    },
+    selectedLength ({ selectedDays }) {
+      return selectedDays.length
+    },
+    onDaySelect ({ selectedLength, selectedDays, multiple, goPrev, compact, removeDay }) {
       return ($event, day, week) => {
         if (day.isprev) {
           goPrev(day)
         }  else {
           const findIndex = selectedDays.findIndex(d => d.daykey === day.daykey)
-          if (findIndex === -1) {
+          if (findIndex < 0) {
             if (multiple) {
               selectedDays.push(day)
             } else {
-              if (selectedDays.length == 0) {
+              if (selectedLength == 0) {
                 selectedDays.push(day)
               } else {
                 selectedDays.splice(findIndex, 1, day)
               }
             }
           } else {
-            selectedDays.splice(findIndex, 1)
+            if (compact) removeDay($event, day)
           }
         }
         
@@ -118,21 +139,22 @@ export default {
         method: 'get',
         params: {
           year: calendarDate.year(),
-          month: calendarDate.month() + 1
+          month: calendarDate.month() + 1,
+          pre: true
         }
       }
     },
     ischedule ({ mode }) {
       return mode === 'schedule'
     },
-    days ({ calendarDate, prependDays }) {
-      return (prependDays ? prevMonthDays(calendarDate) : [])
+    days ({ calendarDate, prependDays, setDays }) {
+      return ({ request }) => setDays((prependDays ? prevMonthDays(calendarDate) : [])
         .concat(
           Array.from(Array(calendarDate.daysInMonth()).keys())
-            .map(d => ({ date: createDate(calendarDate.year(), calendarDate.month() + 1, d + 1) }))
-        )
+            .map((d, i) => ({ date: createDate(calendarDate.year(), calendarDate.month() + 1, d + 1), code: request.response[i] }))
+        ))
     },
-    $axios ({ resolveresult = ({ request }) => console.log(request.response) , offConfig }) {
+    $axios ({ days , offConfig }) {
       const state = this
       const axiosInstance = axios.create()
       axiosInstance.interceptors.request.use(config => {
@@ -152,13 +174,15 @@ export default {
           state.error = error
         }, 100)
       })
-      return axiosInstance(offConfig).then(response => resolveresult(response)).catch(error => errorRequest(error))
+      return axiosInstance(offConfig).then(response => days(response)).catch(error => errorRequest(error))
     },
-    weekNumbers ({ days }) {
-      return days.map(d => d.date.week())
+    weekNumbers ({ calendarDays }) {
+      const _map = typeof calendarDays == 'function' ? [] : calendarDays
+      return _map.map(d => d.date.week())
     },
-    keyedDays ({ days }) {
-      return days.map(m => ({ isprev: m.isprev, date: m.date, daykey: m.date.unix() }))
+    keyedDays ({ calendarDays }) {
+      const _map = typeof calendarDays == 'function' ? [] : calendarDays
+      return _map.map(m => ({ isprev: m.isprev, date: m.date, daykey: m.date.unix(), code: m.code }))
     },
     minWeekNumber ({ weekNumbers }) {
       return Math.min(...weekNumbers)
@@ -193,6 +217,11 @@ export default {
         return selectedDays.findIndex(d => d.date.date() === date.date() && d.date.month() === date.month()) >= 0
       }
     }
+  },
+  filters: {
+    noDate (value) {
+      return value != undefined ? formatter.format(value, 'mmmm YYYY') : ''
+    }
   }
 }
 </script>
@@ -206,6 +235,9 @@ export default {
   }
   .holiday {
     color: red;
+  }
+  .cd-month--wrapper {
+    width: 90%;
   }
   .cd-day.compact {
     /* max-width: 50px; */
