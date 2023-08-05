@@ -6,9 +6,9 @@
         'd-flex w-100' :isRow,
         'ps-0': inRight,
         'pe-0': inLeft,
-      }]" :rowclass="['cd-tab--wrap nav-item', { 'd-flex': isRow }]" listrole="tablist" itemrole="tab">
+      }]" :rowclass="tabClassResolved" listrole="tablist" itemrole="tab">
     <template v-if="isHeaderContent" slot="header">
-      <div class="cd-tabs--content container tab-content border container-fluid px-2" :class="[{ 'col': isCol }, innerClass.content]">
+      <div class="cd-tabs--content container tab-content border container-fluid px-2" :class="[{ 'col': isCol }, tabClass, innerClass.content]">
         <slot name="content"></slot>
       </div>
     </template>
@@ -20,14 +20,14 @@
     }" slot="pre">
       <div :class="{ 'w-1': isRow, 'h-1': isCol }"/>
     </div>
-    <a class="nav-link p-0 cd-tab border-0 mb-0" data-toggle="tab" slot-scope="{ row, index }" :href="`#${row[tabKey]}`" v-on:click="onTabSelect($event, row)">
-      <div class="cd-tab--header p-2 border rounded-0"
+    <div class="nav-link p-0 cd-tab border-0 mb-0" data-toggle="tab" slot-scope="{ row, index }">
+      <div class="cd-tab--header border rounded-0"
         :class="[row.class, innerClass.rounded, isActive(row) ? ['active', innerClass.activeBorder] : innerClass.border]">
         <slot :tab="row" :index="index">
           <span class="cd-tab--header-default">{{ resolveTabCaption(row) }}</span>
         </slot>
       </div>
-    </a>
+    </div>
     <div class="spring-end d-flex p-2" slot="post" :class="{
       'flex-grow-1': isRow,
       'border-end': inLeft,
@@ -54,6 +54,7 @@ export default {
   },
   props: {
     tabListClass: { type: [String, Object, Array], description: 'CSS классы для списка вкладок' },
+    tabClass: { type: [String, Object, Array, Function], default: 'cd-tab' },
     tabs: { type: Array, required: true, description: 'Вкладки' },
     tabCaption: { type: [Function, String], description: 'Свойство объекта [tab] из массива [tabs], в котором находится заголовок вкладки, или же функция, которая для объекта вкладки возвращает её заголовок' },
     tabKey: { type: String, required: true, default: 'key', description: 'Свойство объекта из массива [tabs], в котором находится идентификатор вкладки' },
@@ -69,6 +70,13 @@ export default {
     }
   },
   computed: {
+    tabClassResolved ({ tabClass, isRow }) {
+      if (typeof tabClass == 'function') {
+        return (tab) => (['cd-tab--wrap nav-item', { 'd-flex': isRow }, tabClass(tab)])
+      } else {
+        return ['cd-tab--wrap nav-item', { 'd-flex': isRow }, tabClass]
+      }
+    },
     resolveTabCaption ({ tabCaption }) {
       return (tab, index) => tabCaption === undefined
         ? tab
