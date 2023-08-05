@@ -1,5 +1,5 @@
 <template>
-  <cd-grid class="cd-days--grid" :class="{ compact: compact }" :collection="weeks" :descriptor="descriptor" keyfield="week" :small="compact" borders="none" :rowclass="['month-week', { compact: compact }]" :hideheader="!compact">
+  <cd-grid class="cd-days--grid" :class="{ compact: compact }" :collection="weeksOrder" :descriptor="descriptor" keyfield="week" :small="compact" borders="none" :rowclass="['month-week', { compact: compact }]" :hideheader="!compact">
     <div slot="grid-tuner">
       <slot name="header"></slot>
     </div>
@@ -52,19 +52,30 @@ export default {
     },
     weekFactory ({ descriptor }) {
       return (week, days) => {
-        const props = descriptor.map(p => (Object.defineProperty({}, p.datafield, {
-          enumerable: true,
-          value: days.find(d => {
+        const props = descriptor.map(p => {
+          const _days = days.find(d => {
             const _day = d.date.day()
-            return _day === p.day
+            return _day == p.day
           })
-        })))
-        const neweek = Object.assign({ week: week }, ...props)
-        return neweek
+          return (Object.defineProperty({ }, p.datafield, {
+            enumerable: true,
+            value: _days
+          }))
+        })
+        return Object.assign({ week: week }, ...props)
       }
     },
     weeks ({ weekRange, days, weekFactory }) {
-      return weekRange.map(w => weekFactory(w, days.filter(d => d.date.week() === w)))
+      return weekRange.map(w => {
+        const _days = days.filter(d => d.date.week() == w)
+        const max = Math.max(..._days.map(m => m.daykey))
+        const ww = { max, week: weekFactory(w, days.filter(d => d.date.week() === w))}
+        return ww
+      })
+    
+    },
+    weeksOrder ({ weeks }) {
+      return ((weeks.sort((a, b) => a.max - b.max)).map((w) => w.week))
     }
   }
 }
@@ -72,6 +83,9 @@ export default {
 <style>
   .cd-grid--day:hover {
     box-shadow: 0 0 6px 3px #c3c3c336;
+  }
+  .weekday-cell {
+    width: 14%;
   }
   .weekday-cell.compact {
     width: 1em;
