@@ -1,24 +1,11 @@
 <template>
-  <cd-grid class="cd-days--grid container" :collection="weeks" :descriptor="descriptor" keyfield="week" :class="[{ 'w-auto': compact }]" :small="compact">
-    <template slot="header" slot-scope="{ property }">
-      <div class="cd-weekday--header">
-        <template v-if="selectWeekdays">
-          <el-checkbox :label="property.text"></el-checkbox>
-        </template>
-        <template v-else>
-          {{ property.text }}
-        </template>
-      </div>
-    </template>
-    <template slot-scope="{ row, property }">
-      <div v-if="row && property" class="cd-day--grid-cell">
-        <cd-day v-if="row[property.datafield]" class="cd-grid--day" :day="getDay(row[property.datafield])"
-          v-on:click.native="selectDay($event, row[property.datafield], row)">
-          <span slot="header">{{ row[property.datafield] }}</span>
-          <div slot-scope="{ day }" class="cd-day--cell-content text-center">
-            <slot :day="day" :week="row"></slot>
-          </div>
-        </cd-day>
+  <cd-grid class="cd-days--grid" :class="{ compact: compact }" :collection="weeks" :descriptor="descriptor" keyfield="week" :small="compact" borders="none" :rowclass="['month-week', { compact: compact }]" :hideheader="!compact">
+    <div slot="grid-tuner">
+      <slot name="header"></slot>
+    </div>
+    <template slot-scope="{ data, property }" v-if="property">
+      <div class="cd-day--grid-cell">
+        <slot :day="data.row[property.prop.datafield]" :week="data.row.week"></slot>
       </div>
     </template>
   </cd-grid>
@@ -26,13 +13,10 @@
 <script>
 import CDGrid from '@/components/cd-grid.vue'
 import { weekDescriptor } from '@/common/month-days'
-import CdDay from './cd-day.vue'
-
 export default {
   name: 'cd-day-grid',
   components: {
-    'cd-grid': CDGrid,
-    'cd-day': CdDay
+    'cd-grid': CDGrid
   },
   props: {
     selectWeekdays: { type: Boolean, default: false, description: 'Показывать ли чекбоксы у дней недели' },
@@ -45,6 +29,7 @@ export default {
       },
       description: 'Дни месяца'
     },
+    selectDay: { type: Function },
     compareDate: { type: Function, required: true, description: 'Функция сравнения объектов с датами' },
     weekRange: {
       type: Array,
@@ -54,10 +39,6 @@ export default {
       },
       description: 'Список недель месяца'
     },
-    selectDay: {
-      type: Function,
-      description: 'Функция, которая выполнится при выборе дня'
-    }
   },
   data (grid) {
     return {}
@@ -91,5 +72,11 @@ export default {
 <style>
   .cd-grid--day:hover {
     box-shadow: 0 0 6px 3px #c3c3c336;
+  }
+  .weekday-cell.compact {
+    width: 1em;
+  }
+  .cd-days--grid.compact {
+    width: max-content;
   }
 </style>
