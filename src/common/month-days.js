@@ -1,6 +1,6 @@
 import moment from 'moment'
-moment.updateLocale('ru-RU', { week: { dow: 1 } })
-const createDate = (year, month, day) => (moment(`${year}-${month}-${day}`, 'YYYY-MM-DD', 'ru-RU'))
+moment.updateLocale('ru', { week: { dow: 1 } })
+const createDate = (year, month, day) => (moment(`${year}-${month}-${day}`, 'YYYY-MM-DD', 'ru'))
 const lastMonthDay = (date) => {
   return date.subtract(1, 'months').set('date', date.daysInMonth())
 }
