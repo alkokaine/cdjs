@@ -1,21 +1,31 @@
 <template>
-  <div class="cd-month--wrapper container">
+  <div class="cd-month--wrapper">
     <slot name="month-header"></slot>
     <template v-if="ischedule">
-      <cd-day-grid class="cd-month" key-field="week" :compact="compact"
-        :week-range="weekRange" :days="keyedDays" :compare-date="compareDate" :select-day="onDaySelect"
+      <cd-day-grid class="cd-month" :compact="compact"
+        :week-range="weekRange" :days="keyedDays" :compare-date="compareDate"
         :select-weekdays="selectWeekdays" :multiple="multiple">
-        <div slot-scope="{ day, week }">
-          <slot :day="day" :week="week"></slot>
-        </div>
+        <div slot="header">grid-header {{ calendarDate }}</div>
+        <cd-day slot-scope="{ day, week }" v-if="day" :info="day" :compact="compact" v-on:click.native="onDaySelect($event, day, week)" :is-selected="isDaySelected(day)">
+            <div slot="header" class="cd-day--header">
+              <slot name="header" :day="day" :week="week"></slot>
+            </div>
+            <template v-if="!compact">
+              <slot :day="day" :week="week"></slot>
+            </template>
+        </cd-day>
       </cd-day-grid>
     </template>
     <template v-else>
       <cd-day-tabs class="cd-month" :days="keyedDays" :select-day="onDaySelect" :orientation="orientation"
         :compare-date="compareDate" :multiple="multiple" :selected-days="selectedDays">
-        <div slot-scope="{ day }">
+        <div slot="header">tab-header {{ calendarDate }}</div>
+        <cd-day slot-scope="{ day }" :info="day" :is-selected="isDaySelected(day)">
+          <div slot="header">
+            <slot name="header" :day="day"></slot>
+          </div>
           <slot :day="day"></slot>
-        </div>
+        </cd-day>
       </cd-day-tabs>
     </template>
     <slot name="month-footer"></slot>
@@ -23,17 +33,22 @@
 </template>
 
 <script>
+import axios from 'axios'
 import { createDate, prevMonthDays } from '@/common/month-days'
 import utils from '@/common/utils'
 import CDDayGrid from '@/components/cd-day-grid.vue'
-import CDDayTabs from '@/components/cd-day-tabs.vue'
+import CDDayTab from '@/components/cd-day-tabs.vue'
+import CDDay from '@/components/cd-day.vue'
+
 export default {
   name: 'cd-month',
   components: {
     'cd-day-grid': CDDayGrid,
-    'cd-day-tabs': CDDayTabs
+    'cd-day': CDDay,
+    'cd-day-tabs': CDDayTab
   },
   props: {
+    goPrev: { type: Function, default: (day) => console.log(day) },
     mode: {
       type: String,
       validator (value) {
@@ -60,25 +75,52 @@ export default {
       editEvent: Object
     }
   },
-  methods: {
-    onDaySelect ($event, day, week) {
-      const findIndex = this.selectedDays.findIndex(d => d.daykey === day.daykey)
-      console.log(day, week)
-      if (findIndex === -1) {
-        if (this.multiple) {
-          this.selectedDays.push(day)
-        } else {
-          this.selectedDays = [day]
-        }
-      } else {
-        this.selectedDays.splice(findIndex, 1)
+  watch: {
+    $axios: {
+      handler (newvalue) {
+        newvalue.then(response => console.log(response)).catch(error => console.error(error))
       }
     }
   },
+  methods: {
+  },
   computed: {
+    onDaySelect ({ selectedDays, multiple, goPrev }) {
+      return ($event, day, week) => {
+        if (day.isprev) {
+          goPrev(day)
+        }  else {
+          const findIndex = selectedDays.findIndex(d => d.daykey === day.daykey)
+          if (findIndex === -1) {
+            if (multiple) {
+              selectedDays.push(day)
+            } else {
+              if (selectedDays.length == 0) {
+                selectedDays.push(day)
+              } else {
+                selectedDays.splice(findIndex, 1, day)
+              }
+            }
+          } else {
+            selectedDays.splice(findIndex, 1)
+          }
+        }
+        
+      }
+    },
     calendarDate ({ date }) {
       const _date = new Date(date)
       return createDate(_date.getFullYear(), _date.getMonth() + 1, _date.getDate())
+    },
+    offConfig ({ calendarDate }) {
+      return {
+        url: 'https://isdayoff.ru/api/getdata',
+        method: 'get',
+        params: {
+          year: calendarDate.year(),
+          month: calendarDate.month() + 1
+        }
+      }
     },
     ischedule ({ mode }) {
       return mode === 'schedule'
@@ -89,6 +131,28 @@ export default {
           Array.from(Array(calendarDate.daysInMonth()).keys())
             .map(d => ({ date: createDate(calendarDate.year(), calendarDate.month() + 1, d + 1) }))
         )
+    },
+    $axios ({ resolveresult = ({ request }) => console.log(request.response) , offConfig }) {
+      const state = this
+      const axiosInstance = axios.create()
+      axiosInstance.interceptors.request.use(config => {
+        state.$nextTick().then(() => {
+          state.isLoading = true
+        })
+        return config
+      })
+      axiosInstance.interceptors.response.use(response => {
+        setTimeout(() => {
+          state.isLoading = false
+        }, 100)
+        return response
+      }, error => {
+        setTimeout(() => {
+          state.isloading = false
+          state.error = error
+        }, 100)
+      })
+      return axiosInstance(offConfig).then(response => resolveresult(response)).catch(error => errorRequest(error))
     },
     weekNumbers ({ days }) {
       return days.map(d => d.date.week())
@@ -125,8 +189,8 @@ export default {
       }
     },
     isDaySelected ({ selectedDays }) {
-      return ({ row }) => {
-        return selectedDays.findIndex(d => d.date.date() === row.date.date() && d.date.month() === row.date.month()) >= 0
+      return ({ date }) => {
+        return selectedDays.findIndex(d => d.date.date() === date.date() && d.date.month() === date.month()) >= 0
       }
     }
   }
@@ -144,9 +208,16 @@ export default {
     color: red;
   }
   .cd-day.compact {
-    max-width: 50px;
+    /* max-width: 50px; */
   }
   .cd-month.compact {
     width: 350px;
+  }
+  .cd-grid--start-th
+  {
+    width: 1px;
+  }
+  .cd-grid--end-th {
+    width: 1px;
   }
 </style>
