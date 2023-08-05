@@ -269,14 +269,10 @@ params: Function // функция, которая возвращает пара
       this.selected = Number(event.target.value)
     },
     resolveCityPayload (payload) {
-      return {
-        params: this.property.params
-      }
+      return this.property.params
     },
     resolveCountryPayload (payload) {
-      return {
-        params: this.property.params
-      }
+      return this.property.params
     }
   }
 }

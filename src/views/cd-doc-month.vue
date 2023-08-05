@@ -1,18 +1,13 @@
 <template>
   <cd-setting-container>
-    <cd-form :payload="payload" :descriptor="settings" :sync="true"></cd-form>
-    <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false" :showheader="true">
-      <cd-form slot="month-header" :descriptor="olympicdescriptor" :payload="olympicpayload" :sync="true">
-        <div slot="footer"></div>
-      </cd-form>
-      <cd-list slot-scope="{ day }" listclass="list-unstyled" :collection="details(day)" keyfield="id">
-        <div class="row" slot-scope="{ row }">
-          <div class="col-1">{{ format(row) }}</div>
-          <div v-if="!payload.mode" class="col-10">{{ row.name }}</div>
+    <cd-form :payload="settings" :descriptor="descriptor" :sync="true"></cd-form>
+    <!-- <cd-month slot="content" :payload="payload" :schedule="holidays" property="date" :canadd="payload.canadd" :mode="payload.mode" :createnew="createnewevent" :isdayvisible="isdayvisible" :tile="false" :showheader="true"> -->
+      <cd-month slot="content" :go-prev="setDate" :date="settings.mdate" :compareDate="compareDate" :select-weekdays="settings.selectWeekdays" :compact="settings.compact" :mode="settings.mode" :orientation="settings.orientation" :multiple="settings.multiple" :prepend-days="settings.prependDays">
+        <div slot-scope="{ day, week }">
+            <div class="month-day">{{ day }}</div>
+            <div class="month-week">{{ week }}</div>
         </div>
-        <span slot="no-data">Нет данных</span>
-      </cd-list>
-    </cd-month>
+      </cd-month>
   </cd-setting-container>
 </template>
 
@@ -21,7 +16,7 @@ import Vue from 'vue'
 import CDSettingContainer from '@/components/cd-setting-container.vue'
 import CDMonth from '@/components/cd-month.vue'
 import CDForm from '@/components/cd-form.vue'
-import CDList from '@/components/cd-list.vue'
+// import CDList from '@/components/cd-list.vue'
 import keys from '@/views/keys'
 
 export default {
@@ -29,41 +24,102 @@ export default {
   components: {
     'cd-month': CDMonth,
     'cd-setting-container': CDSettingContainer,
-    'cd-form': CDForm,
-    'cd-list': CDList
+    'cd-form': CDForm
+    // 'cd-list': CDList
   },
   data (docmonth) {
     return {
       holidays: [],
-      settings: [
+
+      settings: {
+        compact: false,
+        selectWeekdays: true,
+        mdate: new Date(Date.now()),
+        mode: 'schedule',
+        orientation: 'col-left',
+        lang: 'en'
+      },
+      descriptor: [
+        {
+          datafield: 'compact',
+          text: 'Компактный режим',
+          input: 'checkbox'
+        },
+        {
+          datafield: 'selectWeekdays',
+          text: 'Чекбоксы у дней недели',
+          input: 'checkbox'
+        },
+        {
+          datafield: 'prependDays',
+          text: 'Дополнять первую неделю месяца днями из предыдущего месяца',
+          input: 'checkbox'
+        },
+        {
+          datafield: 'multiple',
+          text: 'Можно ли выбрать несколько дней',
+          input: 'checkbox'
+        },
+        {
+          datafield: 'mdate',
+          text: 'Дата календаря',
+          input: 'date'
+        },
         {
           datafield: 'mode',
-          text: 'Показывать все',
-          input: 'checkbox'
+          text: 'Режим',
+          input: 'select',
+          valuekey: 'mode',
+          labelkey: 'label',
+          values: [
+            {
+              mode: 'schedule',
+              label: 'таблица'
+            },
+            {
+              mode: 'list',
+              label: 'список'
+            }
+          ]
         },
         {
-          datafield: 'canadd',
-          text: 'Можно ли добавлять события',
-          input: 'checkbox'
+          datafield: 'orientation',
+          text: 'ориентация',
+          input: 'select',
+          labelkey: 'label',
+          valuekey: 'value',
+          values: [
+            {
+              label: 'row-top',
+              value: 'row-top'
+            },
+            {
+              label: 'row-bottom',
+              value: 'row-bottom'
+            },
+            {
+              label: 'col-left',
+              value: 'col-left'
+            },
+            {
+              label: 'col-right',
+              value: 'col-right'
+            }
+          ],
+          hidden: row => row.mode === 'schedule'
         },
         {
-          datafield: 'month',
-          text: 'месяц',
-          input: 'date',
-          onchange (payload, value, parent) {
-            const date = new Date(value)
-            Vue.set(docmonth.payload, 'MonthID', date.getMonth() + 1)
-            Vue.set(docmonth.payload, 'Year', date.getFullYear())
-          }
+          datafield: 'lang',
+          text: 'язык',
+          input: 'select',
+          labelkey: 'text',
+          valuekey: 'lang',
+          values: [
+            { text: 'английский', lang: 'en' },
+            { text: 'фарси', lang: 'fa' }
+          ]
         }
       ],
-      payload: {
-        mode: 1,
-        Year: 2022,
-        MonthID: 2,
-        canadd: true,
-        workdays: false
-      },
       olympicdescriptor: [
         {
           datafield: 'sport_id',
@@ -184,6 +240,9 @@ export default {
     }
   },
   methods: {
+    setDate ({ date }) {
+      this.settings.mdate = date.toDate()
+    },
     checkday (exist, check) {
       if (check.date === undefined) return false
       return exist.day === check.date.getDate() && exist.date.getMonth() === check.date.getMonth()
@@ -207,6 +266,11 @@ export default {
       Vue.set(dm.payload, 'Year', payload.Year)
       Vue.set(dm.payload, 'MonthID', payload.MonthID)
       callback()
+    },
+    compareDate ({ date }, day) {
+      return date.getDate() === day.getDate() &&
+        date.getMonth() === day.getMonth() &&
+        date.getFullYear() === day.getFullYear()
     }
   }
 }

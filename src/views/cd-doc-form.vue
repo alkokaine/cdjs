@@ -61,11 +61,7 @@ export default {
           resolveresult (response) {
             return response.data.Data
           },
-          headers: {
-            Accept: '*/*',
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1NDcxMTY2OSwiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.UhM0s_gZdZkZPtvBdZQYbbi_6yN3kEd2hcw02Z3oCcs'
-          },
+          headers: keys.crossd,
           url: '/local/api/building/object/196',
           reset: options.reset,
           method: 'get',

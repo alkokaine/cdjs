@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>{{ component.name }}</h3>
-    <cd-grid keyfield="propertyname" :collection="data" :descriptor="descriptor"></cd-grid>
+    <cd-grid keyfield="propertyname" start-cell-th="bg-primary start-cell" :collection="data" :descriptor="descriptor" :rowclass="resolveRowClass"></cd-grid>
   </div>
 </template>
 
@@ -66,11 +66,16 @@ export default {
           return `${propertyvalue.name}`
         }
       }
+    },
+    resolveRowClass (row) {
+      return row.propertyname
     }
   }
 }
 </script>
 
 <style>
-
+.start-cell {
+  width: 5px!important;
+}
 </style>
