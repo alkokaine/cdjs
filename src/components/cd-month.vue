@@ -152,34 +152,36 @@ export default {
           }
       }
     },
-    onDaySelect ({ selectedDays, goPrev, empty, isDaySelected, selectDay, $nextTick }) {
+    onDaySelect ({ selectedDays, goPrev, empty, isDaySelected, selectDay, removeDay, $nextTick }) {
       return ($event, day, week) => {
         if (day == empty) {
-          Object.entries(week)
-            .map(m => m[1])
-            .filter(f => f != empty && f.date != empty && f.isprev == empty)
-            .filter(f => !isDaySelected(f))
-            .forEach(d => $nextTick().then(() => selectDay.call(selectedDays, $event, d)))
+          const entries = Object.entries(week).map(m => m[1]).filter(f => f != empty && f.date != empty && f.isprev == empty)
+
+          if ($event.target.classList.contains('bi-check-square-fill')) {
+            entries.forEach(d => $nextTick().then(() => removeDay.call(selectedDays, $event, d)))
+          } else {
+            entries.filter(f => !isDaySelected(f)).forEach(d => $nextTick().then(() => selectDay.call(selectedDays, $event, d)))
+          } 
         } else if (day.isprev) {
-          goPrev(day)
-        }  else {
-          selectDay.call(selectedDays, $event, day)
-        }
-        
+            goPrev(day)
+          }  else {
+            selectDay.call(selectedDays, $event, day)
+          }
       }
     },
     calendarDate ({ date }) {
       const _date = new Date(date)
       return createDate(_date.getFullYear(), _date.getMonth() + 1, _date.getDate())
     },
-    offConfig ({ calendarDate }) {
+    offConfig ({ calendarDate, sixDays }) {
       return {
         url: 'https://isdayoff.ru/api/getdata',
         method: 'get',
         params: {
           year: calendarDate.year(),
           month: calendarDate.month() + 1,
-          pre: true
+          pre: true,
+          sd: sixDays == true ? 1 : 0
         }
       }
     },
