@@ -4,7 +4,16 @@
     <template v-if="ischedule">
       <cd-day-grid class="cd-month" :compact="compact"
         :week-range="weekRange" :days="keyedDays" :compare-date="compareDate"
-        :select-weekdays="selectWeekdays" :multiple="multiple">
+        :select-weekdays="selectWeekdays">
+        <template v-if="multiple" slot="week" slot-scope="{ week }">
+          <button class="btn btn-link text-decoration-none bi w-100 p-0" 
+            :class="{
+              'bi-plus-square': isNotSelected(week),
+              'bi-check-square': isSomeSelected(week),
+              'bi-check-square-fill': isFullSelected(week)
+            }"
+            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Выбрать неделю" v-on:click="onDaySelect($event, empty, week)"></button>
+        </template>
         <cd-day slot-scope="{ day, week }" v-if="day" :info="day" :compact="compact" v-on:click.native="onDaySelect($event, day, week)" :is-selected="isDaySelected(day)">
             <div slot="header" class="cd-day--header">
               <button class="btn btn-link text-decoration-none bi px-2" v-on:click.capture.stop="removeDay($event, day)" :class="{ 'd-none': compact, 'bi-x-square text-light': isDaySelected(day) }"></button>
@@ -70,8 +79,9 @@ export default {
     multiple: { type: Boolean, default: false, description: 'Можно ли выбрать несколько дней' },
     date: { type: [Date, String, Number] }
   },
-  data (calendar) {
+  data ({ multiple }) {
     return {
+      empty: undefined,
       isLoading: false,
       selectedWeekdays: [],
       selectedDays: [],
@@ -92,6 +102,23 @@ export default {
     }
   },
   computed: {
+    monthWeekdayCount({ keyedDays }) {
+      return (week) => {
+        return keyedDays.filter(d => d.isprev == undefined && d.date.week() == week).length
+      }
+    },
+    currentSelected ({ selectedDays, calendarDate }) {
+      return (week) => (selectedDays.filter(f => f.date.year() == calendarDate.year() && f.date.month() == calendarDate.month() && f.date.week() == week)).length
+    },
+    isNotSelected ({ currentSelected }) {
+      return ({ week }) => currentSelected(week) == 0
+    },
+    isSomeSelected ({ monthWeekdayCount, currentSelected }) {
+      return ({ week }) => (currentSelected(week) > 0) && (currentSelected(week) < monthWeekdayCount(week))
+    },
+    isFullSelected ({ monthWeekdayCount, currentSelected }) {
+      return ({ week }) => currentSelected(week) == monthWeekdayCount(week)
+    },
     resolveTabClass ({ isDaySelected }) {
       return ( tab ) => {
         return [ 'cd-month-tab-day', isDaySelected(tab) ? 'cd-day-tab-selected': 'cd-day-tab' ]
@@ -106,25 +133,37 @@ export default {
     selectedLength ({ selectedDays }) {
       return selectedDays.length
     },
-    onDaySelect ({ selectedLength, selectedDays, multiple, goPrev, compact, removeDay }) {
-      return ($event, day, week) => {
-        if (day.isprev) {
-          goPrev(day)
-        }  else {
-          const findIndex = selectedDays.findIndex(d => d.daykey === day.daykey)
+    selectDay ({ multiple, removeDay, compact }) {
+      return function ($event, day) {
+        const array = this
+        const findIndex = array.findIndex(d => d.daykey === day.daykey)
           if (findIndex < 0) {
             if (multiple) {
-              selectedDays.push(day)
+              array.push(day)
             } else {
-              if (selectedLength == 0) {
-                selectedDays.push(day)
+              if (array.length == 0) {
+                array.push(day)
               } else {
-                selectedDays.splice(findIndex, 1, day)
+                array.splice(findIndex, 1, day)
               }
             }
           } else {
             if (compact) removeDay($event, day)
           }
+      }
+    },
+    onDaySelect ({ selectedDays, goPrev, empty, isDaySelected, selectDay, $nextTick }) {
+      return ($event, day, week) => {
+        if (day == empty) {
+          Object.entries(week)
+            .map(m => m[1])
+            .filter(f => f != empty && f.date != empty && f.isprev == empty)
+            .filter(f => !isDaySelected(f))
+            .forEach(d => $nextTick().then(() => selectDay.call(selectedDays, $event, d)))
+        } else if (day.isprev) {
+          goPrev(day)
+        }  else {
+          selectDay.call(selectedDays, $event, day)
         }
         
       }
@@ -214,7 +253,9 @@ export default {
     },
     isDaySelected ({ selectedDays }) {
       return ({ date }) => {
-        return selectedDays.findIndex(d => d.date.date() === date.date() && d.date.month() === date.month()) >= 0
+        return (selectedDays.findIndex(d => {
+          return ((d.date.date() === date.date() && d.date.month() === date.month()) )
+        }) >= 0)
       }
     }
   },

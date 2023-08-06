@@ -1,11 +1,18 @@
 <template>
-  <cd-grid class="cd-days--grid" :class="{ compact: compact }" :collection="weeksOrder" :descriptor="descriptor" keyfield="week" :small="compact" borders="none" :rowclass="['month-week', { compact: compact }]" :hideheader="!compact">
+  <cd-grid class="cd-days--grid" :class="{ compact: compact }" :collection="weeksOrder" :descriptor="descriptor" keyfield="week" 
+    :small="compact" borders="none" :rowclass="['month-week', { compact: compact }]" :hideheader="!compact"
+    start-cell-td="w-auto">
     <div slot="grid-tuner">
       <slot name="header"></slot>
     </div>
-    <template slot-scope="{ data, property }" v-if="property">
+    <template slot-scope="{ start, data, property }">
       <div class="cd-day--grid-cell">
-        <slot :day="data.row[property.prop.datafield]" :week="data.row.week"></slot>
+        <template v-if="start">
+          <slot name="week" :week="data.row"></slot>
+        </template>
+        <template v-else-if="property">
+          <slot :day="data.row[property.prop.datafield]" :week="data.row.week"></slot>
+        </template>
       </div>
     </template>
   </cd-grid>

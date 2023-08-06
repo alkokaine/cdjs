@@ -11,24 +11,24 @@
       </div>
     </div>
     <div slot="content">
-      <cd-list :collection="selectedDays" keyfield="daykey" listclass="list-unstyled" rowclass="month-day--details row my-2 w-auto">
-        <div slot-scope="{ row }" :id="row.daykey">
-          <slot :day="row"></slot>
+      <cd-month-days :collection="sortedDays" keyfield="daykey" listclass="list-unstyled" rowclass="month-day--details row my-2 w-auto">
+        <div slot-scope="{ day }" :id="day.daykey">
+          <slot :day="day"></slot>
         </div>
-      </cd-list>
+      </cd-month-days>
     </div>
   </cd-tabs>
 </template>
 
 <script>
-import CDTabs from '@/components/cd-tabs.vue'
-import CDList from './cd-list.vue'
+import CDTabs from './cd-tabs.vue'
+import CDMonthDays from './cd-month-days'
 const formatter = Intl.DateTimeFormat('ru-RU')
 export default {
   name: 'cd-day-tabs',
   components: {
     'cd-tabs': CDTabs,
-    'cd-list': CDList
+    'cd-month-days': CDMonthDays
 
   },
   props: {
@@ -55,6 +55,10 @@ export default {
   computed: {
     getDay () {
       return ({ date }) => (date.toDate())
+    },
+    sortedDays ({ selectedDays }) {
+      return (selectedDays.sort((a, b) => a.daykey - b.daykey))
+      
     },
     isHoliday () {
       return ({ code }) => code == '1'
