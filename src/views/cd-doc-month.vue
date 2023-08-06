@@ -4,6 +4,7 @@
       <cd-month slot="content" :go-prev="setDate" :date="settings.mdate" :compareDate="compareDate" :select-weekdays="settings.selectWeekdays" :six-days="settings.sixDays" :compact="settings.compact" :mode="settings.mode" :orientation="settings.orientation" :multiple="settings.multiple" :prepend-days="settings.prependDays">
         <div slot-scope="{ day, week }">
           <div class="month-week">{{ week }}</div>
+          <div class="month-day mx-auto">{{ day }}</div>
         </div>
       </cd-month>
   </cd-setting-container>
@@ -199,5 +200,8 @@ export default {
   }
   .setting-form--container {
     z-index: 10;
+  }
+  .month-day {
+    width: 95%;
   }
 </style>
