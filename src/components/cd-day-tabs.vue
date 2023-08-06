@@ -7,9 +7,7 @@
     <div class="cd-day--wrap cd-day--tab" :class="[{ 'mw-100': isCol }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
       <div class="cd-day-tab--content d-flex flex-nowrap flex-row align-items-center">
         <slot name="title" :day="tab"></slot>
-        <div class="p-2">
-          <a class="text-decoration-none" :href="href(tab)">{{ tabCaption(tab) }}</a>
-        </div>
+        <a class="text-decoration-none p-2" :class="{ 'text-danger': isHoliday(tab) }" :href="href(tab)">{{ tabCaption(tab) }}</a>
       </div>
     </div>
     <div slot="content">
@@ -57,6 +55,9 @@ export default {
   computed: {
     getDay () {
       return ({ date }) => (date.toDate())
+    },
+    isHoliday () {
+      return ({ code }) => code == '1'
     },
     isCol ({ orientation }) {
       return ['col-left', 'col-right'].indexOf(orientation) >= 0
