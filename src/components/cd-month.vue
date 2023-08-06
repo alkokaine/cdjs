@@ -8,7 +8,7 @@
         <template v-if="multiple" slot="week" slot-scope="{ week }">
           <button class="btn btn-link text-decoration-none bi w-100 p-0" 
             :class="{
-              'bi-plus-square': isNotSelected(week),
+              'bi-plus': isNotSelected(week),
               'bi-check-square': isSomeSelected(week),
               'bi-check-square-fill': isFullSelected(week)
             }"
