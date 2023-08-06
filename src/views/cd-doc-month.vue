@@ -1,7 +1,7 @@
 <template>
   <cd-setting-container>
     <cd-form :payload="settings" :descriptor="descriptor" :sync="true"></cd-form>
-      <cd-month slot="content" :go-prev="setDate" :date="settings.mdate" :compareDate="compareDate" :select-weekdays="settings.selectWeekdays" :compact="settings.compact" :mode="settings.mode" :orientation="settings.orientation" :multiple="settings.multiple" :prepend-days="settings.prependDays">
+      <cd-month slot="content" :go-prev="setDate" :date="settings.mdate" :compareDate="compareDate" :select-weekdays="settings.selectWeekdays" :six-days="settings.sixDays" :compact="settings.compact" :mode="settings.mode" :orientation="settings.orientation" :multiple="settings.multiple" :prepend-days="settings.prependDays">
         <div slot-scope="{ day, week }">
           <div class="month-week">{{ week }}</div>
         </div>
@@ -33,6 +33,7 @@ export default {
         compact: false,
         selectWeekdays: true,
         mdate: new Date(Date.now()),
+        sixDays: false,
         mode: 'schedule',
         orientation: 'col-left',
         lang: 'en'
@@ -62,6 +63,11 @@ export default {
           datafield: 'mdate',
           text: 'Дата календаря',
           input: 'date'
+        },
+        {
+          datafield: 'sixDays',
+          text: 'Шестидневная рабочая неделя',
+          input: 'checkbox'
         },
         {
           datafield: 'mode',
@@ -118,102 +124,7 @@ export default {
           ]
         }
       ],
-      olympicdescriptor: [
-        {
-          datafield: 'sport_id',
-          text: 'Вид спорта',
-          input: 'select',
-          valuekey: 'sport_id',
-          labelkey: 'nazwa',
-          multiple: true,
-          filterable: true,
-          clearable: true,
-          url: '/olympic/olypi/sports',
-          resolveresult: (response) => (response.data.sports),
-          method: 'get',
-          onselect (...args) {
-          },
-          rules: (payload) => ([
-          ])
-        },
-        {
-          datafield: 'empty_id',
-          text: 'тест',
-          input: 'select',
-          valuekey: 'empty_id',
-          labelkey: 'label',
-          values: []
-        },
-        {
-          datafield: 'object_id',
-          text: 'object_id',
-          input: 'select',
-          valuekey: 'ObjectID',
-          labelkey: 'UltraShortName',
-          headers: {
-            Accept: '*/*',
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjMwNiIsIlVzZXJOYW1lIjoi0JDQu9C10LrRgdC10Lkg0JrQvtC60L7QstC40L0iLCJPYmplY3RJRCI6IjE3IiwiQXBwbGljYXRpb25JRCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTY1NzM0NzUzNywiaXNzIjoiY3Jvc3MtZCIsImF1ZCI6ImNyb3NzLWQifQ.TjrvqCqUDleM1dpGmSSoXB6BAXrY3bEVWMnFQEHzYnc'
-          },
-          url: '/local/api/objects/short',
-          method: 'get',
-          resolveresult: (response) => (response.data.Data),
-          resolvepayload: (payload) => ({
-            ObjectIDs: [],
-            ObjectTypeID: null,
-            ObjectGroupID: null,
-            SearchString: ''
-          })
-        },
-        {
-          datafield: 'address',
-          text: 'address',
-          input: 'autocomplete',
-          method: 'post',
-          labelkey: 'unrestricted_value',
-          valuekey: 'unrestricted_value',
-          headers: keys.dadataheaders,
-          onselect (payload, event, parent) {
-            console.log(this, payload, event)
-          },
-          resolvepayload (query, payload, parent) {
-            return {
-              query: query,
-              count: 20,
-              locations_boost: [{
-                kladr_id: '51'
-              }]
-            }
-          },
-          focustrigger: false,
-          clearable: true,
-          url: '/suggestions/address',
-          resolveresult: (response) => (response.data.suggestions)
-        }
-      ],
-      olympicpayload: {
-        sport_id: null
-      },
       timeformatter: new Intl.DateTimeFormat('ru-RU', { timeStyle: 'medium' })
-    }
-  },
-  watch: {
-    olympicpayload: {
-      immediate: true,
-      handler (newvalue, oldvalue) {
-        const dn = this
-        if (oldvalue === undefined) {
-          dn.$http.get('/olympic/olypi/events').then((response) => {
-            dn.holidays = response.data.events.map(e => {
-              const date = new Date(e.start_time)
-              Vue.set(e, 'date', date)
-              Vue.set(e, 'day', date.getDate())
-              Vue.set(e, 'month', date.getMonth())
-              return e
-            })
-          })
-        }
-      }
     }
   },
   computed: {
