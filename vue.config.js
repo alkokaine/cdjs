@@ -37,7 +37,7 @@ module.exports = {
           }
         },
         '/local': {
-          target: 'https://localhost:5001/',
+          target: 'https://portal.cross-d.ru/',
           pathRewrite: {
             '/local': ''
           }
