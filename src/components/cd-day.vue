@@ -1,25 +1,24 @@
 <template>
   <div class="cd-day" :class="{ 'opacity-25': info.isprev }">
-    <div class="cd-day--container w-100">
+    <div class="cd-day--container">
       <div class="cd-day--header d-flex flex-row mx-auto w-100" 
-        :class="{ 
-          'fw-bold': isSelected, 
-          'justify-space-around': compact, 
-          'border-bottom border-black text-light': !compact, 
+        :class="{
+          'border-bottom border-black text-light w-100 justify-content-evenely': !compact, 
+          'justify-content-center': compact,
           'bg-secondary': (compact && isSelected || !compact),
           'bg-danger': isHoliday && (compact && isSelected || !compact),
           'text-body': !compact && info.isprev, 
           'text-danger': compact && isHoliday,
-          'bg-secondary text-light': compact && isSelected 
+          'bg-secondary text-light fw-bold': compact && isSelected 
         }">
         <div class="cd-day--number px-2">
-          <span class="" :class="{ 'fs-6': compact, 'fs-2': !compact }">{{ dateStruct.day }}</span>
+          <span class="" :class="{ 'fs-6': compact, 'fs-3': !compact }">{{ dateStruct.day }}</span>
         </div>
-        <div :class="{ 'd-none': compact }">
-          <div class="fw-bold">{{ dateStruct.month }}</div>
-          <div>{{ dateStruct.weekday }}</div>
+        <div :class="{ 'd-block w-100': !compact, 'd-none': compact }">
+          <span class="fw-bold">{{ dateStruct.month }}</span>
+          <span class="d-block">{{ dateStruct.weekday }}</span>
         </div>
-        <div class="d-flex justify-content-end w-100">
+        <div :class="{ 'd-flex justify-content-end' : !compact, 'd-none': compact }">
           <div class="w-auto text-wrap">
             <slot name="header"></slot>
           </div>
@@ -35,7 +34,7 @@
 </template>
 
 <script>
-const weekdayFormatter = new Intl.DateTimeFormat('ru-RU', { weekday: 'long' })
+const weekdayFormatter = new Intl.DateTimeFormat('ru-RU', { weekday: 'short' })
 const monthFormatter = new Intl.DateTimeFormat('ru-RU', { month: 'short' })
 const dayFormatter = new Intl.DateTimeFormat('ru-RU', { day: '2-digit' })
 export default {
