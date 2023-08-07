@@ -171,7 +171,7 @@ export default {
         isslider: property.input === 'slider',
         isswitch: property.input === 'switch'
       },
-      pickeroptions: property.options,
+      pickeroptions: { firstDayOfWeek: 1, ...property.options },
       values: (property.values || []),
       error: false
     }
