@@ -16,18 +16,24 @@
             <th v-if="selectrows" class="cd-checkbox--cell">
               <input type="checkbox" class="cd-grid--checkbox" v-on:change="onrowselect($event)" :checked="allselected"/>
             </th>
-            <th scope="col" :class="startCellTh"></th>
+            <th scope="col" :class="startCellTh">
+              <slot name="theader" :start="true"></slot>
+            </th>
             <template v-if="columns.length">
               <th scope="col"
                 v-for="(col, jindex) in columns"
                 :key="jindex" :class="col.headerclass">
-                  <p class="mb-0">{{ col.text }}</p>
+                  <slot name="theader" :property="col">
+                    <p class="mb-0">{{ col.text }}</p>
+                  </slot>
               </th>
             </template>
             <template v-else>
               <th scope="col"></th>
             </template>
-            <th scope="col" :class="endCellTh"></th>
+            <th scope="col" :class="endCellTh">
+              <slot name="theader" :end="true"></slot>
+            </th>
           </tr>
         </thead>
         <tbody v-loading="isloading" class="cd-grid---tbody" :class="tbodyclass">
