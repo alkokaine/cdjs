@@ -2,8 +2,11 @@
   <div>
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
-    <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
-      <div>
+    <cd-tabs class="examples-list" :tabs="gridexamples" tab-key="name" :current="currentindex" :ontabselected="selectexample">
+      <div class="p-2" slot-scope="{ tab }">
+        <span>{{ tab.caption }}</span>
+      </div>
+      <div slot="content">
         <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
         <cd-grid class="example-grid" ref="example" :keyfield="grid.keyfield" :headers="grid.headers" :expandable="true"
             :get="grid.get"
@@ -24,7 +27,7 @@
                 <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
                   <div slot="header">
                     <div v-for="(text, index) in tutorial[step].text" :key="index">{{ text }}</div>
-                    <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-prop-list>
+                    <cd-props v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-props>
                   </div>
                   <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
                 </cd-list>
