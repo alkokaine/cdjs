@@ -1,25 +1,31 @@
 <template>
   <cd-grid class="cd-days--grid" :class="{ compact: compact }" :collection="weeksOrder" :descriptor="descriptor" keyfield="week" 
-    :small="compact" borders="none" :rowclass="['month-week', { compact: compact }]" :hideheader="!compact"
-    start-cell-td="w-auto">
+    :small="compact" borders="none" :rowclass="['month-week', { compact: compact }]" :hideheader="false"
+    start-cell-th="select-week--header" start-cell-td="select-week--cell" v-on:keyup.capture="moveCursor($event, cursorDate)">
     <div slot="grid-tuner">
       <slot name="header"></slot>
     </div>
+    <template slot="theader" slot-scope="{ start, property }">
+      <template v-if="start && selectWeekdays"></template>
+      <template v-else-if="property">
+        {{ property.text }}
+      </template>
+    </template>
     <template slot-scope="{ start, data, property }">
-      <div class="cd-day--grid-cell">
-        <template v-if="start">
+      <template v-if="start">
           <slot name="week" :week="data.row"></slot>
         </template>
-        <template v-else-if="property">
-          <slot :day="data.row[property.prop.datafield]" :week="data.row.week"></slot>
+        <template v-else-if="property && data.row[property.prop.datafield]">
+          <div class="p-1 mx-auto" :class="{ 'current': isCurrent(data.row[property.prop.datafield]) }">
+            <slot :day="data.row[property.prop.datafield]" :week="data.row.week"></slot>
+          </div>
         </template>
-      </div>
     </template>
   </cd-grid>
 </template>
 <script>
-import CDGrid from '@/components/cd-grid.vue'
-import { weekDescriptor } from '@/common/month-days'
+import CDGrid from './cd-grid.vue'
+import { weekDescriptor } from '../common/month-days'
 export default {
   name: 'cd-day-grid',
   components: {
@@ -46,9 +52,6 @@ export default {
       },
       description: 'Список недель месяца'
     },
-  },
-  data (grid) {
-    return {}
   },
   computed: {
     getDay () {
@@ -99,5 +102,13 @@ export default {
   }
   .cd-days--grid.compact {
     width: max-content;
+  }
+  .cd-day--grid-wrap {
+    width: 92%;
+  }
+  .select-week--header {
+  }
+  .select-week--cell {
+    vertical-align: middle;
   }
 </style>
