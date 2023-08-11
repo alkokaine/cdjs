@@ -16,7 +16,7 @@
           <slot name="week" :week="data.row"></slot>
         </template>
         <template v-else-if="property && data.row[property.prop.datafield]">
-          <div class="p-1 mx-auto" :class="{ 'current': isCurrent(data.row[property.prop.datafield]) }">
+          <div class="p-1 mx-auto">
             <slot :day="data.row[property.prop.datafield]" :week="data.row.week"></slot>
           </div>
         </template>
