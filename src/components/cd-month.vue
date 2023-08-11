@@ -6,7 +6,7 @@
         :week-range="weekRange" :days="keyedDays" :compare-date="compareDate"
         :select-weekdays="selectWeekdays">
         <template v-if="multiple" slot="week" slot-scope="{ week }">
-          <button class="btn btn-link text-decoration-none bi w-100 p-0" 
+          <button class="btn btn-link text-decoration-none bi p-0" 
             :class="{
               'bi-plus': isNotSelected(week),
               'bi-check-square': isSomeSelected(week),
@@ -46,11 +46,11 @@
 
 <script>
 import axios from 'axios'
-import { createDate, prevMonthDays } from '@/common/month-days'
-import utils from '@/common/utils'
-import CDDayGrid from '@/components/cd-day-grid.vue'
-import CDDayTab from '@/components/cd-day-tabs.vue'
-import CDDay from '@/components/cd-day.vue'
+import { createDate, prevMonthDays } from '../common/month-days'
+import utils from '../common/utils'
+import CDDayGrid from './cd-day-grid.vue'
+import CDDayTab from './cd-day-tabs.vue'
+import CDDay from './cd-day.vue'
 const formatter = new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric'})
 export default {
   name: 'cd-month',
