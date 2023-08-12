@@ -182,6 +182,11 @@ export default {
         this.values = []
         this.cellvalue = null
       }
+    },
+    value: { 
+      handler (newvalue) {
+        this.cellvalue = newvalue
+      }
     }
   },
   methods: {
