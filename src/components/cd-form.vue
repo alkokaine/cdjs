@@ -1,8 +1,9 @@
 <template>
   <div class="cd-form" :class="rootclass">
     <slot name="header"></slot>
-    <el-form :model="formobject" size="mini" ref="innerform" v-loading="revert" :name="name" class="cd-form--content" :class="formclass" :rules="rules" @submit.native.prevent>
-      <cd-fieldset class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :descriptor="descriptor" :isvisible="isvisible" :readonly="isreadonly">
+    <el-form :model="formobject" size="mini" ref="innerform" :name="name" class="cd-form--content" :class="formclass" :rules="rules" @submit.native.prevent @reset.native.prevent>
+      <div slot="title">{{ hasChanges }}</div>
+      <cd-fieldset v-if="!revert" class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :descriptor="descriptor" :isvisible="isvisible" :readonly="isreadonly">
         <template slot-scope="{ property, parent }">
           <template v-if="property">
             <el-form-item class="cd-cell mb-2" :error="propertyerror(property)" :prop="property.datafield" :class="{ 'd-block': property.input === 'textarea' }" :required="isrequired(property)" :for="property.datafield">
@@ -10,7 +11,7 @@
               <slot :property="property" :parent="parent">
                 <cd-cell :property="property" :class="property.class" :onchange="onchange" :parent="self"
                   :onblur="onblur" :onclear="onclear" :oninput="oninput" :onfocus="onfocus" :onselect="onselect" :resolvepayload="resolvefetchdata(property)"
-                  :disabled="!ispropertyeditable(property)" v-model="formobject[property.datafield]" :revert="revert"
+                  :disabled="!ispropertyeditable(property)" :value="formobject[property.datafield]" :revert="revert"
                   :isoptiondisabled="resolveoptiondisabled(property)">
                 </cd-cell>
               </slot>
@@ -20,10 +21,10 @@
       </cd-fieldset>
       <slot name="footer"></slot>
       <div class="cd-form--controls" v-if="showcontrols">
-        <button class="btn btn-sm btn-outline-secondary mx-1 cd-reset--button" type="reset" v-on:click="onreset({ $event, payload }, reset)">
+        <button class="btn btn-sm btn-outline-secondary mx-1 cd-reset--button" type="reset" v-on:click="resetForm({ $event, payload }, reset)">
           <slot name="reset">{{ resettext }}</slot>
         </button>
-        <button class="btn btn-primary btn-sm mx-1" v-on:click="onsubmit({ $event, payload: formobject }, submit)">
+        <button class="btn btn-primary btn-sm mx-1" v-on:click="submitForm({ $event, payload: formobject }, submit)">
           <slot name="submit">{{ submittext }}</slot>
         </button>
       </div>
@@ -94,6 +95,30 @@ export default {
     }
   },
   computed: {
+    resetForm ({ $nextTick, $refs, setRevert, setFormObject, sync, setHasChanges }) {
+      return ({ $event, payload}, callback) => {
+        $nextTick().then(() => $refs.innerform.resetFields())
+          .then(() => setRevert(true))
+          .then(() => setFormObject(payload, sync))
+          .then(() => setHasChanges(false))
+          .then(() => callback({ payload }))
+          .then(() => setRevert(false))
+      }
+    },
+    submitForm ({ $nextTick, $refs, setHasChanges, $alert }) {
+      return ({ $event, payload }, callback) => {
+        $refs.innerform.validate(result => {
+          debugger
+          if (result == false) {
+            $alert('Обнаружены ошибки!', 'Внимание', {
+              confirmButtonText: 'ОК'
+            })
+          } else {
+            callback({ payload })
+          }
+        })
+      }
+    },
     propertyerror ({ errors }) {
       return (property) => {
         const propertyerrors = errors.filter(f => f.property === property.datafield)
@@ -142,9 +167,24 @@ export default {
     }
   },
   methods: {
-    setpropertyvalue (datafield, propertyname, propertyvalue) {
-      const property = this.flatprops.find(f => f.datafield === datafield)
-      Vue.set(property, propertyname, propertyvalue)
+    setHasChanges (hasChanges) {
+      this.hasChanges = hasChanges
+    },
+    setRevert (isRevert) {
+      const form = this
+      return Promise.resolve(form.$nextTick().then(() => {
+        form.revert = isRevert
+      }))
+    },
+    setFormObject(object, sync) {
+      const form = this
+      return Promise.resolve(form.$nextTick().then(() => { 
+        if (typeof object != 'function') {
+          form.formobject = sync ? object : { ... object }
+        } else {
+          form.formobject = object
+        }
+      }))
     },
     resolveoptiondisabled (property) {
       const form = this
@@ -174,11 +214,6 @@ export default {
           return false
         }
       })
-    },
-    onreset (args, callback) {
-      const form = this
-      form.formobject = Object.assign({}, form.payload)
-      callback(args)
     },
     onchange ({ $event, property }, callback) {
       const form = this
@@ -227,28 +262,11 @@ export default {
   },
   data: function (form) {
     return {
-      formobject: form.sync ? form.payload : Object.assign({}, form.payload),
-      haschange: false,
+      formobject: form.sync ? form.payload : Object.assign({}, { ...form.payload }),
+      hasChanges: false,
       revert: false,
       self: form,
       validateinfo: []
-    }
-  },
-  watch: {
-    editmode: {
-      handler (newvalue) {
-        this.revert = !newvalue
-      }
-    },
-    revert: {
-      handler (newvalue) {
-        const form = this
-        if (newvalue) {
-          setTimeout(() => {
-            form.revert = false
-          }, 50)
-        }
-      }
     }
   }
 }
