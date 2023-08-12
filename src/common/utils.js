@@ -11,14 +11,14 @@ function range (start, end, step) {
  * мы здесь боремся
  * @returns чистый объект
  */
-function compress (object) {
-  for (const property in object) {
-    if (!hasProperty.call(object, property) || object[property] === undefined) {
-      delete object[property]
-    }
-  }
-  return object
-}
+// function compress (object) {
+//   for (const property in object) {
+//     if (!hasProperty.call(object, property) || object[property] === undefined) {
+//       delete object[property]
+//     }
+//   }
+//   return object
+// }
 
 /**
  *
@@ -40,75 +40,6 @@ function resolvePropertyValue (object, propertyname, payload, another = undefine
   }
   return undefined
 }
-function createRouterLink (property, propertyholder, payload) {
-  return resolvePropertyValue(property, 'route', propertyholder)
-}
-/**
- * функция, возвращающая настройки поля <input>
- * для свойства property с именем property.datafield
- * объекта propertyholder,
- * @param {Object} property дескриптор свойства property.datafield
- * объекта propertyholder
- * @param {Object} propertyholder объект, для свойства property.datafield
- * мы получаем настройки элемента input
- * @param {Object} payload какой-нибудь внешний объект, от которого может
- * зависеть поведение элемента input
- * @returns {Object} настройки элемента <input>
- */
-function createInput (property, propertyholder, payload) {
-  const parent = this
-  return compress({
-    type: (property.input || 'text'),
-    pattern: resolvePropertyValue(property, 'pattern', propertyholder),
-    name: property.datafield,
-    max: resolvePropertyValue(property, 'max', propertyholder),
-    min: resolvePropertyValue(property, 'min', propertyholder),
-    maxlength: resolvePropertyValue(property, 'maxlength', propertyholder),
-    minlength: resolvePropertyValue(property, 'minlength', propertyholder),
-    checked: propertyholder[property.datafield] === 1 || propertyholder[property.datafield] === true,
-    placeholder: resolvePropertyValue(property, 'placeholder', propertyholder),
-    ondebounce (value, event) { parent.onpropertychange(property, value) }
-  })
-}
-
-/**
- * функция, возвращающая настройки элемента
- * формы select с опциями, которые достаются по url
- * @param {*} property свойство, для которого мы получаем
- * настройки для элемента формы
- * @param {*} propertyholder объект, свойство property которого
- * мы рассматриваем
- * @param {*} payload какой-то объект, от которого может зависеть
- * функциональность элемента формы select для рассматриваемого
- * свойства property
- * @returns объект, содержащий необходымые для рендеринга
- * элемента формы select
- */
-function createSelect (property, propertyholder, payload) {
-  const parent = this
-  const select = compress({
-    valuekey: property.valuekey, // свойство ключа коллекции опций
-    labelkey: property.labelkey, // свойство опции, которое мы видим в дропдауне
-    payload: resolvePropertyValue(property, 'resolvepayload', propertyholder), // параметры получения данных,
-    values: property.values,
-    resolvepayload: property.resolvepayload,
-    clearable: property.clearable,
-    get: {
-      url: property.url,
-      method: property.method
-    },
-    resolveresult: property.resolveresult, // функция, возвращающая нужные данные
-    // для списка опций селекта из ответа сервера
-    // определяем, задизаблена ли опция
-    isdisabled: (option) => resolvePropertyValue(property, 'isdisabled', propertyholder, option),
-    // выполняем onselect
-    onselect: (option) => {
-      if (property.onselect && typeof property.onselect === 'function') property.onselect(propertyholder, option, parent)
-      if (parent.onpropertychange) parent.onpropertychange(property, option)
-    }
-  })
-  return select
-}
 
 const hasProperty = Object.prototype.hasOwnProperty
 
@@ -127,11 +58,11 @@ const ispropertyvisible = function (property, payload, propertyowner) {
   return true
 }
 
-const ispropertyeditable = function (property, payload, propertyowner) {
+const ispropertyeditable = function (property, payload) {
   if (hasProperty.call(property, 'canedit')) {
-    if (typeof property.canedit === 'function') return property.canedit(propertyowner, payload)
+    if (typeof property.canedit === 'function') return property.canedit(payload)
     if (typeof property.canedit === 'boolean') return property.canedit
-    console.warn(`[CDJS:WARNING] для property.isvisible ожидается булевское значение, или функция, возвращающая булевское значение. Получено ${typeof property.isvisible}`, property)
+    console.warn(`[CDJS:WARNING] для property.canedit ожидается булевское значение, или функция, возвращающая булевское значение. Получено ${typeof property.canedit}`, property)
     return true
   }
   return true
@@ -156,53 +87,6 @@ const flatterer = function (arr, accum) {
     }
     return res // вернём что получилось
   }, accum)
-}
-
-/**
- * собственно ради чего всё задумывалось
- * функция, возвращающая настройки клетки таблицы или поля на форме
- * по объекту property (дескриптору свойства property.datafield
- * объекта propertyholder)
- * сюда бы хорошо передать компонент, который выполняет эту функцию,
- * завести у него свойство типа хранилища и, при получении данных из API,
- * иметь возможность запихнуть туда полученный датасет, таким образом мы сможем,
- * гхм, регулировать посылаемые к API запросы, забирая из хранилища уже готовые
- * данные
- * впрочем, он может быть и в this
- * @param {Object} property дескриптор свойства property.datafield
- * объекта propertyholder
- * @param {Object} propertyholder объект, свойство property.datafield
- * которого мы хотим показать
- * @param {Object} payload какой-нибудь внешний объект, от значений которого
- * может зависеть настройки, возвращаемые этой фукнцией
- * @returns {Object} настройки ячейки таблицы или поля на форме
- */
-const propertyconfig = function (property, propertyholder, isreadonly, payload = {}) {
-  const ph = propertyholder
-  const p = property
-  const parent = this
-  return {
-    input: createInput.call(parent, p, ph, payload),
-    select: p.input === 'select' ? createSelect.call(parent, p, ph, payload) : undefined,
-    route: p.route ? createRouterLink.call(parent, p, ph, payload) : undefined,
-    clearable: p.clearable,
-    datafield: p.datafield,
-    text: p.text,
-    value: resolvePropertyValue(p, 'format', ph) || ph[p.datafield],
-    onchange (event) {
-      if (p.input === 'checkbox') {
-        p.toogle(ph)
-      }
-    },
-    onblur (event) {
-    },
-    oninput (event) {
-    },
-    reset (event) {
-      Vue.set(ph, p.datafield, null)
-      if (p.reset !== undefined && typeof p.reset === 'function') p.reset(ph, parent)
-    }
-  }
 }
 
 /**
@@ -287,11 +171,11 @@ const extractarguments = function getArgs (func) {
   return result
 }
 export default {
+  resolvePropertyValue,
   range,
   ispropertyeditable,
   ispropertyvisible,
   flatterer,
-  propertyconfig,
   countchildren,
   headerrows,
   extractarguments

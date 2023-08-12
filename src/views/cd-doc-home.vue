@@ -29,7 +29,7 @@ import CDForm from '@/components/cd-form.vue'
 import CDSelect from '@/components/cd-select.vue'
 import CDPropExample from '@/generic/cd-prop-example.vue'
 import readyvaluesoptions from '@/examples/propertyoptions.js'
-
+import keys from '@/views/keys'
 const countryParams = {
   limit: 10,
   namePrefix: '',
@@ -61,8 +61,15 @@ export default {
           ],
           info: [
             {
+              id: 'home-0-0',
+              header: '0?',
+              description: [
+                ''
+              ]
+            },
+            {
               id: 'home-1-1',
-              header: 'Начнём',
+              header: '...',
               description: [
                 'Поведение через определение. За этими простыми словами скрывается не менее простая идея'
               ],
@@ -154,11 +161,23 @@ params: Function // функция, которая возвращает пара
           input: 'select',
           valuekey: 'wikiDataId',
           labelkey: 'name',
-          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+          url: '/geo/countries',
+          headers: keys.geoheaders,
+          slotdescriptor: [
+            {
+              datafield: 'code'
+            },
+            {
+              datafield: 'name'
+            },
+            {
+              datafield: 'wikiDataId'
+            }
+          ],
           method: 'get',
           resolveresult: (response) => response.data.data,
           resolvepayload: home.resolveCountryPayload,
-          isdisabled: (payload, option) => option.wikiDataId.endsWith(7)
+          isdisabled: (option, payload, parent) => option.wikiDataId.endsWith(7)
         },
         params: countryParams,
         paramsdescriptor: [
@@ -177,7 +196,8 @@ params: Function // функция, которая возвращает пара
         payload: {
           datafield: 'id',
           text: 'Город',
-          url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities',
+          url: '/geo/cities',
+          headers: keys.geoheaders,
           method: 'get',
           input: 'select',
           labelkey: 'city',
@@ -200,11 +220,17 @@ params: Function // функция, которая возвращает пара
             input: 'select',
             valuekey: 'wikiDataId',
             labelkey: 'name',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
+            url: '/geo/countries',
+            headers: keys.geoheaders,
             method: 'get',
+            slotdescriptor: [
+              {
+                datafield: 'wikiDataId'
+              }
+            ],
             resolveresult: (response) => response.data.data,
             resolvepayload: home.resolveCountryPayload,
-            isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
+            isdisabled: (option, payload, parent) => option.wikiDataId.endsWith(7),
             onselect: (payload, option) => {
               if (option) Vue.set(payload, 'countryIds', `${option.code},`)
             }
@@ -237,20 +263,16 @@ params: Function // функция, которая возвращает пара
   },
   methods: {
     onpropertychange (...args) {
-      console.log(args)
+      // console.log(args)
     },
     onpropertyselect (event) {
       this.selected = Number(event.target.value)
     },
     resolveCityPayload (payload) {
-      return {
-        params: this.property.params
-      }
+      return this.property.params
     },
     resolveCountryPayload (payload) {
-      return {
-        params: this.property.params
-      }
+      return this.property.params
     }
   }
 }

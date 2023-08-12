@@ -1,14 +1,15 @@
 export default {
   props: {
-    get: { type: Object, default: () => ({}) }
+    payload: { type: Object },
+    get: { type: Object }
   },
   watch: {
-    // 'get.url': {
-    //   immediate: true,
+    // payload: {
+    //   deep: true,
     //   handler (newvalue, oldvalue) {
     //     const parent = this
     //     if (newvalue) {
-    //       parent.loaddata(newvalue, parent.payload)
+    //       parent.loaddata(parent.get.url, newvalue)
     //     }
     //   }
     // }

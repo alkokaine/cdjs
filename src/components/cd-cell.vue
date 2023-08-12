@@ -1,100 +1,305 @@
 <template>
-  <div class="cd-cell">
-    <slot name="label"></slot>
-    <template v-if="readonly">
-      <template v-if="config.route">
-        <router-link :to="config.route">{{ config.value }}</router-link>
-      </template>
-      <template v-else>
-        <span>{{ config.value }}</span>
-      </template>
+  <div class="cd-field">
+    <template v-if="editortype.isselect">
+      <el-select :id="property.datafield" class="w-100" :disabled="disabled" v-model="cellvalue" :value-key="property.valuekey"
+        :clearable="property.clearable" :placeholder="property.placeholder" :filterable="property.filterable" :collapse-tags="property.collapsetags"
+        :multiple="property.multiple" size="mini" :remote="property.remote" :remote-method="retrieveoptions"
+        v-on:change="onchange({ $event: option($event), property }, ($event === '' ? property.reset : property.onselect))"
+        v-on:visible-change="onvisiblechange({ $event, property }, property.onvisiblechange)"
+        v-on:remove-tag="onremovetag({ $event, property }, property.onremovetag)"
+        v-on:clear="onclear({ $event, property }, property.onclear)"
+        v-on:blur="onblur({ $event, property }, property.onblur)"
+        @input="dispatch"
+        v-on:focus="onfocus({ $event, property }, property.onfocus)" >
+        <cd-list class="cd-select--options" listclass="list-unstyled" :errorRequest="onerror" :beforeRequest="onbefore"
+          :collection="values" :keyfield="property.valuekey" :resolveresult="resolveresult" :payload="property.payload" :get="property" :headers="property.headers" :resolvepayload="resolvepayload">
+          <el-option slot-scope="{ row }" :value="row[property.valuekey]" :label="row[property.labelkey]" :disabled="isoptiondisabled(row)">
+            <cd-props v-if="property.slotdescriptor" :payload="row" :descriptor="property.slotdescriptor"></cd-props>
+            <span v-else>{{ row[property.labelkey] }}</span>
+          </el-option>
+          <div class="select-no-data" slot="no-data">
+            <template v-if="error">
+              <el-option class="error-info" v-if="error" :value="error">
+                <cd-props class="error-info" :payload="error" :descriptor="errordescriptor"></cd-props>
+              </el-option>
+            </template>
+            <el-option v-if="isempty" :value="nullvalue">
+              <div class="mx-auto"><div class="py-2 px-1">Нет данных</div></div>
+            </el-option>
+          </div>
+        </cd-list>
+      </el-select>
     </template>
-    <template v-else>
-    <template v-if="config.select">
-      <cd-select :payload="config.select.payload"
-        :keyfield="config.select.valuekey"
-        :labelkey="config.select.labelkey"
-        :resolvepayload="config.select.resolvepayload"
-        :value="config.value"
-        :get="config.select.get"
-        :collection="values"
-        :isdisabled="config.select.isdisabled"
-        :clearable="config.select.clearable"
-        :resolveresult="resolveresult"
-        :onselect="config.select.onselect"></cd-select>
-      </template>
-      <template v-else-if="config.textarea">
-        <textarea class="form-control form-control-sm" :id="config.datafield"/>
-      </template>
-      <template v-else-if="config.input">
-        <code v-if="config.input.type === 'code'">
-          {{ value }}
-        </code>
-        <template v-else>
-          <input v-debounce:0.3s="config.input.ondebounce" :type="config.input.type" :name="config.datafield" :readonly="readonly"
-            :value="value" :required="config.required" :pattern="config.input.pattern"
-            class="form-control form-control-sm"
-            :class="{'is-readonly': readonly, 'form-check-input': config.input.type === 'checkbox' }" :placeholder="config.input.placeholder"
-            :min="config.input.min" :max="config.input.max" :minlength="config.input.minlength"
-            :maxlength="config.input.maxlength"
-            :checked="config.input.checked" v-on:input="config.oninput" v-on:blur="config.onblur" v-on:change="config.onchange"/>
-        </template>
-      </template>
+    <template v-else-if="editortype.isautocomplete">
+      <el-autocomplete :id="property.datafield" class="w-100" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable" v-model="cellvalue" :debounce="300"
+        :value-key="property.valuekey" :placement="property.placement" :fetch-suggestions="fetchsuggestions" size="mini"
+        :trigger-on-focus="property.focustrigger" v-on:select="onselect({ $event, property }, property.onselect)"
+        v-on:change="onchange({ $event, property }, property.onchange)" v-on:focus="onfocus({ $event, property }, property.onfocus)" v-on:blur="onblur({ $event, property }, property.onblur)"
+        v-on:input="oninput({ $event, property }, property.oninput)" v-on:clear="onclear({ $event, property }, property.onclear)"
+        @input="dispatch">
+        <div slot-scope="{ item }" :class="['cd-autocomplete--option my-1', {'pe-none': isoptiondisabled(item) }]">
+            <cd-props v-if="property.slotdescriptor" :payload="item" :descriptor="property.slotdescriptor"></cd-props>
+            <span v-else>{{ item[property.labelkey] }}</span>
+        </div>
+      </el-autocomplete>
     </template>
-    <button v-if="config.clearable" class="btn bg-transparent cd-clear--button btn-sm" v-on:click.stop="onreset"><i class="bi bi-x-circle" ></i></button>
+    <template v-else-if="editortype.isdate">
+      <el-date-picker :id="property.datafield" class="w-100" :disabled="disabled" size="mini" v-model="cellvalue" :placeholder="property.placeholder" :clearable="property.clearable"
+        :format="property.displayformat" :value-format="property.valueformat"
+        :editable="property.editable" :picker-options="pickeroptions"
+        v-on:change="onchange({ $event, property },  property.onchange)"
+        v-on:blur="onblur({ $event, property }, property.onblur)"
+        v-on:focus="onfocus({ $event, property }, property.onfocus)"
+        v-on:input="oninput({ $event, property }, property.oninput)"
+        v-on:clear="onclear({ $event, property }, property.onclear)"  @input="dispatch">
+      </el-date-picker>
+    </template>
+    <template v-else-if="editortype.isdatetime"></template>
+    <div v-else-if="editortype.isnumber" class="el-input el-input--mini w-100" :class="[{ 'is-disabled': disabled }]">
+      <input :id="property.datafield" :disabled="disabled" class="el-input el-input__inner" :class="[{ 'is-disabled': disabled }]" type="number" v-model="cellvalue"
+        :clearable="property.clearable"
+        v-on:input="oninput({ $event, property }, property.oninput)"
+        v-on:focus="onfocus({ $event, property }, property.onfocus)"
+        v-on:change="onchange({ $event, property }, property.onchange)"
+        v-on:blur="onblur({ $event, property }, property.onblur)"  @input="dispatch"/>
+    </div>
+    <template v-else-if="editortype.ischeckbox">
+      <el-checkbox :id="property.datafield" class="cd-checkbox" size="mini" v-model="cellvalue" :disabled="disabled" v-on:change="onchange({ $event, property }, property.onchange)" :checked="ischecked" @input="dispatch"></el-checkbox>
+    </template>
+    <template v-else-if="editortype.isfile">
+      <el-upload :id="property.datafield" class="cd-upload" :action="property.url" :headers="property.headers" :multiple="property.multiple" ></el-upload>
+    </template>
+    <template v-else-if="editortype.istextarea">
+      <el-input :id="property.datafield" type="textarea" v-model="cellvalue" :disabled="disabled"
+        v-on:blur="onblur({ $event, property}, property.onblur)"
+        v-on:change="onchange({ $event, property}, property.onchange)"
+        v-on:input="oninput({ $event, property }, property.oninput)"
+        v-on:focus="onfocus({ $event, property }, property.onfocus)"
+        v-on:clear="onclear({ $event, property }, property.onclear)"  @input="dispatch"></el-input>
+    </template>
+    <template v-else-if="editortype.isslider">
+      <input :id="property.datafield" type="range" class="form-range" :min="property.min" :max="property.max" :step="property.step" v-model="cellvalue" :disabled="disabled"
+        v-on:change="onchange({ $event, property }, property.onchange)"
+        v-on:input="oninput({ $event, property }, property.oninput)" @input="dispatch"/>
+    </template>
+    <template v-else-if="editortype.isswitch">
+      <el-switch :id="property.datafield" v-model="cellvalue" v-on:change="onchange({ $event, property }, property.onchange)" :disabled="disabled" @input="dispatch"></el-switch>
+    </template>
+    <template v-else-if="!isarray">
+      <el-input :id="property.datafield" v-model="cellvalue" size="mini" :disabled="disabled" :placeholder="property.placeholder" :clearable="property.clearable"
+        v-on:change="onchange({ $event, property }, property.onchange)"
+        v-on:input="oninput({ $event, property }, property.oninput)"
+        v-on:focus="onfocus({ $event, property }, property.onfocus)"
+        v-on:blur="onblur({ $event, property }, property.onblur)" @input="dispatch"></el-input>
+    </template>
   </div>
 </template>
 
 <script>
-import { getDirective } from 'vue-debounce'
-import CDSelect from './cd-select.vue'
-
+import Vue from 'vue'
+import CDList from './cd-list.vue'
+import CDProps from './cd-props.vue'
 export default {
   name: 'cd-cell',
-  directives: {
-    debounce: getDirective()
-  },
   components: {
-    'cd-select': CDSelect
+    'cd-list': CDList,
+    'cd-props': CDProps
   },
   props: {
-    config: { type: Object, required: true },
-    showlabel: { type: Boolean, default: false },
-    readonly: { type: Boolean, default: true }
+    disabled: { type: Boolean, default: false },
+    property: { type: Object, required: true },
+    readonly: { type: Boolean, default: true },
+    value: { type: [String, Number, Object, Array, Date, Boolean] },
+    onchange: { type: Function },
+    oninput: { type: Function },
+    onblur: { type: Function },
+    onfocus: { type: Function },
+    onclear: { type: Function },
+    onselect: { type: Function },
+    isoptiondisabled: { type: [Boolean, Function] },
+    errordescriptor: {
+      type: Array,
+      default: function () {
+        return [
+          {
+            descriptor: [
+              {
+                descriptor: [
+                  {
+                    datafield: 'status',
+                    class: 'error-status w-25'
+                  },
+                  {
+                    datafield: 'status_text',
+                    class: 'error-status-text w-75'
+                  }
+                ],
+                class: 'response-status d-inline'
+              },
+              {
+                datafield: 'response',
+                class: 'error-message'
+              },
+              {
+                datafield: 'message',
+                class: 'error-details'
+              }
+            ],
+            class: 'error-info'
+          }
+        ]
+      }
+    },
+    parent: { type: Object },
+    resolvepayload: { type: Function }
   },
   data (cell) {
+    const property = cell.property
     return {
-      value: cell.config.value,
-      values: cell.config.select ? (cell.config.select.values || []) : []
+      isarray: Array.isArray(cell.value),
+      cellvalue: cell.resolvevalue(property, cell.value),
+      nullvalue: null,
+      editortype: {
+        isselect: property.input === 'select',
+        isautocomplete: property.input === 'autocomplete',
+        isdate: property.input === 'date',
+        isdatetime: property.input === 'datetime',
+        isnumber: ['number', 'money'].includes(property.input),
+        ischeckbox: property.input === 'checkbox',
+        isfile: property.input === 'file',
+        istextarea: property.input === 'textarea',
+        isslider: property.input === 'slider',
+        isswitch: property.input === 'switch'
+      },
+      pickeroptions: { firstDayOfWeek: 1, ...property.options },
+      values: (property.values || []),
+      error: false
+    }
+  },
+  watch: {
+    'property.url': {
+      handler (newvalue) {
+        this.values = []
+        this.cellvalue = null
+      }
+    },
+    value: { 
+      handler (newvalue) {
+        this.cellvalue = newvalue
+      }
     }
   },
   methods: {
-    resolveresult (response) {
-      this.values = this.config.select.resolveresult(response)
+    dispatch (e) {
+      const isevent = isNaN(+e) && e.target !== undefined
+      if (!isevent) this.$emit('input', e)
+      else this.$emit('input', e.target.value)
     },
-    onreset () {
-      this.value = ''
-      this.config.reset()
+    reload () {
+      const cell = this
+      const url = cell.property.url
+      const timeout = (cell.property.timeout || 50)
+      setTimeout(() => { Vue.set(cell.property, 'url', '') }, timeout)
+      setTimeout(() => { Vue.set(cell.property, 'url', url) }, timeout)
+    },
+    retrieveoptions () {
+      const cell = this
+      return () => {
+        Vue.set(cell, 'values', cell.property.values)
+      }
+    },
+    resolvevalue (property, value) {
+      if (property.input === 'slider') {
+        return (value || 0)
+      } else {
+        return (value || null)
+      }
+    },
+    option (event) {
+      const cell = this
+      if (event === null || event === undefined) return null
+      if (event === cell.error) return event
+      if (Array.isArray(event)) {
+        return event
+      }
+      return this.values.find(o => o[cell.property.valuekey] === event)
+    },
+    optionpropertyclass (...args) {
+      return 'option-property'
+    },
+    resolveresult (response) {
+      this.values = this.property.resolveresult(response)
+      this.cellvalue = this.value
+      this.error = false
+    },
+    onerror ({ message, request, response }) {
+      this.error = {
+        type: 'error',
+        status: (response || {}).status,
+        status_text: (response || {}).statusText,
+        response: (request || {}).response,
+        message: message
+      }
+      this.values = []
+      this.cellvalue = ''
+      if (this.property.onerror && typeof this.property.onerror === 'function') this.property.onerror(this.error)
+    },
+    onbefore (config) {
+      if (this.property.onbefore && typeof this.property.onbefore) return this.property.onbefore(config)
+      return config
+    },
+    onvisiblechange (event, callback) {
+      if (callback) callback.call(event.property, event.$event)
+    },
+    onremovetag (event, callback) {
+      if (callback) callback.call(event.property, event.$event)
+    },
+    fetchsuggestions (query, callback) {
+      const cell = this
+      cell.$http[cell.property.method](cell.property.url,
+        cell.resolvepayload(query),
+        {
+          headers: cell.property.headers
+        }
+      ).then((response) => {
+        callback(cell.property.resolveresult(response))
+      }).catch((reason) => {
+        cell.onerror(reason)
+      })
+    }
+  },
+  computed: {
+    ischecked ({ value }) {
+      return value === true
+    },
+    isempty ({ values }) {
+      return values.length === 0
     }
   }
 }
 </script>
 
 <style>
-  .cd-cell {
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
+  .el-select-dropdown__item {
+    height: unset!important;
+    line-height: unset!important;
   }
-  .cd-clear--button {
-    margin-left: -40px;
+  .cd-autocomplete--option {
+    white-space: normal;
+    line-height: 1rem;
   }
-  input.is-readonly {
-    border-style: none;
-    cursor: default;
-    background-color: var(--bs-body-bg);
+</style>
+<style scoped>
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
-  .form-control:focus{
-    box-shadow: 0 0 0 0.05rem rgb(13 110 253 / 25%)!important;
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+  .cd-slider {
+    width: 100%;
   }
 </style>

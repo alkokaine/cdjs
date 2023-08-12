@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <cd-menu class="doc-menu" :iscollapsed="iscollapsed" :menu="menu" :menuitemclicked="menuitemclick">
+    <cd-menu class="doc-menu" :iscollapsed="iscollapsed" :menu="menu">
       <div slot="menu-header" class="cdjs-container" :class="{ 'is-collapsed': iscollapsed }">
         <div v-if="!iscollapsed" class="cdjs-name--block">
           <router-link to="/">CDJS</router-link>
@@ -17,14 +17,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
 import CDMenu from './components/cd-menu.vue'
-// axios.defaults.baseURL = 'wft-geo-db.p.rapidapi.com'
-// axios.defaults.headers.common['x-rapidapi-host'] = 'wft-geo-db.p.rapidapi.com'
-axios.defaults.headers.common['x-rapidapi-key'] = '0d6efbd8a7msh8fcd0fa4c7e36a4p15464ejsn34c8169d4000'
-axios.defaults.headers.common.Authorization = 'token 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'
-Vue.prototype.$http = axios
 
 export default {
   name: 'App',
@@ -33,78 +26,6 @@ export default {
   },
   data (app) {
     return {
-      metadata: {
-        currentOffset: 0,
-        totalCount: 0
-      },
-      formpayload: {
-        namePrefix: ''
-      },
-      get: { url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities', method: 'get' },
-      payload: {
-        limit: 10,
-        minPopulation: null,
-        namePrefix: null,
-        distanceUnit: null,
-        offset: 0,
-        excludedCountryIds: null
-      },
-      descriptor: [
-        {
-          datafield: 'id',
-          text: 'id'
-        },
-        {
-          datafield: 'type',
-          text: 'Type'
-        },
-        {
-          datafield: 'city',
-          text: 'City'
-        },
-        {
-          datafield: 'country',
-          text: 'Country'
-        },
-        {
-          datafield: 'countryCode',
-          text: 'Country Code'
-        },
-        {
-          datafield: 'region',
-          text: 'Region'
-        },
-        {
-          datafield: 'latitude',
-          text: 'Lat'
-        },
-        {
-          datafield: 'longitude',
-          text: 'Lon'
-        }
-      ],
-      form: [
-        {
-          datafield: 'namePrefix',
-          text: 'Поиск'
-        },
-        {
-          select: {
-            valuekey: 'wikiDataId',
-            labelkey: 'name',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
-            method: 'get',
-            resolveresult: (response) => (response.data.data),
-            isdisabled: (payload, option) => option.wikiDataId.endsWith(7),
-            params: (payload) => ({
-              limit: 10,
-              namePrefix: payload.namePrefix
-            })
-          },
-          datafield: 'wikiDataId',
-          text: 'Country'
-        }
-      ],
       menu: [
         { id: 1, icon: 'bi bi-list-ul', text: 'Список', url: '/Collection' },
         { id: 13, icon: '', text: 'Вкладки', url: '/Tabs' },
@@ -112,7 +33,7 @@ export default {
           id: 2,
           icon: 'bi bi-menu-button-wide',
           text: 'Меню',
-          url: '/Menu',
+          // url: '/Menu',
           drop: true,
           menu: [
             {
@@ -229,12 +150,11 @@ export default {
     color: var(--menu-color);
     font-size: var(--font-size);
     height: 100%;
-    width: var(--menu-width);
     position: fixed;
     z-index: 1000;
   }
   .doc-menu.is-collapsed {
-    width: var(--collapsed-menu-width);
+    max-width: var(--collapsed-menu-width);
   }
   .content-wrapper {
     margin-left: var(--menu-width);

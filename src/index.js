@@ -5,6 +5,7 @@ import CDMenu from './components/cd-menu.vue'
 import CDMonth from './components/cd-month.vue'
 import CDTabs from './components/cd-tabs.vue'
 import CDSettingContainer from './components/cd-setting-container.vue'
+import CDProps from './components/cd-props.vue'
 
 export default {
   CDForm,
@@ -13,5 +14,6 @@ export default {
   CDMenu,
   CDTabs,
   CDMonth,
+  CDProps,
   CDSettingContainer
 }

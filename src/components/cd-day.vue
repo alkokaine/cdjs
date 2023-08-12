@@ -1,18 +1,34 @@
 <template>
-  <div class="cd-day" :class="{ 'border mb-2' : tile && !compact, 'row border-bottom border-start border-end': !tile && !compact }">
-    <div v-if="!compact" class="cd-day--header container-sm row p-0 m-0" :class="{ 'border-1 border-bottom' : tile, 'col-1': !tile }">
-      <div class="cd-day--number col w-auto">
-        {{ day }}
+  <div class="cd-day" :class="{ 'opacity-25': info.isprev }">
+    <div class="cd-day--container mx-auto ">
+      <div class="cd-day--header d-flex flex-row" 
+        :class="{
+          'border-bottom border-black text-light w-100 justify-content-evenely': !compact, 
+          'justify-content-center': compact,
+          'bg-secondary': (compact && isSelected || !compact),
+          'bg-danger': isHoliday && (compact && isSelected || !compact),
+          'text-body': !compact && info.isprev, 
+          'text-danger': compact && isHoliday,
+          'bg-secondary text-light fw-bold': compact && isSelected 
+        }">
+        <div class="cd-day--number px-2">
+          <span class="" :class="{ 'fs-6': compact, 'fs-3': !compact }">{{ dateStruct.day }}</span>
+        </div>
+        <div :class="{ 'd-block': !compact, 'd-none': compact }">
+          <span class="fw-bold">{{ dateStruct.month }}</span>
+          <span class="d-block">{{ dateStruct.weekday }}</span>
+        </div>
+        <div :class="{ 'd-flex justify-content-end' : !compact, 'd-none': compact }">
+          <div class="w-auto text-wrap">
+            <slot name="header"></slot>
+          </div>
+        </div>
       </div>
-      <div class="cd-day--info col w-auto">
-        <div class="cd-day--month">{{ month }}</div>
-        <div class="cd-day--weekday">{{ weekday }}</div>
+      <div class="cd-day--content--wrapper position-relative w-100" :class="{ 'd-none': compact, 'bg-opacity-25 bg-secondary': !compact && isSelected, 'bg-white': !compact && !isSelected}">
+        <div class="cd-day--content py-2 mx-auto">
+          <slot></slot>
+        </div>
       </div>
-    </div>
-    <div class="cd-day--content" :class="{ 'col border-start': !tile && !compact, 'container-sm': !compact }">
-      <slot>
-        <span v-if="compact">{{ day }}</span>
-      </slot>
     </div>
   </div>
 </template>
@@ -24,23 +40,29 @@ const dayFormatter = new Intl.DateTimeFormat('ru-RU', { day: '2-digit' })
 export default {
   name: 'cd-day',
   props: {
-    info: { type: Object, required: true },
+    info: { type: Object },
     compact: { type: Boolean, default: false },
-    tile: { type: Boolean, default: true }
+    tile: { type: Boolean },
+    isSelected: { type: Boolean }
   },
-  data (day) {
+  data ({ info }) {
     return {
     }
   },
   computed: {
-    day () {
-      return dayFormatter.format(this.info.date)
+    dateStruct ({ info }) {
+      const toDate = info.date.toDate()
+      return {
+        day: dayFormatter.format(toDate),
+        weekday: weekdayFormatter.format(toDate),
+        month: monthFormatter.format(toDate)
+      }
     },
-    weekday () {
-      return weekdayFormatter.format(this.info.date)
+    isEve ({ info }) {
+      return info.code == '2'
     },
-    month () {
-      return monthFormatter.format(this.info.date)
+    isHoliday ({ info }) {
+      return info.code == '1'
     }
   }
 }
@@ -49,10 +71,23 @@ export default {
 <style>
   .cd-day--header {
     height: fit-content;
+    /* background-color: lightgray; */
   }
   .cd-day--number {
-    font-size: 2em;
-    font-weight: bold;
-    width: inherit;
-}
+    /* font-size: 2em; */
+    max-width: min-content;
+  }
+  .cd-day--info {
+    text-align: left;
+  }
+  .cd-day {
+    cursor: pointer;
+  }
+  .cd-day--content {
+    width: 95%;
+  }
+  .cd-day--container {
+    width: 95%;
+    height: 95%;
+  }
 </style>

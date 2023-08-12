@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     oninput (event) {
-      if (event.target.value === 'reload') this.loaddata(this.get.url, this.payload)
+      // if (event.target.value === 'reload') this.loaddata(this.get.url, this.payload)
       const selected = this.collection.find(option => String(option[this.keyfield]) === event.target.value)
       if (selected !== null && selected !== undefined) {
         this.current = selected[this.keyfield]

@@ -1,395 +1,298 @@
 <template>
-  <cd-list class="cd-month container-sm" :listclass="[ 'list-unstyled', { 'row': mode }]"
-    :rowclass="rootrowclass" :collection="source" keyfield="key" :isrowvisible="isdayvisible">
-    <div class="month-header" slot="header">
-      <slot name="month-header">
-        <div v-if="showheader">{{ monthheader }}</div>
-        <button v-if="mode && canadd" class="btn btn-sm btn-link" v-on:click="templateselect">Заполнить по расписанию</button>
-      </slot>
-    </div>
-    <div class="month-item-wrap" slot-scope="content" :class="{ 'weekday-container': content.row.id }">
-      <template v-if="mode">
-        <cd-list class="cd-weekday--container" :collection="weekdaylist(content)" keyfield="key" listclass="list-unstyled col" :rowclass="resolvedayclass" :listitemclicked="ondayselect" :isrowvisible="isdayvisible">
-          <div class="weekday-name" slot="header">
-            <div v-if="selectweekday">
-              <input type="checkbox" v-on:change="onweekdayselect($event, content)" :checked="isweekdayselected(content)"/>
+  <div class="cd-month--wrapper mx-auto">
+    <slot name="month-header"></slot>
+    <template v-if="ischedule">
+      <cd-day-grid class="cd-month" :compact="compact"
+        :week-range="weekRange" :days="keyedDays" :compare-date="compareDate"
+        :select-weekdays="selectWeekdays">
+        <template v-if="multiple" slot="week" slot-scope="{ week }">
+          <button class="btn btn-link text-decoration-none bi p-0" 
+            :class="{
+              'bi-plus': isNotSelected(week),
+              'bi-check-square': isSomeSelected(week),
+              'bi-check-square-fill': isFullSelected(week)
+            }"
+            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Выбрать неделю" v-on:click="onDaySelect($event, empty, week)"></button>
+        </template>
+        <cd-day slot-scope="{ day, week }" v-if="day" :info="day" :compact="compact" v-on:click.native="onDaySelect($event, day, week)" :is-selected="isDaySelected(day)">
+            <div slot="header" class="cd-day--header">
+              <button class="btn btn-link text-decoration-none bi px-2" v-on:click.capture.stop="removeDay($event, day)" :class="{ 'd-none': compact, 'bi-x-square text-light': isDaySelected(day) }"></button>
             </div>
-            {{ content.row.short_name }}
-          </div>
-          <div class="month-item-wrap" slot-scope="day"
-            :class="{ 'prev-month': day.row.isprev, 'holiday' : day.row.code == 1, 'selected': resolvedayselected(day) }">
-            <cd-day :info="day.row" :compact="compact" :tile="tile">
-              <slot :day="day.row" :index="day.index"></slot>
-            </cd-day>
-          </div>
-        </cd-list>
-      </template>
-      <template v-else>
-        <cd-day :info="content.row" :tile="tile">
-          <slot :day="content.row" :index="content.index"></slot>
+            <template v-if="!compact">
+              <div class="day-content text-pre">
+                <slot :day="day" :week="week"></slot>
+              </div>
+            </template>
         </cd-day>
-      </template>
-    </div>
-    <template v-if="canadd && !payload.mode">
-      <div class="cd-day new-day--template container-sm" slot="placeholder">
-        <div class="cd-day--number col btn btn-group btn-group-lg" role="group" aria-label="new-day-group">
-          <button class="btn bi bi-calendar2-week btn-link" v-on:click.stop="templateselect"></button>
-          <button class="btn bi bi-calendar3-event btn-link" v-on:click.stop="addday"></button>
-        </div>
-      </div>
+      </cd-day-grid>
     </template>
-    <div class="month-no-data" slot="no-data">
-      Нет данных
-    </div>
-    <div v-if="!compact && createnew" slot="footer">
-      <el-dialog class="template-selector" :visible.sync="runtemplate" :close-on-click-modal="false" v-on:closed="ondialogclose" width="30%">
-        <cd-form v-if="templateready" :descriptor="templatedescriptor" :payload="generatorconfig" :onpropertychange="ontemplatechange">
-          <cd-month class="month-template-preview" slot="footer" :payload="payload" :canadd="false" :showheader="false"
-            :isdayselected="newtask.daycompare" :ondayselect="newtask.ondayselect" :onweekdayselect="weekdayselect"
-            :tile="false"
-            :isweekdayselected="resolveweekdayselected" :selectweekday="newtask.id === 3" :compact="true" :resolvedayclass="dayclass">
-            <span slot="month-header" class="compact">{{ monthheader }}</span>
-          </cd-month>
-        </cd-form>
-        <div class="commit-template" slot="footer">
-          <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="closedialog">Отменить</button>
-          <button type="button" class="btn btn-sm btn-primary" v-on:click="run($event, calendar.filter(newtask.daycompare))">Сохранить</button>
-        </div>
-      </el-dialog>
-    </div>
-  </cd-list>
+    <template v-else>
+      <cd-day-tabs class="cd-month ms-3" :days="keyedDays" :select-day="onDaySelect" :orientation="orientation"
+        :compare-date="compareDate" :multiple="multiple" :selected-days="selectedDays" :day-class="resolveTabClass">
+        <span slot="title" slot-scope="{ day }"><button class="btn btn-link text-decoration-none bi px-2" v-on:click="removeDay($event, day)" :class="{ 'bi-check-square-fill': isDaySelected(day) }"></button></span>
+        <cd-day slot-scope="{ day }" :info="day" :is-selected="isDaySelected(day)">
+          <div slot="header">
+            <slot name="header" :day="day"></slot>
+          </div>
+            <div class="day-content text-pre">
+              <slot :day="day"></slot>
+            </div>
+        </cd-day>
+      </cd-day-tabs>
+    </template>
+    <slot name="month-footer"></slot>
+  </div>
 </template>
 
 <script>
-import calendar from '../common/calendar-mixin'
-import CDList from './cd-list.vue'
-import CDForm from './cd-form.vue'
+import axios from 'axios'
+import { createDate, prevMonthDays } from '../common/month-days'
+import utils from '../common/utils'
+import CDDayGrid from './cd-day-grid.vue'
+import CDDayTab from './cd-day-tabs.vue'
 import CDDay from './cd-day.vue'
-import moment from 'moment'
-import { Dialog } from 'element-ui'
-
-const daysInMonth = (year, month) => (moment(`${year}-${month}`, 'YYYY-MM')).daysInMonth()
-const date = (year, month, day) => (moment(`${year}-${month}-${day}`, 'YYYY-MM-DD'))
-
+const formatter = new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric'})
 export default {
   name: 'cd-month',
-  mixins: [calendar],
   components: {
-    'cd-list': CDList,
-    'cd-form': CDForm,
+    'cd-day-grid': CDDayGrid,
     'cd-day': CDDay,
-    'el-dialog': Dialog
+    'cd-day-tabs': CDDayTab
   },
   props: {
-    tile: { type: Boolean, default: true },
-    compact: { type: Boolean, default: false },
-    createnew: {
-      type: Function,
-      description: 'Сколько я не думал, не нашёл лучшего варианта, кроме следующего: функция принимает массив дат, выполняет какие-то преобразования и добавляет результат в массив, переданный как свойство компонента cd-month'
-    },
-    showheader: { type: Boolean, default: true, description: 'Переключатель видимости месяца-года' },
-    canadd: { type: Boolean, default: true, description: 'Можно ли добавлять события в календарь' },
-    weekdays: {
-      type: Array,
-      default: function () {
-        return [
-          {
-            id: 1,
-            name: 'Понедельник',
-            short_name: 'ПН'
-          },
-          {
-            id: 2,
-            name: 'Вторник',
-            short_name: 'ВТ'
-          },
-          {
-            id: 3,
-            name: 'Среда',
-            short_name: 'СР'
-          },
-          {
-            id: 4,
-            name: 'Четверг',
-            short_name: 'ЧТ'
-          },
-          {
-            id: 5,
-            name: 'Пятница',
-            short_name: 'ПТ'
-          },
-          {
-            id: 6,
-            name: 'Суббота',
-            short_name: 'СБ',
-            class: 'cd-weekend'
-          },
-          {
-            id: 0,
-            name: 'Воскресенье',
-            short_name: 'ВС',
-            class: 'cd-weekend'
-          }
-        ]
+    goPrev: { type: Function, default: (day) => console.log(day) },
+    mode: {
+      type: String,
+      validator (value) {
+        return ['list', 'schedule'].indexOf(value) !== -1
       },
-      description: 'Массив дней недели'
+      default: 'schedule',
+      description: 'Режим календаря, schedule (по умолчанию) -- месяц разбит по неделям; list -- дни идут списком'
     },
-    mode: { type: Number, default: 1 },
-    isdayvisible: { type: Function, default: (day) => (true) },
-    isdayselected: { type: Function },
-    format: { type: String, default: 'YYYY-MM-DD' },
-    schedule: { type: [Function, Array], description: 'Данные, которые мы хотим показать в календаре' },
-    property: { type: String, description: 'Имя свойства объекта из коллекции schedule, содержащее значение даты события' },
-    resolvedayclass: { type: [String, Array, Function], default: () => (''), description: 'Функция, возвращающая класс для элемента cd-day' },
-    ondayselect: { type: Function, default: (event, args) => {}, description: 'Функция, которая выполняется при клике на день' },
-    selectweekday: { type: Boolean, default: false },
-    onweekdayselect: { type: Function, default: (event, args) => {}, desciption: 'Функция, которая выполнится, если выбрать колонку с днём недели' },
-    isweekdayselected: { type: Function, default: (...args) => (false) }
+    compareDate: { type: Function, required: true, description: 'функция возвращает true, если даты параметров функции совпадают' },
+    sixDays: { type: Boolean, default: false, description: 'Признак шестидневной рабочей недели' },
+    prependDays: { type: Boolean, default: true, description: 'Если месяц начинается не с понедельника и prepend-days = true, то присоединим дни из предыдущего месяца так, чтобы первое число указанного месяца было в своей клетке дня недели' },
+    compact: { type: Boolean, default: false, description: 'Компактный режим' },
+    selectWeekdays: { type: Boolean, default: false, description: 'Режим выбора дня недели (появится чекбокс)' },
+    onWeekdaySelect: { type: Function, description: 'Функция, которую выполним по выбору дня недели' },
+    orientation: { type: String, description: 'Расположение ярлыков на дни месяца' },
+    multiple: { type: Boolean, default: false, description: 'Можно ли выбрать несколько дней' },
+    date: { type: [Date, String, Number] }
   },
-  data (cdm) {
+  data ({ multiple }) {
     return {
-      generatorconfig: Object,
-      runtemplate: false,
-      formatter: new Intl.DateTimeFormat('ru-RU', { month: 'long' }),
-      templatedescriptor: [
-        {
-          datafield: 'template_id',
-          text: 'Выберите шаблон',
-          input: 'select',
-          labelkey: 'text',
-          valuekey: 'id',
-          values: [
-            {
-              id: 1,
-              text: 'Чётные числа',
-              daycompare (dayscope) {
-                return dayscope.isprev === undefined && (dayscope.date.getDate() % 2 === 0) && (!cdm.generatorconfig.workdays || dayscope.code !== 1)
-              }
-            },
-            {
-              id: 2,
-              text: 'Нечётные числа',
-              daycompare (dayscope) {
-                return dayscope.isprev === undefined && (dayscope.date.getDate() % 2 === 1) && (!cdm.generatorconfig.workdays || dayscope.code !== 1)
-              }
-            },
-            {
-              id: 3,
-              text: 'Выбрать дни недели',
-              daycompare (dayscope) {
-                return dayscope.isprev === undefined && cdm.selectedweekdays.indexOf(dayscope.date.getDay()) !== -1 && (!cdm.generatorconfig.workdays || dayscope.code !== 1)
-              }
-            },
-            {
-              id: 4,
-              text: 'Выбрать дни вручную',
-              ondayselect (event, args) {
-                if (args.row.isprev === undefined) {
-                  const index = cdm.selecteddays.indexOf(args.row.date.getDate())
-                  if (index >= 0) cdm.selecteddays.splice(index, 1)
-                  else cdm.selecteddays.push(args.row.date.getDate())
-                }
-              },
-              daycompare (dayscope) {
-                return cdm.selecteddays.indexOf(dayscope.date.getDate()) !== -1
-              }
-            }
-          ],
-          onselect (payload, option) {
-            cdm.newtask = option
-          }
-        },
-        {
-          input: 'checkbox',
-          datafield: 'workdays',
-          text: 'Только рабочие дни',
-          disabled: true,
-          toogle (payload) {
-            cdm.generatorconfig.workdays = !cdm.generatorconfig.workdays
-          }
-        }
-      ],
-      newtask: {},
-      selectedweekdays: [],
-      selecteddays: []
+      empty: undefined,
+      isLoading: false,
+      selectedWeekdays: [],
+      selectedDays: [],
+      editEvent: Object,
+      calendarDays: Array
     }
   },
   watch: {
-    runtemplate: {
+    $axios: {
       handler (newvalue) {
-        if (newvalue === true) {
-          this.generatorconfig = {
-            template_id: null,
-            workdays: false
-          }
-        } else {
-          this.generatorconfig = Object
-        }
+        newvalue.then(response => console.log(response)).catch(error => console.error(error))
       }
-    }
-  },
-  computed: {
-    dayclass () {
-      return this.newtask.id === 4 ? 'selectable' : ''
-    },
-    calendar () {
-      const month = this
-      const days = Array.from(Array(daysInMonth(month.payload.Year, month.payload.MonthID)).keys())
-        .map((_d, index) => ({ date: date(month.payload.Year, month.payload.MonthID, _d + 1).toDate() }))
-      const monthstart = date(month.payload.Year, month.payload.MonthID, 1)
-      const weekday = monthstart.day()
-      if (weekday === 1) return days
-      const result = []
-      let ln = weekday - 1
-      if (ln < 0) ln = 6 - ln - 1
-      while (ln > 0) {
-        const d = monthstart.subtract(1, 'days')
-        result.unshift({ date: d.toDate(), isprev: true })
-        ln -= 1
-      }
-      return result.concat(days)
-    },
-    // url () {
-    //   return `https://isdayoff.ru/api/getdata?year=${this.payload.Year}&month=${this.payload.MonthID}&pre=1&covid=1&sd=0`
-    // },
-    islistview () {
-      return this.mode === 0
-    },
-    daynumber () {
-      return (day) => (day.date.getDay())
-    },
-    templateready () {
-      return typeof this.generatorconfig !== 'function'
-    },
-    resolvedayselected () {
-      const month = this
-      return (day) => {
-        if (month.isdayselected !== undefined && month.isdayselected(day.row)) return 'selected'
-        return ''
-      }
-    },
-    monthdate () {
-      return new Date(this.payload.Year, this.payload.MonthID - 1, 1)
-    },
-    monthheader () {
-      return `${this.formatter.format(this.monthdate)} ${this.payload.Year}`
-    },
-    source () {
-      return this.mode === 0 ? this.calendar : this.weekdays
-    },
-    weekdaylist () {
-      const month = this
-      if (month.calendar.length === 0) return () => []
-      return (wd) => {
-        return month.calendar.filter(d => d.date.getDay() === wd.row.id)
-      }
-    },
-    rootrowclass () {
-      const month = this
-      return (row) => ([{ 'weekday-container col': month.mode === 1 }, row.class])
     }
   },
   methods: {
-    ondialogclose () {
-      this.selectedweekdays = []
-      this.selecteddays = []
-      this.newtask = {}
+    setDays (days) {
+      this.calendarDays = days
+    }
+  },
+  computed: {
+    monthWeekdayCount({ keyedDays }) {
+      return (week) => {
+        return keyedDays.filter(d => d.isprev == undefined && d.date.week() == week).length
+      }
     },
-    templateselect () {
-      this.runtemplate = true
+    currentSelected ({ selectedDays, calendarDate }) {
+      return (week) => (selectedDays.filter(f => f.date.year() == calendarDate.year() && f.date.month() == calendarDate.month() && f.date.week() == week)).length
     },
-    addday () {
+    isNotSelected ({ currentSelected }) {
+      return ({ week }) => currentSelected(week) == 0
     },
-    ontemplatechange (...args) {
+    isSomeSelected ({ monthWeekdayCount, currentSelected }) {
+      return ({ week }) => (currentSelected(week) > 0) && (currentSelected(week) < monthWeekdayCount(week))
     },
-    weekdayselect (event, weekday) {
-      const index = this.selectedweekdays.indexOf(weekday.row.id)
-      if (index === -1) this.selectedweekdays.push(weekday.row.id)
-      else this.selectedweekdays.splice(index, 1)
+    isFullSelected ({ monthWeekdayCount, currentSelected }) {
+      return ({ week }) => currentSelected(week) == monthWeekdayCount(week)
     },
-    resolveweekdayselected (weekday) {
-      return this.selectedweekdays.indexOf(weekday.row.id) >= 0
+    resolveTabClass ({ isDaySelected }) {
+      return ( tab ) => {
+        return [ 'cd-month-tab-day', isDaySelected(tab) ? 'cd-day-tab-selected': 'cd-day-tab' ]
+      }
     },
-    closedialog () {
-      this.runtemplate = false
+    removeDay ({ selectedDays }) {
+      return ($event, { daykey }) => {
+        const index = selectedDays.findIndex(d => d.daykey == daykey)
+        if (index >= 0) selectedDays.splice(index, 1)
+      }
     },
-    run (event, days) {
-      this.createnew(days.map(d => d.date))
+    selectedLength ({ selectedDays }) {
+      return selectedDays.length
+    },
+    selectDay ({ multiple, removeDay, compact }) {
+      return function ($event, day) {
+        const array = this
+        const findIndex = array.findIndex(d => d.daykey === day.daykey)
+          if (findIndex < 0) {
+            if (multiple) {
+              array.push(day)
+            } else {
+              if (array.length == 0) {
+                array.push(day)
+              } else {
+                array.splice(findIndex, 1, day)
+              }
+            }
+          } else {
+            if (compact) removeDay($event, day)
+          }
+      }
+    },
+    onDaySelect ({ selectedDays, goPrev, empty, isDaySelected, selectDay, removeDay, $nextTick }) {
+      return ($event, day, week) => {
+        if (day == empty) {
+          const entries = Object.entries(week).map(m => m[1]).filter(f => f != empty && f.date != empty && f.isprev == empty)
+
+          if ($event.target.classList.contains('bi-check-square-fill')) {
+            entries.forEach(d => $nextTick().then(() => removeDay.call(selectedDays, $event, d)))
+          } else {
+            entries.filter(f => !isDaySelected(f)).forEach(d => $nextTick().then(() => selectDay.call(selectedDays, $event, d)))
+          } 
+        } else if (day.isprev) {
+            goPrev(day)
+          }  else {
+            selectDay.call(selectedDays, $event, day)
+          }
+      }
+    },
+    calendarDate ({ date }) {
+      const _date = new Date(date)
+      return createDate(_date.getFullYear(), _date.getMonth() + 1, _date.getDate())
+    },
+    offConfig ({ calendarDate, sixDays }) {
+      return {
+        url: 'https://isdayoff.ru/api/getdata',
+        method: 'get',
+        params: {
+          year: calendarDate.year(),
+          month: calendarDate.month() + 1,
+          pre: true,
+          sd: sixDays == true ? 1 : 0
+        }
+      }
+    },
+    ischedule ({ mode }) {
+      return mode === 'schedule'
+    },
+    days ({ calendarDate, prependDays, setDays }) {
+      return ({ request }) => setDays((prependDays ? prevMonthDays(calendarDate) : [])
+        .concat(
+          Array.from(Array(calendarDate.daysInMonth()).keys())
+            .map((d, i) => ({ date: createDate(calendarDate.year(), calendarDate.month() + 1, d + 1), code: request.response[i] }))
+        ))
+    },
+    $axios ({ days , offConfig }) {
+      const state = this
+      const axiosInstance = axios.create()
+      axiosInstance.interceptors.request.use(config => {
+        state.$nextTick().then(() => {
+          state.isLoading = true
+        })
+        return config
+      })
+      axiosInstance.interceptors.response.use(response => {
+        setTimeout(() => {
+          state.isLoading = false
+        }, 100)
+        return response
+      }, error => {
+        setTimeout(() => {
+          state.isloading = false
+          state.error = error
+        }, 100)
+      })
+      return axiosInstance(offConfig).then(response => days(response)).catch(error => errorRequest(error))
+    },
+    weekNumbers ({ calendarDays }) {
+      const _map = typeof calendarDays == 'function' ? [] : calendarDays
+      return _map.map(d => d.date.week())
+    },
+    keyedDays ({ calendarDays }) {
+      const _map = typeof calendarDays == 'function' ? [] : calendarDays
+      return _map.map(m => ({ isprev: m.isprev, date: m.date, daykey: m.date.unix(), code: m.code }))
+    },
+    minWeekNumber ({ weekNumbers }) {
+      return Math.min(...weekNumbers)
+    },
+    maxWeekNumber ({ weekNumbers }) {
+      return Math.max(...weekNumbers)
+    },
+    weekRange ({ minWeekNumber, maxWeekNumber, weekNumbers }) {
+      return utils.range(minWeekNumber, maxWeekNumber, 1).filter(w => weekNumbers.indexOf(w) !== -1)
+    },
+
+    checkboxid () {
+      return ({ day }) => `wd_${day}`
+    },
+    isChecked ({ selectedWeekdays }) {
+      return (row) => {
+        return selectedWeekdays.indexOf(row.day) >= 0
+      }
+    },
+    weekdayClass ({ selectedWeekdays, sixDays }) {
+      return (weekday, index) => {
+        // const isselected = selectedWeekdays.indexOf(weekday.day) >= 0
+        if ((index === 5 && !sixDays) || index === 6) return 'holiday'
+        return [`weekday-${weekday.info.long.toLowerCase()}s`, {
+          'is-selected': selectedWeekdays.indexOf(weekday.day) >= 0,
+          holiday: (index === 5 && !sixDays) || index === 6
+        }]
+      }
+    },
+    isDaySelected ({ selectedDays }) {
+      return ({ date }) => {
+        return (selectedDays.findIndex(d => {
+          return ((d.date.date() === date.date() && d.date.month() === date.month()) )
+        }) >= 0)
+      }
+    }
+  },
+  filters: {
+    noDate (value) {
+      return value != undefined ? formatter.format(value, 'mmmm YYYY') : ''
     }
   }
 }
 </script>
 
 <style>
-  .cd-month {
-
+  .mw-mc {
+    max-width: min-content;
   }
-  .month-header {
-    text-align: center;
-  }
-  .prev-month {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-  .cd-weekend {
-    color: salmon;
+  .cd-weekday--container {
+    max-width: 14%;
   }
   .holiday {
-    color: salmon;
+    color: red;
   }
-  .weekday-name {
-    font-size: 1.5em;
-    user-select: none;
-    text-align: center;
-    font-weight: bold;
+  .cd-month--wrapper {
+    width: 90%;
   }
-  .weekday-container {
-    text-align: center;
+  .cd-day.compact {
+    /* max-width: 50px; */
   }
-  .new-day--template {
-    text-align: center;
+  .cd-month.compact {
+    width: 350px;
   }
-  i {
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+  .cd-grid--start-th
+  {
+    width: 1px;
   }
-  .month-no-data {
-    padding-top: 2em;
-    padding-bottom: 2em;
-    margin-bottom: 1em;
-    text-align: center;
-    border: 0.01em solid gray;
-  }
-  .template-selector {
-    width: inherit;
-  }
-  .month-item-wrap.selected {
-    background-color: rgba(117, 115, 115, 0.445);
-    font-weight: bold;
-  }
-  .template-weekday-list {
-    font-size: 1rem;
-    font-weight: 200;
-  }
-  .preview-day-number {
-    padding: 3px;
-  }
-  .commit-template {
-    text-align: right;
-  }
-  .commit-template > .btn {
-    margin-left: 1em;
-  }
-    .compact {
-    margin-bottom: unset!important;
-  }
-  .month-template-preview.compact {
-    font-size: 0.7em;
-  }
-  .compact:hover {
-    box-shadow: none;
-  }
-  .selectable {
-    cursor: pointer;
+  .cd-grid--end-th {
+    width: 1px;
   }
 </style>

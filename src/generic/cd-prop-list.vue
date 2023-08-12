@@ -48,7 +48,7 @@ export default {
     },
     onpropertychange () {
       return (descriptor) => {
-        return (property, value) => {
+        return (propertyholder, property, value) => {
           Vue.set(descriptor.row, property.datafield, value)
         }
       }
@@ -56,14 +56,14 @@ export default {
   },
   methods: {
     ondrag (event, property) {
-      console.log(property)
+      // console.log(property)
     },
     ondrop (event, property) {
-      console.log(property)
+      // console.log(property)
     },
     ondragover (event, property) {
       event.preventDefault()
-      console.log(property)
+      // console.log(property)
     },
     removeproperty (event, args) {
       this.descriptor.splice(args, 1)
@@ -73,7 +73,7 @@ export default {
       this.zoomprop = prop
     },
     addproperty (...args) {
-      console.log(args)
+      // console.log(args)
     },
     onpropertyedited (event, args) {
 

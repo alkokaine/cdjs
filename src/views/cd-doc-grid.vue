@@ -2,36 +2,59 @@
   <div>
     <cd-doc :content="doc"></cd-doc>
     <cd-info v-for="(info, index) in infos" :component="info" property="props" :key="index"></cd-info>
-    <cd-tabs class="examples-list" :tabs="gridexamples" keyfield="name" :current="currentindex" :ontabselected="selectexample">
-      <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
-      <cd-grid v-if="grid" class="example-grid" ref="example" :keyfield="grid.keyfield"
-        :get="grid.get"
-        :payload="payload"
-        :descriptor="grid.descriptor"
-        :resolveresult="grid.resolveresult"
-        :resolvepayload="grid.resolvepayload"
-        :collection="collection"
-        :total="total"
-        :paging="grid.paging"
-        :pageSize="10"
-        :onpagechange="onpagechange">
-        <div slot="grid-tuner">
-          <div v-if="currentindex === 2">
-            <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
-              <div slot="header">
-                <div v-for="(text, index) in tutorial[step].text" :key="index">{{ text }}</div>
-                <cd-prop-list v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-prop-list>
-              </div>
-              <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
-            </cd-list>
-          </div>
-          <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter"
+    <cd-tabs class="examples-list" :tabs="gridexamples" tab-key="name" :current="currentindex" :ontabselected="selectexample">
+      <div class="p-2" slot-scope="{ tab }">
+        <span>{{ tab.caption }}</span>
+      </div>
+      <div slot="content">
+        <cd-form v-if="settingform" :descriptor="settingform.descriptor" :payload="settingform.payload" :onpropertychange="onsettingchanged"></cd-form>
+        <cd-grid class="example-grid" ref="example" :keyfield="grid.keyfield" :headers="grid.headers" :expandable="true"
+            :get="grid.get"
             :payload="payload"
-            :inline="true"
-            :onpropertychange="onfilterchange">
-          </cd-form>
-        </div>
-      </cd-grid>
+            :descriptor="grid.descriptor"
+            :resolveresult="grid.resolveresult"
+            :resolvepageparams="grid.resolvepageparams"
+            :resolvepayload="grid.resolvepayload"
+            :collection="collection"
+            :selectrows="true"
+            :total="total"
+            :paging="grid.paging"
+            :pageSize="10"
+            :page="currentpage"
+            :onpagechange="onpagechange">
+            <div slot="grid-tuner">
+              <div v-if="currentindex === 2">
+                <cd-list v-if="step >= 0 && tutorial[step]" :collection="tutorial[step].buttons" keyfield="id">
+                  <div slot="header">
+                    <div v-for="(text, index) in tutorial[step].text" :key="index">{{ text }}</div>
+                    <cd-props v-if="tutorial[step].descriptor" :descriptor="tutorial[step].descriptor()" :onremoveproperty="onremoveproperty" :popoff="step < 4"></cd-props>
+                  </div>
+                  <button class="btn btn-sm" slot-scope="button" v-on:click.stop="button.row.click" :disabled="isbuttondisabled(button)">{{ button.row.text }}</button>
+                </cd-list>
+              </div>
+              <cd-form v-if="grid.usefilter" class="cd-grid--filter" :descriptor="grid.filter" :sync="true"
+                :payload="payload"
+                :inline="true"
+                :onpropertychange="onfilterchange">
+              </cd-form>
+            </div>
+            <template slot-scope="scope">
+              <template v-if="!scope.property">
+                <template>
+                  <template v-if="scope.start">
+                    <span></span>
+                  </template>
+                  <template v-else-if="scope.end">
+                    <span></span>
+                  </template>
+                  <template v-else-if="scope.data.row">
+                    {{ scope.data.row }}
+                  </template>
+                </template>
+              </template>
+            </template>
+          </cd-grid>
+      </div>
     </cd-tabs>
   </div>
 </template>
@@ -44,6 +67,7 @@ import CDGrid from '@/components/cd-grid.vue'
 import CDForm from '@/components/cd-form.vue'
 import CDTabs from '@/components/cd-tabs.vue'
 import CDList from '@/components/cd-list.vue'
+import keys from '@/views/keys'
 import CDPropList from '@/generic/cd-prop-list.vue'
 export default {
   name: 'cd-doc-grid',
@@ -64,6 +88,11 @@ export default {
           {
             datafield: 'city',
             text: 'city'
+          },
+          {
+            datafield: 'money',
+            text: 'money',
+            input: 'money'
           },
           {
             datafield: 'country',
@@ -96,58 +125,61 @@ export default {
         ]
       }
     },
-    cityfilter: {
-      type: Array,
+    countrydd: {
+      type: Object,
       default: function () {
         const view = this
-        return [
-          {
-            datafield: 'countryIds',
-            text: 'Страна',
-            input: 'select',
-            valuekey: 'code',
-            labelkey: 'name',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/countries',
-            method: 'get',
-            resolvepayload: (payload) => ({
-              params: {
-                offset: 0,
-                limit: 10
-              }
-            }),
-            resolveresult: (response) => response.data.data,
-            isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
-            onselect: (payload, option, parent) => {
-              if (option) {
-                const region = parent.descriptor.find(p => p.datafield === 'region_id')
-                Vue.set(region, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.code}/regions`)
-                Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=${option.code}`)
-              } else {
-                Vue.set(view.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
-              }
-            }
-          },
-          {
-            datafield: 'region_id',
-            text: 'regions',
-            input: 'select',
-            valuekey: 'wikiDataId',
-            labelkey: 'name',
-            url: '',
-            method: 'get',
-            resolveresult: (response) => response.data.data,
-            resolvepayload: (payload) => ({
-              params: {
-                offset: 0,
-                limit: 10
-              }
-            }),
-            isdisabled: (payload, option) => option !== undefined && (option.wikiDataId || '').endsWith(7),
-            onselect (payload, option, descriptor) {
-              if (option) Vue.set(view.grid.get, 'url', `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
+        return {
+          datafield: 'countryIds',
+          text: 'Страна',
+          input: 'select',
+          valuekey: 'wikiDataId',
+          labelkey: 'name',
+          url: '/geo/countries',
+          headers: keys.geoheaders,
+          method: 'get',
+          resolvepayload: (payload) => ({
+            params: payload
+          }),
+          resolveresult: (response) => response.data.data,
+          isdisabled: (option, payload, parent) => option !== undefined && (option.wikiDataId || '').endsWith(7),
+          onselect: (payload, option, parent) => {
+            if (option) {
+              const region = parent.descriptor.find(p => p.datafield === 'region_id')
+              setTimeout(() => Vue.set(region, 'url', `/geo/countries/${option.code}/regions`), 1500)
+              setTimeout(() => Vue.set(view.grid.get, 'url', `/geo/cities?countryIds=${option.code}&`), 1500)
+            } else {
+              setTimeout(() => Vue.set(view.grid.get, 'url', '/geo/cities'), 1500)
             }
           }
-        ]
+        }
+      }
+    },
+    regiondd: {
+      type: Object,
+      default: function () {
+        const view = this
+        return {
+          datafield: 'region_id',
+          text: 'regions',
+          input: 'select',
+          valuekey: 'wikiDataId',
+          labelkey: 'name',
+          url: '',
+          method: 'get',
+          resolveresult: (response) => response.data.data,
+          resolvepayload: (payload) => ({
+            params: {
+              offset: 0,
+              limit: 10
+            }
+          }),
+          headers: keys.geoheaders,
+          isdisabled: (option, payload, parent) => option !== undefined && (option.wikiDataId || '').endsWith(7),
+          onselect (payload, option, descriptor) {
+            if (option) Vue.set(view.grid.get, 'url', `/geo/countries/${option.countryCode}/regions/${option.isoCode}/cities`)
+          }
+        }
       }
     },
     simplegrid: {
@@ -157,43 +189,36 @@ export default {
         const simplegrid = {
           get: {
             method: 'get',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
+            url: '/geo/cities'
           },
+          headers: keys.geoheaders,
           descriptor: examples.citydescriptor,
-          keyfield: 'Id',
+          keyfield: 'wikiDataId',
           total: 0,
           paging: true,
           resolveresult: (response) => examples.resolveresult(response),
-          resolvepayload (payload) {
-            return examples.resolvepayload(payload)
+          resolvepageparams (page, pagesize) {
+            return {
+              limit: pagesize,
+              offset: (page - 1) * pagesize
+            }
           }
+          // resolveurl: (url, page, pageSize) => {
+          //   if (url.indexOf('?') !== -1) return `${url}offset=${(page - 1) * pageSize}&limit=10`
+          //   return `${url}?offset=${(page - 1) * pageSize}&limit=10`
+          // }
         }
         return simplegrid
       }
     },
-    filtered: {
-      type: Object,
-      default: function () {
-        const examples = this
-        const grid = {
-          get: {
-            method: 'get',
-            url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities'
-          },
-          usefilter: true,
-          filter: examples.cityfilter,
-          descriptor: examples.citydescriptor,
-          keyfield: 'Id',
-          total: 0,
-          paging: true,
-          resolveresult: (response) => examples.resolveresult(response),
-          resolvepayload (payload) {
-            return examples.resolvepayload(payload)
-          }
-        }
-        return grid
-      }
-    },
+    // filtered: {
+    //   type: Object,
+    //   default: function () {
+    //     const examples = this
+    //     const grid =
+    //     return grid
+    //   }
+    // },
     breweries: {
       type: Object,
       default: function () {
@@ -201,7 +226,7 @@ export default {
         const breweries = {
           get: {
             method: 'get',
-            url: 'https://api.openbrewerydb.org/breweries'
+            url: '/beer/breweries'
           },
           descriptor: [],
           keyfield: 'id',
@@ -238,7 +263,8 @@ export default {
           ],
           onselect (property, option, parent) {
             Vue.set(examples, 'collection', [])
-            Vue.set(examples, 'grid', option.grid)
+            const newgrid = this.values.find(v => v.key === option.key)
+            Vue.set(examples, 'grid', newgrid.grid)
             Vue.set(examples, 'step', 0)
           }
         }
@@ -255,37 +281,22 @@ export default {
         }
         return form
       }
-    },
-    gridexamples: {
-      type: Array,
-      default: function () {
-        const view = this
-        return [
-          {
-            name: 'simple',
-            caption: 'Простой грид',
-            grid: view.simplegrid
-          },
-          {
-            name: 'filtered',
-            caption: 'Грид с фильтром',
-            grid: view.filtered
-          },
-          {
-            name: 'make-your-own-grid-in-5-min',
-            caption: 'Сделай свой грид за 5 минут',
-            form: view.form,
-            grid: view.simplegrid
-          }
-        ]
-      }
     }
+    // ,
+    // gridexamples: {
+    //   type: Array,
+    //   default: function () {
+    //     const view = this
+    //     return
+    //   }
+    // }
   },
   data (view) {
     const increase = () => { Vue.set(view, 'step', view.step + 1) }
     return {
       infos: CDGrid.mixins.concat(CDGrid),
       currentindex: 0,
+      currentpage: 1,
       selected: Object,
       preview: [],
       tutorial: [
@@ -362,14 +373,51 @@ export default {
       settingform: false,
       total: 0,
       payload: {
-        limit: 10,
         minPopulation: null,
         namePrefix: null,
         distanceUnit: null,
-        offset: 0,
         countryIds: null
       },
-      // gridexamples: ,
+      gridexamples: [
+        {
+          name: 'simple',
+          caption: 'Простой грид',
+          grid: view.simplegrid
+        },
+        {
+          name: 'filtered',
+          caption: 'Грид с фильтром',
+          grid: {
+            get: {
+              method: 'get',
+              url: '/geo/cities'
+            },
+            headers: keys.geoheaders,
+            usefilter: true,
+            filter: [
+              view.countrydd,
+              view.regiondd
+            ],
+            resolvepageparams (page, pagesize) {
+              return {
+                limit: pagesize,
+                offset: (page - 1) * pagesize
+              }
+            },
+            descriptor: view.citydescriptor,
+            keyfield: 'id',
+            total: 0,
+            paging: true,
+            resolveresult: (response) => view.resolveresult(response)
+          }
+        },
+        {
+          name: 'make-your-own-grid-in-5-min',
+          caption: 'Сделай свой грид за 5 минут',
+          form: view.form,
+          grid: view.simplegrid
+        }
+      ],
       doc: [
         {
           id: 'grid-a',
@@ -401,7 +449,7 @@ export default {
     }
   },
   methods: {
-    onsettingchanged (property, value) {
+    onsettingchanged (propertyholder, property, value) {
       console.log(property, value)
     },
     generateproperties () {
@@ -418,16 +466,10 @@ export default {
         params: payload
       }
     },
-    onfilterchange (property, value) {
+    onfilterchange (propertyholder, property, value) {
       if (property.datafield === 'countryIds') {
-        Vue.set(this.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
+        Vue.set(this.grid.get, 'url', '/geo/cities')
       }
-      // if (property.datafield !== 'region_id') {
-      //   if (property.datafield === 'countryIds') {
-      //     Vue.set(this.grid.get, 'url', 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities')
-      //   }
-      //   Vue.set(this.payload, property.datafield, value)
-      // }
     },
     selectexample (event, args) {
       this.currentindex = args.index
@@ -439,8 +481,8 @@ export default {
       Vue.set(this, 'total', response.data.metadata.totalCount)
       Vue.set(this, 'collection', response.data.data)
     },
-    onpagechange (event, pageargs) {
-      Vue.set(this.payload, 'offset', pageargs.row.offset)
+    onpagechange (newpage) {
+      this.currentpage = newpage.page
     },
     onremoveproperty (property) {
       this.hasremoved = true
