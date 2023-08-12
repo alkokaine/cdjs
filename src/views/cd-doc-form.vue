@@ -8,7 +8,7 @@
       :showcontrols="true"
       :editmode="editmode"
       :submit="submitform"
-      :sync="false"
+      :sync="true"
       :reset="resetform">
       <template slot-scope="{ property }">
         <template v-if="property.datafield === 'test'">
@@ -79,7 +79,12 @@ export default {
     return {
       editmode: false,
       form: CDForm,
-      test: {},
+      test: {
+        date1: null,
+        Name: null,
+        City: null,
+        address: null
+      },
       shadow: Object,
       descriptor: [
         {
@@ -217,7 +222,11 @@ export default {
                       valuekey: 'unrestricted_value',
                       headers: keys.dadataheaders,
                       onselect (payload, event, parent) {
-                        console.log(this, payload, event)
+                        debugger
+                        const { data, unrestricted_value } = event
+                        const { settlement_with_type, city_with_type } = data
+                        Vue.set(payload, 'City', (city_with_type || settlement_with_type))
+                        Vue.set(payload, 'address', unrestricted_value)
                       },
                       resolvepayload (query, payload, parent) {
                         return {
@@ -492,22 +501,14 @@ export default {
   //   }
   // },
   methods: {
-    onpropertychange (...args) {
-      // console.log(args)
-    },
     oncancel (event) {
       this.editmode = false
     },
     submitform ({ $event, payload }) {
-      const form = this
-
-      Object.keys(payload).forEach(key => {
-        Vue.set(form.test, key, payload[key])
-      })
-      console.log('submitting form', $event, payload, this.test)
+      this.test = { ...payload }
     },
     resetform ({ $event, payload }) {
-      console.log('resetting form', $event, payload, this.test)
+      this.test = { ...payload }
     }
   }
 }
