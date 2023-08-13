@@ -1,6 +1,6 @@
 <template>
   <div class="cd-form" :class="rootclass">
-    <slot name="header"></slot>
+    <slot name="header" :model="formobject"></slot>
     <el-form :model="formobject" size="mini" ref="innerform" :name="name" class="cd-form--content" :class="formclass" :rules="rules" @submit.native.prevent @reset.native.prevent>
       <div slot="title">{{ hasChanges }}</div>
       <cd-fieldset v-if="!revert" class="cd-fieldset--root border-0" :resolvevalue="resolvevalue" :descriptor="descriptor" :isvisible="isvisible" :readonly="isreadonly">
@@ -97,7 +97,7 @@ export default {
   computed: {
     resetForm ({ $nextTick, $refs, setRevert, setFormObject, sync, setHasChanges }) {
       return ({ $event, payload}, callback) => {
-        $nextTick().then(() => $refs.innerform.resetFields())
+        $nextTick()
           .then(() => setRevert(true))
           .then(() => setFormObject(payload, sync))
           .then(() => setHasChanges(false))
@@ -105,16 +105,16 @@ export default {
           .then(() => setRevert(false))
       }
     },
-    submitForm ({ $nextTick, $refs, setHasChanges, $alert }) {
-      return ({ $event, payload }, callback) => {
+    submitForm ({ $refs, setHasChanges, $alert, payload }) {
+      return (args, callback) => {
+        console.log(args.payload, payload)
         $refs.innerform.validate(result => {
-          debugger
           if (result == false) {
             $alert('Обнаружены ошибки!', 'Внимание', {
               confirmButtonText: 'ОК'
             })
           } else {
-            callback({ payload })
+            callback({ payload: args.payload })
           }
         })
       }
@@ -180,7 +180,7 @@ export default {
       const form = this
       return Promise.resolve(form.$nextTick().then(() => { 
         if (typeof object != 'function') {
-          form.formobject = sync ? object : { ... object }
+          form.formobject = sync ? object : ({ ...object })
         } else {
           form.formobject = object
         }

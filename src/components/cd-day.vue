@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="cd-day--content--wrapper position-relative w-100" :class="{ 'd-none': compact, 'bg-opacity-25 bg-secondary': !compact && isSelected, 'bg-white': !compact && !isSelected}">
-        <div class="cd-day--content py-2 mx-auto">
+        <div class="cd-day--content mx-auto">
           <slot></slot>
         </div>
       </div>
@@ -85,6 +85,7 @@ export default {
   }
   .cd-day--content {
     width: 95%;
+    cursor: default;
   }
   .cd-day--container {
     width: 95%;
