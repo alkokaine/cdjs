@@ -101,7 +101,6 @@ export default {
     width: 1em;
   }
   .cd-days--grid.compact {
-    width: max-content;
   }
   .cd-day--grid-wrap {
     width: 92%;
