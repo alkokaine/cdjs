@@ -153,11 +153,10 @@ export default {
     parent: { type: Object },
     resolvepayload: { type: Function }
   },
-  data (cell) {
-    const property = cell.property
+  data ({ property, value, resolvevalue }) {
     return {
-      isarray: Array.isArray(cell.value),
-      cellvalue: cell.resolvevalue(property, cell.value),
+      isarray: Array.isArray(value),
+      cellvalue: resolvevalue(property, value),
       nullvalue: null,
       editortype: {
         isselect: property.input === 'select',
