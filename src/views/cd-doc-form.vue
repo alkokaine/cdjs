@@ -222,7 +222,6 @@ export default {
                       valuekey: 'unrestricted_value',
                       headers: keys.dadataheaders,
                       onselect (payload, event, parent) {
-                        debugger
                         const { data, unrestricted_value } = event
                         const { settlement_with_type, city_with_type } = data
                         Vue.set(payload, 'City', (city_with_type || settlement_with_type))
