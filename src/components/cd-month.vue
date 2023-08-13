@@ -14,7 +14,7 @@
             }"
             data-bs-toggle="tooltip" data-bs-placement="bottom" title="Выбрать неделю" v-on:click="onDaySelect($event, empty, week)"></button>
         </template>
-        <cd-day slot-scope="{ day, week }" v-if="day" :info="day" :compact="compact" v-on:click.native="onDaySelect($event, day, week)" :is-selected="isDaySelected(day)">
+        <cd-day slot-scope="{ day, week }" :info="day" :compact="compact" v-on:click.native="onDaySelect($event, day, week)" :is-selected="isDaySelected(day)">
             <div slot="header" class="cd-day--header">
               <button class="btn btn-link text-decoration-none bi px-2" v-on:click.capture.stop="removeDay($event, day)" :class="{ 'd-none': compact, 'bi-x-square text-light': isDaySelected(day) }"></button>
             </div>
@@ -28,15 +28,20 @@
     </template>
     <template v-else>
       <cd-day-tabs class="cd-month ms-3" :days="keyedDays" :select-day="onDaySelect" :orientation="orientation"
-        :compare-date="compareDate" :multiple="multiple" :selected-days="selectedDays" :day-class="resolveTabClass">
-        <span slot="title" slot-scope="{ day }"><button class="btn btn-link text-decoration-none bi px-2" v-on:click="removeDay($event, day)" :class="{ 'bi-check-square-fill': isDaySelected(day) }"></button></span>
+        :compare-date="compareDate" :multiple="multiple" :selected-days="selectedDays" :day-class="resolveTabClass"
+        :date="calendarDate">
+        <cd-day-grid slot="scheduler" slot-scope="{ month, date }" class="scheduler" :compact="true" 
+          :week-range="weekRange" :days="keyedDays" :compare-date="compareDate" :select-weekdays="selectWeekdays">
+          <div slot="header">{{ month || date }}</div> 
+        </cd-day-grid>
+        <button slot="icon" slot-scope="{ day }" class="btn btn-link text-decoration-none p-0 bi" 
+                  v-on:click="removeDay($event, day)" :class="{ 'bi-check-square-fill': isDaySelected(day) }">
+        </button>
         <cd-day slot-scope="{ day }" :info="day" :is-selected="isDaySelected(day)">
-          <div slot="header">
-            <slot name="header" :day="day"></slot>
+          <slot name="header" :day="day"></slot>
+          <div class="day-content text-pre">
+            <slot :day="day"></slot>
           </div>
-            <div class="day-content text-pre">
-              <slot :day="day"></slot>
-            </div>
         </cd-day>
       </cd-day-tabs>
     </template>
@@ -77,7 +82,7 @@ export default {
     onWeekdaySelect: { type: Function, description: 'Функция, которую выполним по выбору дня недели' },
     orientation: { type: String, description: 'Расположение ярлыков на дни месяца' },
     multiple: { type: Boolean, default: false, description: 'Можно ли выбрать несколько дней' },
-    date: { type: [Date, String, Number] }
+    date: { type: [Date, String, Number] },
   },
   data ({ multiple }) {
     return {
@@ -294,5 +299,8 @@ export default {
   }
   .cd-grid--end-th {
     width: 1px;
+  }
+  .cd-month--wrapper.scheduler {
+    width: min-content!important;
   }
 </style>
