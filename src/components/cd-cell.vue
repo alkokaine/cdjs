@@ -60,6 +60,7 @@
         :clearable="property.clearable"
         v-on:input="oninput({ $event, property }, property.oninput)"
         v-on:focus="onfocus({ $event, property }, property.onfocus)"
+        :min="property.min" :max="property.max" :step="property.step | any"
         v-on:change="onchange({ $event, property }, property.onchange)"
         v-on:blur="onblur({ $event, property }, property.onblur)"  @input="dispatch"/>
     </div>
@@ -186,6 +187,11 @@ export default {
       handler (newvalue) {
         this.cellvalue = newvalue
       }
+    }
+  },
+  filters: {
+    any (value) {
+      return (value || 'any')
     }
   },
   methods: {
