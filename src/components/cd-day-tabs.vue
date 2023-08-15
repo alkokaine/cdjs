@@ -5,7 +5,6 @@
     </div>
     <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs d-flex flex-row flex-nowrap w-100" :tab-class="dayClass"
       :orientation="orientation">
-      
       <div class="cd-day--wrap cd-day--tab" :class="[{ 'mw-100': isCol }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
         <div class="cd-day-tab--content w-auto p-2" :class="{'opacity-25': tab.isprev }">
           <slot name="title" :day="tab">
