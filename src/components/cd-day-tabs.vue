@@ -1,30 +1,30 @@
 <template>
-  <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs d-flex flex-row flex-nowrap w-100" :tab-class="dayClass"
-    :orientation="orientation">
-    <div slot="header">
-      <slot name="header"></slot>
+  <div class="cd-day-tabs--wrapper">
+    <div class="scheduler-slot position-relative w-100">
+        <slot name="scheduler"></slot>
     </div>
-    <div class="cd-day--wrap cd-day--tab" :class="[{ 'mw-100': isCol }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
-      <div class="cd-day-tab--content w-auto p-2" :class="{'opacity-25': tab.isprev }">
-        <slot name="title" :day="tab">
-          <div class="tab-title--block">
-            <slot name="icon" :day="tab"></slot>
-            <a class="text-decoration-none ps-2 fw-bold text-end" :class="{ 'text-danger': isHoliday(tab) }" :href="href(tab)">{{ tabCaption(tab) }}</a>
-          </div>
-        </slot>
+    <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs d-flex flex-row flex-nowrap w-100" :tab-class="dayClass"
+      :orientation="orientation">
+      
+      <div class="cd-day--wrap cd-day--tab" :class="[{ 'mw-100': isCol }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
+        <div class="cd-day-tab--content w-auto p-2" :class="{'opacity-25': tab.isprev }">
+          <slot name="title" :day="tab">
+            <div class="tab-title--block">
+              <slot name="icon" :day="tab"></slot>
+              <a class="text-decoration-none ps-2 fw-bold text-end" :class="{ 'text-danger': isHoliday(tab) }" :href="href(tab)">{{ tabCaption(tab) }}</a>
+            </div>
+          </slot>
+        </div>
       </div>
-    </div>
-    <div slot="content">
-      <cd-month-days :date="date" :collection="sortedDays" keyfield="daykey" listclass="list-unstyled" rowclass="month-day--details row my-2 w-auto">
-        <div slot="scheduler" slot-scope="{ month, date }">
-          <slot name="scheduler" :month="month" :date="date"></slot>
-        </div>
-        <div slot-scope="{ day }" :id="day.daykey">
-          <slot :day="day"></slot>
-        </div>
-      </cd-month-days>
-    </div>
-  </cd-tabs>
+      <div slot="content">
+        <cd-month-days :date="date" :collection="sortedDays" keyfield="daykey" listclass="list-unstyled" rowclass="month-day--details row my-2 w-auto" :toggle-schedule="toggleSchedule">
+          <div slot-scope="{ day }" :id="day.daykey">
+            <slot :day="day"></slot>
+          </div>
+        </cd-month-days>
+      </div>
+    </cd-tabs>
+  </div>
 </template>
 
 <script>
@@ -53,7 +53,8 @@ export default {
     selectedDays: {
       type: Array,
       description: 'Массив выбранных дат'
-    }
+    },
+    toggleSchedule: { type: Function }
   },
   data (tabs) {
     return {
@@ -97,5 +98,8 @@ export default {
   .cd-day-tab--content {
     width: 4em;
     cursor: pointer;
+  }
+  .scheduler-slot {
+
   }
 </style>
