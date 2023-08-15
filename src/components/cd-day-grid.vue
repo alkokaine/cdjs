@@ -18,7 +18,7 @@
         <template v-else-if="property && data.row[property.prop.datafield]">
           <div class="p-1 mx-auto">
             <slot :day="data.row[property.prop.datafield]" :week="data.row.week">
-              <cd-day :info="data.row[property.prop.datafield]" :compact="compact"></cd-day>
+              <cd-day :info="data.row[property.prop.datafield]" :compact="compact" v-on:click.native="selectDay($event, data.row[property.prop.datafield], data.row.week)" :is-selected="isSelected(data.row[property.prop.datafield])"></cd-day>
             </slot>
           </div>
         </template>
@@ -46,7 +46,7 @@ export default {
       },
       description: 'Дни месяца'
     },
-    selectDay: { type: Function },
+    selectDay: { type: Function, default: function(){} },
     compareDate: { type: Function, required: true, description: 'Функция сравнения объектов с датами' },
     weekRange: {
       type: Array,
@@ -56,6 +56,7 @@ export default {
       },
       description: 'Список недель месяца'
     },
+    isSelected: { type: Function, default: function(){ return false } }
   },
   computed: {
     getDay () {
