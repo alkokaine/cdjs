@@ -13,7 +13,15 @@
     </template>
     <template slot-scope="{ start, data, property }">
       <template v-if="start">
-          <slot name="week" :week="data.row"></slot>
+          <slot name="week" :week="data.row">
+            <button class="btn btn-link text-decoration-none bi p-0" 
+                :class="{
+                  'bi-plus': isNotSelected(data.row),
+                  'bi-check-square': isSomeSelected(data.row),
+                  'bi-check-square-fill': isFullSelected(data.row)
+                }"
+                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Выбрать неделю" v-on:click="selectDay($event, empty, data.row)"></button>
+          </slot>
         </template>
         <template v-else-if="property && data.row[property.prop.datafield]">
           <div class="p-1 mx-auto">
@@ -23,6 +31,9 @@
           </div>
         </template>
     </template>
+    <div class="cd-days--grid-footer" slot="table-footer">
+      <slot name="footer"></slot>
+    </div>
   </cd-grid>
 </template>
 <script>
@@ -35,6 +46,11 @@ export default {
     'cd-grid': CDGrid,
     'cd-day': CDDay
   },
+  data () {
+    return {
+      empty: undefined
+    }
+  },
   props: {
     selectWeekdays: { type: Boolean, default: false, description: 'Показывать ли чекбоксы у дней недели' },
     compact: { type: Boolean, default: false, description: 'Компактный режим' },
@@ -46,6 +62,9 @@ export default {
       },
       description: 'Дни месяца'
     },
+    date: { type: Object, required: true },
+    keyedDays: { type: Array, required: true },
+    selectedDays: { type: Array, default: () => ([]) },
     selectDay: { type: Function, default: function(){} },
     compareDate: { type: Function, required: true, description: 'Функция сравнения объектов с датами' },
     weekRange: {
@@ -56,9 +75,29 @@ export default {
       },
       description: 'Список недель месяца'
     },
-    isSelected: { type: Function, default: function(){ return false } }
+    isSelected: { type: Function, default: function(){ return false } },
+    multiple: { type: Boolean }
   },
   computed: {
+    isNotSelected ({ currentSelected }) {
+      return ({ week }) => currentSelected(week) == 0
+    },
+    isSomeSelected ({ monthWeekdayCount, currentSelected }) {
+      return ({ week }) => (currentSelected(week) > 0) && (currentSelected(week) < monthWeekdayCount(week))
+    },
+    isFullSelected ({ monthWeekdayCount, currentSelected }) {
+      return ({ week }) => currentSelected(week) == monthWeekdayCount(week)
+    },
+    
+    currentSelected ({ selectedDays, date }) {
+      return (week) => (selectedDays.filter(f => f.date.year() == date.year() && f.date.month() == date.month() && f.date.week() == week)).length
+    },
+    monthWeekdayCount({ keyedDays }) {
+      return (week) => {
+        return keyedDays.filter(d => d.isprev == undefined && d.date.week() == week).length
+      }
+    },
+
     getDay () {
       return ({ date }) => (date.toDate())
     },

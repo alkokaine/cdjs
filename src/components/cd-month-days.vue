@@ -1,16 +1,6 @@
 <template>
   <cd-list :collection="grouped" keyfield="daykey" :rowclass="['my-2']"  :listclass="['list-unstyled', { 'd-none': !showDetails, 'accordion': !isgroup, 'accordion-body': isgroup  }]">
-    <div slot="no-data" class="no-schedule">
-      <div v-if="isSchedule" class="cd-select-days mx-auto">
-        <slot name="scheduler" :month="month" :date="date"></slot>
-      </div>
-      <div v-else class="mx-auto schedule-month pt-5">
-        <button class="btn btn-sm border btn-primary-outline" v-on:click="schedule">{{ scheduleText }}</button>
-      </div>
-    </div>
-    <template slot="header" v-if="month">
-      <div class="fs-4 fw-bold accordion-header" v-on:click="setShowDetails($event, showDetails)">{{ month.date }}</div>
-    </template>
+    <div v-if="month" slot="header" class="fs-4 fw-bold accordion-header" v-on:click="setShowDetails($event, showDetails)">{{ month.date }}</div>
     <div slot-scope="{ row, index }" class="cd-month-day p-2">
       <template v-if="row.days">
         <cd-month-days :date="date" :month="row" class="m-2 p-2 border" :expand="showDetails" :class="{ 'accordion-item accordion-collapse': !isgroup }">
@@ -22,6 +12,9 @@
       <template v-else>
         <slot :day="row" :index="index"></slot>
       </template>
+    </div>
+    <div slot="footer">
+      <slot name="footer" :month="month" :date="date"></slot>
     </div>
   </cd-list>
 </template>
@@ -37,32 +30,21 @@ export default {
     month: { type: Object },
     collection: { type: Array },
     expand: { type: Boolean, default: true },
-    date: { type: Object },
-    scheduleText: { type: String, default: 'Запланировать...' }
+    date: { type: Object }
   },
   data ({ expand }) {
     return {
-      showDetails: expand,
-      isSchedule: false
+      showDetails: expand
     }
   },
   methods: { 
     setShowDetails(event, currnt) {
       this.showDetails = !currnt
     },
-    setSchedule (value) {
-      this.isSchedule = value
-    }
   },
   computed: {
     isgroup ({ month }) {
       return month != undefined
-    },
-    schedule ({ date, month, setSchedule }) {
-      return (args) => {
-        console.log((month || date), args)
-        setSchedule(true)
-      }
     },
     days ({ month, collection }) {
       return ((month || {}).days || collection)
@@ -96,6 +78,5 @@ export default {
     max-width: min-content;
   }
   .cd-select-days {
-    width: max-content;
   }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="cd-day-tabs--wrapper">
-    <div class="scheduler-slot position-relative w-100">
-        <slot name="scheduler"></slot>
+    <div class="scheduler-slot w-100">
+        <slot name="scheduler" :date="date"></slot>
     </div>
     <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs d-flex flex-row flex-nowrap w-100" :tab-class="dayClass"
       :orientation="orientation">
@@ -20,6 +20,7 @@
           <div slot-scope="{ day }" :id="day.daykey">
             <slot :day="day"></slot>
           </div>
+          <button slot="footer" class="btn btn-sm border btn-primary-outline" v-on:click="toggleSchedule($event, true)">{{ scheduleText }}</button>
         </cd-month-days>
       </div>
     </cd-tabs>
@@ -53,7 +54,8 @@ export default {
       type: Array,
       description: 'Массив выбранных дат'
     },
-    toggleSchedule: { type: Function }
+    toggleSchedule: { type: Function },
+    scheduleText: { type: String, default: 'Запланировать...' }
   },
   data (tabs) {
     return {

@@ -4,16 +4,7 @@
     <template v-if="ischedule">
       <cd-day-grid class="cd-month" :compact="compact"
         :week-range="weekRange" :days="keyedDays" :compare-date="compareDate"
-        :select-weekdays="selectWeekdays">
-        <template v-if="multiple" slot="week" slot-scope="{ week }">
-          <button class="btn btn-link text-decoration-none bi p-0" 
-            :class="{
-              'bi-plus': isNotSelected(week),
-              'bi-check-square': isSomeSelected(week),
-              'bi-check-square-fill': isFullSelected(week)
-            }"
-            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Выбрать неделю" v-on:click="onDaySelect($event, empty, week)"></button>
-        </template>
+        :select-weekdays="selectWeekdays" :selected-days="selectedDays" :keyed-days="keyedDays" :select-day="onDaySelect" :date="calendarDate">
         <cd-day slot-scope="{ day, week }" :info="day" :compact="compact" v-on:click.native="onDaySelect($event, day, week)" :is-selected="isDaySelected(day)">
             <div slot="header" class="cd-day--header">
               <button class="btn btn-link text-decoration-none bi px-2" v-on:click.capture.stop="removeDay($event, day)" :class="{ 'd-none': compact, 'bi-x-square text-light': isDaySelected(day) }"></button>
@@ -29,11 +20,18 @@
     <template v-else>
       <cd-day-tabs class="cd-month ms-3" :days="keyedDays" :select-day="onDaySelect" :orientation="orientation"
         :compare-date="compareDate" :multiple="multiple" :selected-days="selectedDays" :day-class="resolveTabClass"
-        :date="calendarDate">
-        <cd-day-grid slot="scheduler" slot-scope="{ month, date }" class="scheduler" :compact="true" 
-          :week-range="weekRange" :days="keyedDays" :compare-date="compareDate" :select-weekdays="selectWeekdays">
-          <div slot="header">{{ month || date }}</div> 
-        </cd-day-grid>
+        :date="calendarDate" :toggle-schedule="setSchedule">
+        <div slot="scheduler"  slot-scope="{ month, date }"  class="scheduler position-relative">
+          <cd-form v-if="isSchedule" class="scheduler-form border rounded bg-white shadow-lg bg-white opacity-100 p-2 m-2  position-absolute start-50 translate-middle-x"
+            :reset="resetSchedule"  :submit="submitSchedule"
+            :descriptor="selectorDescriptor" :payload="selector" :showcontrols="true">
+              <div slot="header">{{ month || date }}</div>
+              <cd-day-grid slot="footer" class="schedule-calendar--grid" :compact="true" :select-day="onDaySelect" :is-selected="isDaySelected" :date="calendarDate"
+                :week-range="weekRange" :selected-days="selectedDays" :days="keyedDays" :compare-date="compareDate" :select-weekdays="selectWeekdays" :keyed-days="keyedDays">
+              </cd-day-grid>
+          </cd-form>
+        </div>
+        
         <button slot="icon" slot-scope="{ day }" class="btn btn-link text-decoration-none p-0 bi" 
                   v-on:click="removeDay($event, day)" :class="{ 'bi-check-square-fill': isDaySelected(day) }">
         </button>
@@ -54,7 +52,62 @@ import axios from 'axios'
 import { createDate, prevMonthDays } from '../common/month-days'
 import utils from '../common/utils'
 import CDDayGrid from './cd-day-grid.vue'
+import CDForm from './cd-form.vue'
 import CDDayTab from './cd-day-tabs.vue'
+const selectorDescriptor = [
+  {
+    text: 'Шаблон',
+    input: 'select',
+    valuekey: 'key',
+    labelkey: 'label',
+    onselect (payload, option, parent) {
+      console.log(option)
+      console.log(payload)
+    },
+    values: [
+      {
+        function: (date) => {
+          console.log(date)
+          return false
+        },
+        key: 1,
+        label: 'Все рабочие дни'
+      },
+      {
+        function: (date) => {
+          console.log(date)
+          return false
+        },
+        key: 2,
+        label: 'Чётные дни месяца'
+      },
+      {
+        function: (date) => {
+          console.log(date)
+          return false
+        },
+        key: 3,
+        label: 'Нечётные дни месяца'
+      },
+      {
+        function: (date) => {
+          console.log(date)
+          return false
+        },
+        key: 4,
+        label: 'Чётные дни недели'
+      },
+      {
+        function: (date) => {
+          console.log(date)
+          return false
+        },
+        key: 5,
+        label: 'Нечётные дни недели'
+      }
+    ]
+  }
+]
 import CDDay from './cd-day.vue'
 const formatter = new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric'})
 export default {
@@ -62,7 +115,8 @@ export default {
   components: {
     'cd-day-grid': CDDayGrid,
     'cd-day': CDDay,
-    'cd-day-tabs': CDDayTab
+    'cd-day-tabs': CDDayTab,
+    'cd-form': CDForm
   },
   props: {
     goPrev: { type: Function, default: (day) => console.log(day) },
@@ -87,7 +141,10 @@ export default {
   data ({ multiple }) {
     return {
       empty: undefined,
+      selector: {},
       isLoading: false,
+      isSchedule: false,
+      selectorDescriptor,
       selectedWeekdays: [],
       selectedDays: [],
       editEvent: Object,
@@ -102,27 +159,25 @@ export default {
     }
   },
   methods: {
+    setSchedule($event, value) {
+      this.isSchedule = value
+      if (!value) this.selector = {}
+    },
     setDays (days) {
       this.calendarDays = days
     }
   },
   computed: {
-    monthWeekdayCount({ keyedDays }) {
-      return (week) => {
-        return keyedDays.filter(d => d.isprev == undefined && d.date.week() == week).length
+    submitSchedule ({ setSchedule }) {
+      return (...args) => {
+
+        setSchedule({}, false)
       }
     },
-    currentSelected ({ selectedDays, calendarDate }) {
-      return (week) => (selectedDays.filter(f => f.date.year() == calendarDate.year() && f.date.month() == calendarDate.month() && f.date.week() == week)).length
-    },
-    isNotSelected ({ currentSelected }) {
-      return ({ week }) => currentSelected(week) == 0
-    },
-    isSomeSelected ({ monthWeekdayCount, currentSelected }) {
-      return ({ week }) => (currentSelected(week) > 0) && (currentSelected(week) < monthWeekdayCount(week))
-    },
-    isFullSelected ({ monthWeekdayCount, currentSelected }) {
-      return ({ week }) => currentSelected(week) == monthWeekdayCount(week)
+    resetSchedule ({ setSchedule }) {
+      return (...args) => {
+        setSchedule({}, false)
+      }
     },
     resolveTabClass ({ isDaySelected }) {
       return ( tab ) => {
@@ -161,7 +216,6 @@ export default {
       return ($event, day, week) => {
         if (day == empty) {
           const entries = Object.entries(week).map(m => m[1]).filter(f => f != empty && f.date != empty && f.isprev == empty)
-
           if ($event.target.classList.contains('bi-check-square-fill')) {
             entries.forEach(d => $nextTick().then(() => removeDay.call(selectedDays, $event, d)))
           } else {
@@ -170,7 +224,8 @@ export default {
         } else if (day.isprev) {
             goPrev(day)
           }  else {
-            selectDay.call(selectedDays, $event, day)
+            if (isDaySelected(day)) removeDay.call(selectedDays, $event, day)
+            else selectDay.call(selectedDays, $event, day)
           }
       }
     },
@@ -302,5 +357,11 @@ export default {
   }
   .cd-month--wrapper.scheduler {
     width: min-content!important;
+  }
+  .scheduler {
+    z-index: 100;
+  }
+  .schedule-calendar--grid {
+    /* width: fit-content; */
   }
 </style>
