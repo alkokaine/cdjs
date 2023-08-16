@@ -185,7 +185,7 @@ export default {
     },
     value: { 
       handler (newvalue) {
-        this.cellvalue = newvalue
+        this.cellvalue = this.resolvevalue(this.property, newvalue)
       }
     }
   },
@@ -277,8 +277,10 @@ export default {
     ischecked ({ value }) {
       return value === true
     },
-    isempty ({ values }) {
-      return values.length === 0
+    isempty ({ values, property }) {
+      if (values == undefined) return true
+      else if (Array.isArray(values)) return (values.length == 0)
+      throw new Error(`[CDJS] unexpected value for property ${property.datafield}`)
     }
   }
 }
