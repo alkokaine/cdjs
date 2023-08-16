@@ -1,9 +1,9 @@
 <template>
   <cd-list class="cd-properties" listclass="property-list" rowclass="property-descriptor" :collection="descriptor" keyfield="datafield" :listitemclicked="onpropertyclick">
-    <div class="property-descriptor--inner" slot-scope="property" draggable="true" v-on:drag="ondrag($event, property)" v-on:drop="ondrop($event, property)" v-on:dragover="ondragover($event, property)">
-      <button type="button" class="btn btn-link btn-sm bi bi-x-circle" v-on:click.stop="removeproperty($event, property.index)"></button>
+    <div slot-scope="property" class="property-descriptor--inner" draggable="true" @drag="ondrag($event, property)" @drop="ondrop($event, property)" @dragover="ondragover($event, property)">
+      <button type="button" class="btn btn-link btn-sm bi bi-x-circle" @click.stop="removeproperty($event, property.index)" />
       <el-popover trigger="click" :value="(zoomprop.index === property.index)" :disabled="popoff">
-        <cd-form :descriptor="resolvedescriptor(property)" :payload="property.row" :onpropertychange="onpropertychange(property)"></cd-form>
+        <cd-form :descriptor="resolvedescriptor(property)" :payload="property.row" :onpropertychange="onpropertychange(property)" />
         <button slot="reference" type="button" class="property-descriptor btn btn-link btn-sm">{{ property.row.datafield }}</button>
       </el-popover>
     </div>
@@ -19,7 +19,7 @@ import CDList from '@/components/cd-list.vue'
 import CDForm from '@/components/cd-form.vue'
 
 export default {
-  name: 'cd-prop-list',
+  name: 'CdPropList',
   components: {
     'cd-list': CDList,
     'el-popover': elpopover,

@@ -1,8 +1,8 @@
 <template>
   <cd-list listclass="cd-doc-generic" :collection="content" keyfield="contentid">
-    <cd-part class="cd-doc-part" slot-scope="docpart" :part="docpart.row">
+    <cd-part slot-scope="docpart" class="cd-doc-part" :part="docpart.row">
       <template v-if="docpart.row.subs">
-        <cd-doc :content="docpart.row.subs"></cd-doc>
+        <cd-doc :content="docpart.row.subs" />
       </template>
     </cd-part>
   </cd-list>
@@ -12,7 +12,7 @@
 import CDList from '@/components/cd-list.vue'
 import CDPart from '@/generic/cd-part-generic.vue'
 export default {
-  name: 'cd-doc',
+  name: 'CdDoc',
   components: {
     'cd-list': CDList,
     'cd-part': CDPart

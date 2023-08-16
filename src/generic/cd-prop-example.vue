@@ -1,15 +1,15 @@
 <template>
   <div class="cd-prop-example--content">
     <div class="cd-descriptor--editor">
-      <slot name="editor"></slot>
+      <slot name="editor" />
     </div>
     <div class="cd-descriptor--view">
       <code>
-        <slot name="preview"></slot>
+        <slot name="preview" />
       </code>
     </div>
     <div class="cd-example--form">
-      <slot name="sandbox"></slot>
+      <slot name="sandbox" />
     </div>
   </div>
 </template>
@@ -17,7 +17,7 @@
 <script>
 
 export default {
-  name: 'cd-prop-example'
+  name: 'CdPropExample'
 }
 </script>
 

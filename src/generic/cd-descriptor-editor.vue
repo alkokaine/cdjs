@@ -1,12 +1,12 @@
 <template>
-  <cd-list class="cd-descriptor-editor" :collection="descriptor" keyfield="datafield"  :listitemclicked="selectproperty" listclass="property-list" rowclass="cd-code--example">
-    <div class="editor-header--wrap" slot="header">
-      <slot name="editor-header"></slot>
+  <cd-list class="cd-descriptor-editor" :collection="descriptor" keyfield="datafield" :listitemclicked="selectproperty" listclass="property-list" rowclass="cd-code--example">
+    <div slot="header" class="editor-header--wrap">
+      <slot name="editor-header" />
     </div>
-    <div class="card" slot-scope="scope">
+    <div slot-scope="scope" class="card">
       <div class="card-body">
         <code class="card-body property-code">{{ scope.row }}</code>
-        <cd-descriptor-editor v-if="scope.row.descriptor" :descriptor="scope.row.descriptor"></cd-descriptor-editor>
+        <cd-descriptor-editor v-if="scope.row.descriptor" :descriptor="scope.row.descriptor" />
       </div>
     </div>
     <cd-form slot="footer" :descriptor="propertydescriptor" :payload="selected" :onpropertychange="updateproperty" class="property-editor" :inline="true">
@@ -21,13 +21,13 @@ import CDList from '@/components/cd-list.vue'
 import CDForm from '@/components/cd-form.vue'
 
 export default {
-  name: 'cd-descriptor-editor',
-  props: {
-    descriptor: { type: Array, required: true }
-  },
+  name: 'CdDescriptorEditor',
   components: {
     'cd-list': CDList,
     'cd-form': CDForm
+  },
+  props: {
+    descriptor: { type: Array, required: true }
   },
   data (editor) {
     return {
