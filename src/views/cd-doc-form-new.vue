@@ -6,10 +6,11 @@
 <script>
 import CDList from '../components/cd-list.vue'
 import SyncForm from '../generic/sync-form.vue'
-
+import keys from './keys'
+import Vue from 'vue'
 const syncId = (index) => `form-item-${index}`
 const submit = function (row, payload) {
-  console.log(row.payload, payload)
+  row.payload = { ...payload }
 }
 const reset = function (row, payload) {
   console.log(row.payload, payload)
@@ -136,7 +137,108 @@ export default {
               sync: false
             },
           ]
-        }        
+        },
+        {
+          key: 'autocomplete',
+          controls: [
+            {
+              key: 'autocomplete-sync',
+              descriptor: [
+                { 
+                  datafield: 'autocomplete', 
+                  text: 'autocomplete-sync', 
+                  input: 'autocomplete',
+                  method: 'post',
+                  url: '/suggestions/address',
+                  headers: keys.dadataheaders,
+                  resolveresult: (response) => (response.data.suggestions),
+                  resolvepayload (query, payload, parent) {
+                    return {
+                      query: query,
+                      count: 20,
+                      locations_boost: [{
+                        kladr_id: '51'
+                      }]
+                    }
+                  },
+                  onselect (payload, option, parent) {
+                      const { data } = option
+                      console.log(data)
+                      Vue.set(payload, 'autocomplete', option.unrestricted_value)
+                      Vue.set(payload, 'city', data.city)
+                      Vue.set(payload, 'geo_lat', data.geo_lat)
+                      Vue.set(payload, 'geo_lon', data.geo_lon)
+                  },
+                  labelkey: 'unrestricted_value',
+                },
+                {
+                  datafield: 'city',
+                  text: 'city'
+                },
+                {
+                  datafield: 'geo_lat',
+                  text: 'geo_lat',
+                  input: 'number'
+                },
+                {
+                  datafield: 'geo_lon',
+                  text: 'geo_lon',
+                  input: 'number'
+                }
+              ],
+              payload: {},
+              sync: true
+            },
+            {
+              key: 'autocomplete',
+              descriptor: [
+                { 
+                  datafield: 'autocomplete', 
+                  text: 'autocomplete', 
+                  input: 'autocomplete', 
+                  method: 'post',
+                  url: '/suggestions/address',
+                  labelkey: 'unrestricted_value',
+                  headers: keys.dadataheaders,
+                  resolveresult: (response) => (response.data.suggestions),
+                  resolvepayload (query, payload, parent) {
+                    return {
+                      query: query,
+                      count: 20,
+                      locations_boost: [{
+                        kladr_id: '51'
+                      }]
+                    }
+                  },
+                  onselect (payload, option, parent) {
+                    const { data } = option
+                    console.log(data)
+                    Vue.set(payload, 'autocomplete', option.unrestricted_value)
+                    Vue.set(payload, 'city', data.city)
+                    Vue.set(payload, 'geo_lat', data.geo_lat)
+                    Vue.set(payload, 'geo_lon', data.geo_lon)
+                  }
+                },
+                {
+                  datafield: 'city',
+                  text: 'city'
+                },
+                {
+                  datafield: 'geo_lat',
+                  text: 'geo_lat',
+                  input: 'number'
+                },
+                {
+                  datafield: 'geo_lon',
+                  text: 'geo_lon',
+                  input: 'number'
+                }
+              ],
+              payload: {},
+              sync: false
+            }
+          ]
+        }
       ],
       syncId
     }

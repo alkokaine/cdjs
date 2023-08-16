@@ -201,7 +201,6 @@ export default {
     padding-inline-start: unset;
   }
   .setting-form--container {
-    z-index: 10;
   }
   .month-day {
     width: 95%;

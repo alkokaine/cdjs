@@ -5,13 +5,13 @@
         <div v-if="!iscollapsed" class="cdjs-name--block">
           <router-link to="/">CDJS</router-link>
         </div>
-        <div class="cdjs-name--collapse" v-on:click="collapse">
-          <i class='collapse-menu' :class="[iscollapsed ? 'bi bi-list' : 'bi bi-x']"></i>
+        <div class="cdjs-name--collapse" @click="collapse">
+          <i class="collapse-menu" :class="[iscollapsed ? 'bi bi-list' : 'bi bi-x']" />
         </div>
       </div>
     </cd-menu>
     <div class="content-wrapper" :class="{ 'is-collapsed': iscollapsed}">
-      <router-view></router-view>
+      <router-view />
     </div>
   </div>
 </template>
