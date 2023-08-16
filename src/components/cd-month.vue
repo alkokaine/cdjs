@@ -137,6 +137,7 @@ export default {
     orientation: { type: String, description: 'Расположение ярлыков на дни месяца' },
     multiple: { type: Boolean, default: false, description: 'Можно ли выбрать несколько дней' },
     date: { type: [Date, String, Number] },
+    selectedDays: { type: Array, default: () => ([]) }
   },
   data ({ multiple }) {
     return {
@@ -146,7 +147,6 @@ export default {
       isSchedule: false,
       selectorDescriptor,
       selectedWeekdays: [],
-      selectedDays: [],
       editEvent: Object,
       calendarDays: Array
     }
