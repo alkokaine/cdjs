@@ -3,7 +3,7 @@
     <div class="show-hide-setting">
       <div class="button-container">
         <i class="bi bi-gear-wide-connected" v-on:click="onsettingtoogle"></i>
-        <div v-if="showform" class="setting-form--container">
+        <div v-if="showform" class="setting-form--container bg-white opacity-100">
           <slot></slot>
         </div>
       </div>
@@ -42,6 +42,7 @@ export default {
   }
   .setting-form--container {
     position: absolute;
+    z-index: 11;
     width: 300px;
     background-color: white;
     border-top: 1px solid;
@@ -49,5 +50,7 @@ export default {
     border-right: 1px solid;
     border-bottom: 1px solid;
     box-shadow: 0px 5px 5px -2px rgb(34 60 80 / 60%);
+  }
+  .config-content {
   }
 </style>
