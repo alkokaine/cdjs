@@ -1,14 +1,14 @@
 <template>
-  <cd-list class="cd-tabs px-4" :class="{ 'row': isCol, 'col': isRow}" :collection="tabs" :keyfield="tabKey"
+  <cd-list class="d-flex cd-tabs" :class="{ 'flex-column': isCol, 'flex-column': isRow}" :collection="tabs" :keyfield="tabKey"
     :listclass="['cd-tabs--wrap list-unstyled nav nav-tabs border-0 px-0', tabListClass,
       {
-        'flex-column w-auto': isCol,
-        'd-flex w-100' :isRow,
+        'flex-column': isCol,
+        'flex-row' :isRow,
         'ps-0': inRight,
         'pe-0': inLeft,
       }]" :rowclass="tabClassResolved" listrole="tablist" itemrole="tab">
     <template v-if="isHeaderContent" slot="header">
-      <div class="cd-tabs--content tab-content border px-2" :class="[{ 'col': isCol }, tabClass, innerClass.content]">
+      <div class="cd-tabs--content tab-content border" :class="[{ 'flex-column': isCol, 'flex-row': isRow }, tabClass, innerClass.content]">
         <slot name="content"></slot>
       </div>
     </template>
@@ -20,7 +20,7 @@
     }" slot="pre">
       <div :class="{ 'w-1': isRow, 'h-1': isCol }"/>
     </div>
-    <div class="nav-link p-0 cd-tab border-0 mb-0" data-toggle="tab" slot-scope="{ row, index }">
+    <div class="cd-tab border-0 mb-0" data-toggle="tab" slot-scope="{ row, index }">
       <div class="cd-tab--header border rounded-0"
         :class="[row.class, innerClass.rounded, isActive(row) ? ['active', innerClass.activeBorder] : innerClass.border]">
         <slot :tab="row" :index="index">
@@ -88,7 +88,7 @@ export default {
           'border-start-0': inLeft,
           'border-top-0': inHeader,
           'border-bottom-0': inFooter,
-          'border-end-0': inRight
+          'w-100 border-end-0': inRight
         },
         rounded: {
           'rounded-start': inLeft,
