@@ -8,7 +8,7 @@
         'pe-0': inLeft,
       }]" :rowclass="tabClassResolved" listrole="tablist" itemrole="tab">
     <template v-if="isHeaderContent" slot="header">
-      <div class="cd-tabs--content container tab-content border container-fluid px-2" :class="[{ 'col': isCol }, tabClass, innerClass.content]">
+      <div class="cd-tabs--content tab-content border px-2" :class="[{ 'col': isCol }, tabClass, innerClass.content]">
         <slot name="content"></slot>
       </div>
     </template>
@@ -38,7 +38,7 @@
       <div :class="{ 'w-1': isRow, 'h-1': isCol }"/>
     </div>
     <template v-if="isFooterContent" slot="footer">
-      <div class="cd-tabs--content container tab-content border container-fluid px-2" :class="[{ 'col': isCol }, innerClass.content]">
+      <div class="cd-tabs--content tab-content border px-2" :class="[{ 'col': isCol }, innerClass.content]">
         <slot name="content"></slot>
       </div>
     </template>
