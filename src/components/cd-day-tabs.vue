@@ -4,7 +4,7 @@
         <slot name="scheduler" :date="date"></slot>
     </div>
     <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs ms-auto w-100" :tab-class="dayClass"
-      :orientation="orientation" :current-key="date.daykey" :tab-list-class="[{ 'align-items-end': isLeft, 'align-items-start': isRight }, 'days-list']">
+      :orientation="orientation" :current-key="date.daykey" :tab-list-class="[{ 'align-items-end': inLeft, 'align-items-start': inRight }, 'days-list']">
       <div class="cd-day--wrap cd-day--tab" :class="[{ '': isCol }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
         <div class="cd-day-tab--content" :class="{'opacity-25': tab.isprev }">
           <slot name="title" :day="tab">
@@ -65,12 +65,6 @@ export default {
     }
   },
   computed: {
-    inLeft ({ orientation }) {
-      return ['col-left'].indexOf(orientation) >= 0
-    },
-    inRight ({ orientation }) {
-      return ['col-right'].indexOf(orientation) >= 0
-    },
     getDay () {
       return ({ date }) => (date.toDate())
     },
