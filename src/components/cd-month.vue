@@ -7,7 +7,7 @@
         :select-weekdays="selectWeekdays" :selected-days="selectedDays" :keyed-days="keyedDays" :select-day="onDaySelect" :date="calendarDate">
         <cd-day slot-scope="{ day, week }" :info="day" :compact="compact" v-on:click.native="onDaySelect($event, day, week)" :is-selected="isDaySelected(day)">
             <div slot="header" class="cd-day--header">
-              <button class="btn btn-link text-decoration-none bi px-2" v-on:click.capture.stop="removeDay($event, day)" :class="{ 'd-none': compact, 'bi-x-square text-light': isDaySelected(day) }"></button>
+              <button class="btn btn-link text-decoration-none bi" v-on:click.capture.stop="removeDay($event, day)" :class="{ 'd-none': compact, 'bi-x-square text-light': isDaySelected(day) }"></button>
             </div>
             <template v-if="!compact">
               <div class="day-content text-pre">
@@ -18,7 +18,7 @@
       </cd-day-grid>
     </template>
     <template v-else>
-      <cd-day-tabs class="cd-month ms-3" :days="keyedDays" :select-day="onDaySelect" :orientation="orientation"
+      <cd-day-tabs class="cd-month" :days="keyedDays" :select-day="onDaySelect" :orientation="orientation"
         :compare-date="compareDate" :multiple="multiple" :selected-days="selectedDays" :day-class="resolveTabClass"
         :date="calendarDate" :toggle-schedule="setSchedule">
         <div slot="scheduler"  slot-scope="{ month, date }"  class="scheduler position-relative">
@@ -32,7 +32,7 @@
           </cd-form>
         </div>
         
-        <button slot="icon" slot-scope="{ day }" class="btn btn-link text-decoration-none p-0 bi" 
+        <button slot="icon" slot-scope="{ day }" class="btn btn-link btn-sm" 
                   v-on:click="removeDay($event, day)" :class="{ 'bi-check-square-fill': isDaySelected(day) }">
         </button>
         <cd-day slot-scope="{ day }" :info="day" :is-selected="isDaySelected(day)">
