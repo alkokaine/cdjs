@@ -33,7 +33,7 @@ const weekDescriptor = compact => weekdays.map(m => ({
   datafield: m.weekday.long,
   text: compact ? m.weekday.short : m.weekday.long,
   day: m.day,
-  tdclass: ['weekday-cell', { compact: compact }],
+  tdclass: ['weekday-cell', { 'compact text-nowrap': compact }],
   headerclass: 'text-center text-uppercase'
 }))
 
