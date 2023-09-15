@@ -1,14 +1,24 @@
 <template>
   <cd-setting-container>
     <cd-form :payload="settings" :descriptor="descriptor" :sync="true"></cd-form>
-      <cd-month slot="content" :go-prev="setDate" :date="settings.mdate" :compareDate="compareDate" :select-weekdays="settings.selectWeekdays" 
-                :six-days="settings.sixDays" :compact="settings.compact" :mode="settings.mode" :orientation="settings.orientation" 
-                :multiple="settings.multiple" :prepend-days="settings.prependDays">
-        <div slot-scope="{ day, week }">
-          <div class="month-week">{{ week }}</div>
-          <div class="month-day mx-auto">{{ day }}</div>
+    <cd-month slot="content" :go-prev="setDate" :date="settings.mdate" :show-controls="true"
+      :select-weekdays="settings.selectWeekdays" :six-days="settings.sixDays" :compact="settings.compact" 
+      :mode="settings.mode" :orientation="settings.orientation" :multiple="true" 
+      :prepend-days="settings.prependDays" :selected-days="selected" :hide-tabs="settings.hideTabs">
+      <div slot="commands" class="mx-auto">
+        <button class="btn btn-sm btn-text text-decoration-none" :class="{ 'pe-none': showSchedule}" v-on:click="setShowSchedule($event, true)">Запланировать</button>
+      </div>
+
+      <el-dialog :visible="showSchedule" slot="scheduler" slot-scope="{ current, date }">
+        <cd-day-select v-if="showSchedule" class=""
+          :selected="current" :date="date" :submit="submit" :reset="reset"></cd-day-select>
+      </el-dialog>
+      <cd-day slot-scope="{ day, isSelected }" :is-selected="isSelected" :info="day" v-on:click.native="selectDay($event, day, isSelected)">
+        <div class="text-wrap">
+          {{ day }}
         </div>
-      </cd-month>
+      </cd-day>
+    </cd-month>
   </cd-setting-container>
 </template>
 
@@ -17,7 +27,24 @@ import Vue from 'vue'
 import CDSettingContainer from '@/components/cd-setting-container.vue'
 import CDMonth from '@/components/cd-month.vue'
 import CDForm from '@/components/cd-form.vue'
-// import CDList from '@/components/cd-list.vue'
+import CDDay from '@/components/cd-day.vue'
+import CDDaySelect from '@/components/cd-day-select.vue'
+import moment from 'moment'
+const timeformatter = new Intl.DateTimeFormat('ru-RU', { month: 'long' })
+
+const onTemplateSelect = function (days, property, payload, selectDay) {
+  Promise.resolve(property.values.find((value) => value[property.valuekey] == payload[property.datafield]))
+    .then(value => Promise.resolve(days.filter(day => value.function(day))))
+    .then(days => {
+      days.forEach(day => selectDay({}, day))
+    })
+}
+
+const formatRow = function(row) {
+  return timeformatter.format(row.date)
+}
+
+
 import keys from '@/views/keys'
 
 export default {
@@ -25,13 +52,21 @@ export default {
   components: {
     'cd-month': CDMonth,
     'cd-setting-container': CDSettingContainer,
-    'cd-form': CDForm
-    // 'cd-list': CDList
+    'cd-form': CDForm,
+    'cd-day': CDDay,
+    'cd-day-select': CDDaySelect
   },
   data (docmonth) {
     return {
+      template: Function,
       holidays: [],
-
+      onTemplateSelect (days, selectDay) {
+        return function (property, payload) { 
+          onTemplateSelect.call(docmonth, days, property, payload, selectDay)
+        }
+      },
+      showSchedule: false,
+      selected: [],
       settings: {
         compact: false,
         selectWeekdays: true,
@@ -40,6 +75,10 @@ export default {
         mode: 'schedule',
         orientation: 'col-left',
         lang: 'en'
+      },
+      scheduler: {
+        mdate: new Date(Date.now()),
+        selector: {},
       },
       descriptor: [
         {
@@ -90,6 +129,12 @@ export default {
           ]
         },
         {
+          datafield: 'hideTabs',
+          text: 'Скрыть вкладки',
+          input: 'checkbox',
+          hidden: ({ mode }) => mode == 'schedule'
+        },
+        {
           datafield: 'orientation',
           text: 'ориентация',
           input: 'select',
@@ -127,13 +172,39 @@ export default {
           ]
         }
       ],
-      timeformatter: new Intl.DateTimeFormat('ru-RU', { timeStyle: 'medium' })
+      selected: []
+    }
+  },
+  filters: {
+    formatMonth (value) {
+      return timeformatter.format(value, { month: '' })
     }
   },
   computed: {
+    selectDay ({ selected }) {
+      return (event, row, isSelected) => {
+        if (isSelected) {
+          const index = selected.findIndex(s => s.daykey == row.daykey)
+          selected.splice(index, 1)
+        } else {
+          selected.push(row)
+        }
+      }
+    },
+    submit ({ setShowSchedule, selected }) {
+      return ({ $event, payload }) => {
+        Promise.resolve(selected.push(...payload))
+          .then(() => setShowSchedule(false))
+      }
+    },
+    reset ({ setShowSchedule }) {
+      return ({ $event, payload }) => {
+        setShowSchedule(false)
+      }
+    },
+    
     format () {
-      const doc = this
-      return (row) => doc.timeformatter.format(row.date)
+      return formatRow
     },
     details () {
       const sorter = (a, b) => {
@@ -149,9 +220,16 @@ export default {
     isdayvisible () {
       const dh = this
       return (day) => dh.payload.mode === 1 || dh.details(day).length !== 0
-    }
+    },
   },
   methods: {
+    setShowSchedule (event, value) {
+      this.showSchedule = value
+    },
+    confirmSelected (event, selection) {
+      this.showSchedule = false
+      this.selected = [...selection]
+    },
     setDate ({ date }) {
       this.settings.mdate = date.toDate()
     },
@@ -178,11 +256,6 @@ export default {
       Vue.set(dm.payload, 'Year', payload.Year)
       Vue.set(dm.payload, 'MonthID', payload.MonthID)
       callback()
-    },
-    compareDate ({ date }, day) {
-      return date.getDate() === day.getDate() &&
-        date.getMonth() === day.getMonth() &&
-        date.getFullYear() === day.getFullYear()
     }
   }
 }
@@ -204,5 +277,17 @@ export default {
   }
   .month-day {
     width: 95%;
+  }
+  .month-schedule--wrap {
+    /* z-index: 10; */
+  }
+  .month-scheduler {
+    width: min-content;
+  }
+  .form-month-schedule {
+    width: fit-content;
+  }
+  .month-nav {
+    max-width: min-content;
   }
 </style>
