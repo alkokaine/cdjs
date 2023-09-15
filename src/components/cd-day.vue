@@ -1,6 +1,6 @@
 <template>
   <div class="cd-day" :class="{ 'opacity-25': info.isprev }">
-    <div class="cd-day--container mx-auto ">
+    <div class="cd-day--container mx-auto" :class="{ 'border border-danger' :isEve && !isWeekend }">
       <div class="cd-day--header d-flex flex-row" 
         :class="{
           'border-bottom border-black text-light w-100 justify-content-evenely': !compact, 
@@ -14,7 +14,7 @@
         <div class="cd-day--number px-2">
           <span class="" :class="{ 'fs-6': compact, 'fs-3': !compact }">{{ dateStruct.day }}</span>
         </div>
-        <div :class="{ 'd-block': !compact, 'd-none': compact }">
+        <div :class="{ 'd-block w-100': !compact, 'd-none': compact }">
           <span class="fw-bold">{{ dateStruct.month }}</span>
           <span class="d-block">{{ dateStruct.weekday }}</span>
         </div>
@@ -63,6 +63,9 @@ export default {
     },
     isHoliday ({ info }) {
       return info.code == '1'
+    },
+    isWeekend ({ info }) {
+      return [0, 6].includes(info.date.day())
     }
   }
 }

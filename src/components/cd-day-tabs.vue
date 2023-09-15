@@ -1,11 +1,11 @@
 <template>
-  <div class="cd-day-tabs--wrapper me-0 ms-auto">
-    <div class="scheduler-slot w-100">
+  <div class="cd-day-tabs--wrapper">
+    <div class="scheduler-slot">
         <slot name="scheduler" :date="date"></slot>
     </div>
-    <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs ms-auto w-100" :tab-class="dayClass"
+    <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs ms-auto" :tab-class="dayClass"
       :orientation="orientation" :current-key="date.daykey" :tab-list-class="[{ 'align-items-end': inLeft, 'align-items-start': inRight }, 'days-list']">
-      <div class="cd-day--wrap cd-day--tab" :class="[{ '': isCol }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
+      <div class="cd-day--wrap cd-day--tab" :class="[{ '': isCol, 'd-none': hideTabs }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
         <div class="cd-day-tab--content" :class="{'opacity-25': tab.isprev }">
           <slot name="title" :day="tab">
             <div class="tab-title--block d-flex flex-nowrap align-items-center">
@@ -17,12 +17,11 @@
           </slot>
         </div>
       </div>
-      <div slot="content" class="p-3">
-        <cd-month-days :date="date" :collection="sortedDays" keyfield="daykey" listclass="list-unstyled" rowclass="month-day--details row my-2 w-auto" :toggle-schedule="toggleSchedule">
+      <div slot="content" class="p-3" :class="{ 'border-start': hideTabs }">
+        <cd-month-days :date="date" :collection="sortedDays" keyfield="daykey" listclass="list-unstyled" rowclass="month-day--details row my-2 w-auto">
           <div slot-scope="{ day }" :id="day.daykey">
             <slot :day="day"></slot>
           </div>
-          <button slot="footer" class="btn btn-sm border btn-primary-outline" v-on:click="toggleSchedule($event, true)">{{ scheduleText }}</button>
         </cd-month-days>
       </div>
     </cd-tabs>
@@ -38,9 +37,9 @@ export default {
   components: {
     'cd-tabs': CDTabs,
     'cd-month-days': CDMonthDays
-
   },
   props: {
+    hideTabs: { type: Boolean, default: false },
     dayClass: { type: [String, Object, Array, Function] },
     days: { type: Array, required: true, description: 'Коллекция дней' },
     orientation: { type: String, description: 'Положение и направление дней' },
@@ -56,8 +55,6 @@ export default {
       type: Array,
       description: 'Массив выбранных дат'
     },
-    toggleSchedule: { type: Function },
-    scheduleText: { type: String, default: 'Запланировать...' }
   },
   data (tabs) {
     return {
