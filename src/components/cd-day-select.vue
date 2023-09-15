@@ -2,7 +2,7 @@
   <cd-form :payload="{}" :descriptor="descriptor">
     <div slot="header" class="day-selector--header"></div>
     <cd-month slot="footer" slot-scope="{ model }" :template="resolveTemplate(model)" :date="scheduler.mdate" :selected-days="selected"
-      :compact="true" :prepend-days="false" :multiple="true">
+      :compact="true" :prepend-days="false" :multiple="true" :selected="schedule" :select-day="onDaySelect">
       <div slot="month-footer" slot-scope="{ selected }" class="text-end">
         <button class="btn btn-sm btn-outline-secondary mx-2" v-on:click="reset">Отменить</button>
         <button class="btn btn-sm btn-primary mx-2" v-on:click="submit({ $event, payload: selected })">Применить</button>
@@ -84,10 +84,17 @@ export default {
     return {
       scheduler: {
         mdate: new Date(date)
-      }
+      },
+      schedule: [],
     }
   },
   computed: {
+    onDaySelect ({ schedule }) {
+      return (event, day, week) => {
+        debugger
+        console.log(schedule)
+      }
+    },
     resolveTemplate ({ templateList }) {
       return ({ template_id }) => ((templateList.find(t => t.key == template_id)) || {}).function
     },
