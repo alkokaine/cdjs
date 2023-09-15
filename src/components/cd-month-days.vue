@@ -1,9 +1,8 @@
 <template>
-  <cd-list :collection="grouped" keyfield="daykey" :rowclass="['my-2']"  :listclass="['list-unstyled', { 'd-none': !showDetails, 'accordion': !isgroup, 'accordion-body': isgroup  }]">
-    <div v-if="month" slot="header" class="fs-4 fw-bold accordion-header" v-on:click="setShowDetails($event, showDetails)">{{ month.date }}</div>
+  <cd-list :collection="grouped" keyfield="daykey" :rowclass="['my-2']"  :listclass="['list-unstyled mb-0']">
     <div slot-scope="{ row, index }" class="cd-month-day p-2">
       <template v-if="row.days">
-        <cd-month-days :date="date" :month="row" class="m-2 p-2 border" :expand="showDetails" :class="{ 'accordion-item accordion-collapse': !isgroup }">
+        <cd-month-days :date="date" :month="row" class="m-2 p-2 border">
           <div slot-scope="{ day }">
             <slot :day="day"></slot>
           </div>
