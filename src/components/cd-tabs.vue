@@ -1,6 +1,6 @@
 <template>
   <cd-list class="d-flex cd-tabs" :class="{ 'flex-column': isCol, 'flex-column': isRow}" :collection="tabs" :keyfield="tabKey"
-    :listclass="['cd-tabs--wrap list-unstyled nav nav-tabs border-0 px-0', tabListClass,
+    :listclass="['cd-tabs--wrap list-unstyled', tabListClass,
       {
         'flex-column': isCol,
         'flex-row' :isRow,
@@ -158,7 +158,6 @@ export default {
 
 <style>
   .cd-tab--wrap {
-    max-width: min-content;
   }
 
   .width-maxc {

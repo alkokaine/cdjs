@@ -1,8 +1,14 @@
 <template>
   <cd-list :collection="grouped" keyfield="daykey" :rowclass="['my-2']"  :listclass="['list-unstyled mb-0']">
+    <template slot="header">
+      <slot name="header" :month="month"></slot>
+    </template>
     <div slot-scope="{ row, index }" class="cd-month-day p-2">
       <template v-if="row.days">
         <cd-month-days :date="date" :month="row" class="m-2 p-2 border">
+          <template slot="header" slot-scope="{ month }">
+            <slot name="header" :month="month">
+          </template>
           <div slot-scope="{ day }">
             <slot :day="day"></slot>
           </div>
@@ -48,7 +54,7 @@ export default {
     days ({ month, collection }) {
       return ((month || {}).days || collection)
     },
-    grouped ({ month, collection }) {
+    grouped ({ month, collection, date }) {
       if (month == undefined) {
         return collection.reduce((acc, cur, i) => {
           const daykey = createDate(cur.date.year(), cur.date.month() + 1, 1)
@@ -66,7 +72,9 @@ export default {
           return acc;
         }, [])
       } else {
-        return month.days
+        return month.days.filter(day => {
+          return new Date(day.date).getMonth() == date.month()
+        })
       }
     }
   }

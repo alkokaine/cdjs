@@ -1,5 +1,5 @@
 <template>
-  <div class="cd-month--wrapper">
+  <div class="cd-month--wrapper m-2">
     <slot name="month-header" :mdate="mdate" :days="keyedDays" :selectDay="onDaySelect">
       <div class="text-nowrap p-2 fs-5 month-nav mx-auto">
         <button v-if="showControls" class="btn bi bi-arrow-left ms-3" v-on:click="setMonth(1)"/>
@@ -175,7 +175,6 @@ export default {
     },
     selectDay ({ selected, multiple, removeDay, compact }) {
       return function ($event, day) {
-        debugger
         const findIndex = selected.findIndex(d => d.daykey === day.daykey)
           if (findIndex < 0) {
             if (multiple) {
@@ -194,7 +193,6 @@ export default {
     },
     onDaySelect ({ goPrev, empty, isDaySelected, selectDay, removeDay, $nextTick }) {
       return ($event, day, week) => {
-        debugger
         if (day == empty) {
           const entries = Object.entries(week).map(m => m[1]).filter(f => f != empty && f.date != empty && f.isprev == empty)
           if ($event.target.classList.contains('bi-check-square-fill')) {

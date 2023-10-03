@@ -3,8 +3,8 @@
     <div class="scheduler-slot">
         <slot name="scheduler" :date="date"></slot>
     </div>
-    <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs ms-auto" :tab-class="dayClass"
-      :orientation="orientation" :current-key="date.daykey" :tab-list-class="[{ 'align-items-end': inLeft, 'align-items-start': inRight }, 'days-list']">
+    <cd-tabs :tabs="days" tab-key="daykey" class="cd-day-tabs ms-auto" :tab-class="dayClass" :class="{ 'border-start': hideTabs }"
+      :orientation="orientation" :current-key="date.daykey" :tab-list-class="[{ 'd-none': hideTabs, 'align-items-end': inLeft, 'align-items-start': inRight }, 'days-list']">
       <div class="cd-day--wrap cd-day--tab" :class="[{ '': isCol, 'd-none': hideTabs }]" slot-scope="{ tab }" v-on:click.capture="selectDay($event, tab)">
         <div class="cd-day-tab--content" :class="{'opacity-25': tab.isprev }">
           <slot name="title" :day="tab">
@@ -12,12 +12,12 @@
               <div class="bi day-icon mx-auto" >
                 <slot name="icon" :day="tab"></slot>
               </div>
-              <a class="text-decoration-none fw-bold text-end p-2" :class="{ 'text-danger': isHoliday(tab) }" href="#">{{ tabCaption(tab) }}</a>
+              <a class="text-decoration-none fw-bold text-end p-2 w-100" :class="{ 'text-danger': isHoliday(tab) }" href="#">{{ tabCaption(tab) }}</a>
             </div>
           </slot>
         </div>
       </div>
-      <div slot="content" class="p-3" :class="{ 'border-start': hideTabs }">
+      <div slot="content" class="p-3">
         <cd-month-days :date="date" :collection="sortedDays" keyfield="daykey" listclass="list-unstyled" rowclass="month-day--details row my-2 w-auto">
           <div slot-scope="{ day }" :id="day.daykey">
             <slot :day="day"></slot>
@@ -98,6 +98,5 @@ export default {
     width: 100%;
   }
   .days-list.flex-column {
-    width: 8vw;
   }
 </style>
